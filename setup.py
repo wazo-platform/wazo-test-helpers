@@ -19,7 +19,7 @@
 from setuptools import setup
 from setuptools import find_packages
 
-VERSION = '0.1'
+VERSION = '0.1.1'
 
 setup(
     name='xivo-test-helpers',
@@ -33,5 +33,5 @@ setup(
     url='https://github.com/xivo-pbx/xivo-test-helpers',
 
     packages=find_packages(),
-    download_url='https://github.com/xivo-pbx/xivo-test-helpers/tarball/0.1'
+    download_url='https://github.com/xivo-pbx/xivo-test-helpers/tarball/{}'.format(VERSION),
 )
