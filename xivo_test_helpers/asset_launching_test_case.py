@@ -26,12 +26,12 @@ logger = logging.getLogger(__name__)
 
 class AssetLaunchingTestCase(unittest.TestCase):
     """
-    Subclasses of this class should have a service field containing the name of
-    the service under test and an asset field containing the name of the asset
-    folder to execute.
-    """
+    Subclasses of this class MUST have the following fields:
 
-    assets_root = os.path.join(os.path.dirname(__file__), '..', 'assets')
+    * service: The name of the service under test in the docker-compose.yml file
+    * asset: The name of the asset to run
+    * assets_root: The location of the assets
+    """
 
     @classmethod
     def setUpClass(cls):
