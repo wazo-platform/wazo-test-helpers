@@ -51,14 +51,21 @@ class AssetLaunchingTestCase(unittest.TestCase):
         cls._run_cmd('docker-compose run --rm sync')
 
     @classmethod
-    def service_status(cls):
-        service_id = cls._run_cmd('docker-compose ps -q {}'.format(cls.service)).strip()
+    def service_status(cls, service_name=None):
+        if not service_name:
+            service_name = cls.service
+
+        service_id = cls._run_cmd('docker-compose ps -q {}'.format(service_name)).strip()
         status = cls._run_cmd('docker inspect {container}'.format(container=service_id))
+
         return json.loads(status)
 
     @classmethod
-    def service_logs(cls):
-        service_id = cls._run_cmd('docker-compose ps -q {}'.format(cls.service)).strip()
+    def service_logs(cls, service_name=None):
+        if not service_name:
+            service_name = cls.service
+
+        service_id = cls._run_cmd('docker-compose ps -q {}'.format(service_name)).strip()
         status = cls._run_cmd('docker logs {container}'.format(container=service_id))
         return status
 
