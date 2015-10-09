@@ -73,7 +73,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
     def _run_cmd(cmd):
         process = subprocess.Popen(cmd.split(' '), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         out, _ = process.communicate()
-        logger.info(out)
+        logger.info('%s', out)
         return out
 
     @classmethod
