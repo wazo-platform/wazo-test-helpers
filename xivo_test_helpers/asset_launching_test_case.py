@@ -15,11 +15,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-import json
 import logging
 import os
 import subprocess
 import unittest
+
+from docker import Client
 
 logger = logging.getLogger(__name__)
 
@@ -52,13 +53,13 @@ class AssetLaunchingTestCase(unittest.TestCase):
 
     @classmethod
     def service_status(cls, service_name=None):
+        c = Client(base_url='unix://var/run/docker.sock')
         if not service_name:
             service_name = cls.service
 
         service_id = cls._run_cmd('docker-compose ps -q {}'.format(service_name)).strip()
-        status = cls._run_cmd('docker inspect {container}'.format(container=service_id))
-
-        return json.loads(status)
+        assert '\n' not in service_id, 'There is more than one container running with name {}'.format(service_name)
+        return c.inspect_container(service_id)
 
     @classmethod
     def service_logs(cls, service_name=None):

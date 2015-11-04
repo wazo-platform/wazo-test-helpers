@@ -33,5 +33,6 @@ setup(
     url='https://github.com/xivo-pbx/xivo-test-helpers',
 
     packages=find_packages(),
+    install_requires=['docker-py'],
     download_url='https://github.com/xivo-pbx/xivo-test-helpers/tarball/{}'.format(VERSION),
 )
