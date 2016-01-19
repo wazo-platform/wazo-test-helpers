@@ -89,6 +89,10 @@ class AssetLaunchingTestCase(unittest.TestCase):
         with Client(base_url='unix://var/run/docker.sock') as docker:
             docker.stop(_container_id(service_name))
 
+    @classmethod
+    def _run_cmd(cls, cmd):
+        _run_cmd(cmd)
+
 
 def _run_cmd(cmd):
     process = subprocess.Popen(cmd.split(' '), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
