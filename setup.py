@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 from setuptools import setup
 from setuptools import find_packages
 
-VERSION = '0.1.4'
+VERSION = '0.1.5'
 
 setup(
     name='xivo-test-helpers',
