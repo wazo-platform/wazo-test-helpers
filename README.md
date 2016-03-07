@@ -12,12 +12,9 @@ pip install xivo-test-helpers
 Releasing a new version
 -----------------------
 
-
-Edit the version file and increase version number.
+Edit setup.py and increase version number.
 
     git commit
-
-Read version number in xivo_ws/version.py.
 
     git tag <version>
 
