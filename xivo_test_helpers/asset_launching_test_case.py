@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2015 Avencall
+# Copyright (C) 2015-2016 Avencall
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -103,5 +103,7 @@ def _run_cmd(cmd):
 
 def _container_id(service_name):
     result = _run_cmd('docker-compose ps -q {}'.format(service_name)).strip()
-    assert '\n' not in result, 'There is more than one container running with name {}'.format(service_name)
+    result = result.decode('utf-8')
+    if '\n' in result:
+        raise AssertionError('There is more than one container running with name {}'.format(service_name))
     return result
