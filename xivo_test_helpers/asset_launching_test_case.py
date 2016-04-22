@@ -49,10 +49,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
         cls.cur_dir = os.getcwd()
         os.chdir(asset_path)
         _run_cmd('docker-compose rm --force')
-        sync_output = _run_cmd('docker-compose run --rm sync')
-
-        if 'unable to connect' in sync_output:
-            raise Exception('Some services did not start')
+        _run_cmd('docker-compose run --rm sync')
 
     @classmethod
     def service_status(cls, service_name=None):
@@ -97,15 +94,10 @@ class AssetLaunchingTestCase(unittest.TestCase):
         _run_cmd(cmd)
 
 
-def _run_cmd(command):
-    command = command.split(' ')
-    try:
-        out = subprocess.check_output(command, stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError as e:
-        logger.error(e.output)
-        raise
-
-    logger.info(out)
+def _run_cmd(cmd):
+    process = subprocess.Popen(cmd.split(' '), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    out, _ = process.communicate()
+    logger.info('%s', out)
     return out
 
 
