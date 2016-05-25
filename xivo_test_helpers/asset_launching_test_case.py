@@ -64,8 +64,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
         if not service_name:
             service_name = cls.service
 
-        service_id = _run_cmd('docker-compose ps -q {}'.format(service_name)).strip()
-        status = _run_cmd('docker logs {container}'.format(container=service_id))
+        status = _run_cmd('docker logs {container}'.format(container=_container_id(service_name)))
         return status
 
     @classmethod
