@@ -94,15 +94,17 @@ class AssetLaunchingTestCase(unittest.TestCase):
         _run_cmd(cmd)
 
 
-def _run_cmd(cmd):
-    process = subprocess.Popen(cmd.split(' '), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    out, _ = process.communicate()
+def _run_cmd(cmd, stderr=True):
+    with open(os.devnull, "w") as null:
+        stderr = subprocess.STDOUT if stderr else null
+        process = subprocess.Popen(cmd.split(' '), stdout=subprocess.PIPE, stderr=stderr)
+        out, _ = process.communicate()
     logger.info('%s', out)
     return out
 
 
 def _container_id(service_name):
-    result = _run_cmd('docker-compose ps -q {}'.format(service_name)).strip()
+    result = _run_cmd('docker-compose ps -q {}'.format(service_name), stderr=False).strip()
     result = result.decode('utf-8')
     if '\n' in result:
         raise AssertionError('There is more than one container running with name {}'.format(service_name))
