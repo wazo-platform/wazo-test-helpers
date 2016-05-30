@@ -41,7 +41,7 @@ def assert_(assert_function, *args, **kwargs):
             assert_function(*args, **kwargs)
             return
         except AssertionError as e:
-            errors.append(str(e))
+            errors.append(unicode(e))
             time.sleep(1)
     else:
         raise NoMoreTries('\n'.join(errors))
