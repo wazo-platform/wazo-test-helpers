@@ -48,8 +48,8 @@ class AssetLaunchingTestCase(unittest.TestCase):
         asset_path = os.path.join(cls.assets_root, cls.asset)
         cls.cur_dir = os.getcwd()
         os.chdir(asset_path)
-        _run_cmd('docker-compose rm --force')
-        _run_cmd('docker-compose run --rm sync')
+        _run_cmd(['docker-compose', 'rm', '--force'])
+        _run_cmd(['docker-compose', 'run', '--rm', 'sync'])
 
     @classmethod
     def service_status(cls, service_name=None):
@@ -64,12 +64,12 @@ class AssetLaunchingTestCase(unittest.TestCase):
         if not service_name:
             service_name = cls.service
 
-        status = _run_cmd('docker logs {container}'.format(container=_container_id(service_name)))
+        status = _run_cmd(['docker', 'logs', _container_id(service_name)])
         return status
 
     @classmethod
     def stop_service_with_asset(cls):
-        _run_cmd('docker-compose kill')
+        _run_cmd(['docker-compose', 'kill'])
         os.chdir(cls.cur_dir)
 
     @classmethod
@@ -98,20 +98,20 @@ class AssetLaunchingTestCase(unittest.TestCase):
 
     @classmethod
     def _run_cmd(cls, cmd):
-        _run_cmd(cmd)
+        _run_cmd(cmd.split(' '))
 
 
 def _run_cmd(cmd, stderr=True):
     with open(os.devnull, "w") as null:
         stderr = subprocess.STDOUT if stderr else null
-        process = subprocess.Popen(cmd.split(' '), stdout=subprocess.PIPE, stderr=stderr)
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=stderr)
         out, _ = process.communicate()
     logger.info('%s', out)
     return out
 
 
 def _container_id(service_name):
-    result = _run_cmd('docker-compose ps -q {}'.format(service_name), stderr=False).strip()
+    result = _run_cmd(['docker-compose', 'ps', '-q', service_name], stderr=False).strip()
     result = result.decode('utf-8')
     if '\n' in result:
         raise AssertionError('There is more than one container running with name {}'.format(service_name))
