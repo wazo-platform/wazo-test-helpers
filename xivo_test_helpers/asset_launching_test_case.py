@@ -96,6 +96,13 @@ class AssetLaunchingTestCase(unittest.TestCase):
         with Client(base_url='unix://var/run/docker.sock') as docker:
             docker.start(_container_id(service_name))
 
+    def docker_exec(cls, command, service_name=None):
+        if not service_name:
+            service_name = cls.service
+
+        docker_command = ['docker', 'exec', _container_id(service_name)] + command
+        _run_cmd(docker_command)
+
     @classmethod
     def _run_cmd(cls, cmd):
         _run_cmd(cmd.split(' '))
