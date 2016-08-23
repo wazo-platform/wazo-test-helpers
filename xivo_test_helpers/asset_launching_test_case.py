@@ -25,6 +25,16 @@ from docker import Client
 logger = logging.getLogger(__name__)
 
 
+class NoSuchService(Exception):
+    def __init__(self, service_name):
+        super(NoSuchService, self).__init__('No such service: {}'.format(service_name))
+
+
+class NoSuchPort(Exception):
+    def __init__(self, service_name, port):
+        super(NoSuchPort, self).__init__('For service {}: No such port: {}'.format(service_name, port))
+
+
 class AssetLaunchingTestCase(unittest.TestCase):
     """
     Subclasses of this class MUST have the following fields:
@@ -66,6 +76,19 @@ class AssetLaunchingTestCase(unittest.TestCase):
 
         status = _run_cmd(['docker', 'logs', _container_id(service_name)])
         return status
+
+    @classmethod
+    def service_port(cls, internal_port, service_name=None):
+        if not service_name:
+            service_name = cls.service
+
+        with Client(base_url='unix://var/run/docker.sock') as docker:
+            result = docker.port(_container_id(service_name), internal_port)
+
+        if not result:
+            raise NoSuchPort(service_name, internal_port)
+
+        return int(result[0]['HostPort'])
 
     @classmethod
     def stop_service_with_asset(cls):
@@ -122,4 +145,6 @@ def _container_id(service_name):
     result = result.decode('utf-8')
     if '\n' in result:
         raise AssertionError('There is more than one container running with name {}'.format(service_name))
+    if not result:
+        raise NoSuchService(service_name)
     return result
