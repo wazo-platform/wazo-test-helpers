@@ -72,3 +72,30 @@ def true(function, *args, **kwargs):
         time.sleep(1)
     else:
         raise NoMoreTries(message)
+
+
+def false(function, *args, **kwargs):
+    """Run <function> <tries> times, spaced with 1 second. Stops when <function>
+    returns an object evaluating to False, and returns it.
+
+    Useful for waiting for an event.
+
+    Arguments:
+
+        - function: the function detecting the event
+        - message: the message raised if <function> does not return something
+          after <tries> times
+        - tries: the number of times to run <function>
+    """
+
+    message = kwargs.pop('message', None)
+    tries = kwargs.pop('tries', 1)
+    return_value = False
+
+    for _ in xrange(tries):
+        return_value = function(*args, **kwargs)
+        if not return_value:
+            return return_value
+        time.sleep(1)
+    else:
+        raise NoMoreTries(message)
