@@ -22,3 +22,11 @@ Edit setup.py and increase version number.
 
     git push
     git push --tags
+
+
+Logging
+-------
+
+Tests that use the AssetLaunchTestCase class will be stripped of some logs. To restore the default logging levels, set the environment variable:
+
+    TEST_LOGS=verbose

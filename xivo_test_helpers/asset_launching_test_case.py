@@ -24,6 +24,11 @@ from docker import Client
 
 logger = logging.getLogger(__name__)
 
+if os.environ.get('TEST_LOGS') != 'verbose':
+    logging.getLogger('requests.packages.urllib3.connectionpool').setLevel(logging.WARNING)
+    logging.getLogger('docker.auth.auth').setLevel(logging.INFO)
+    logger.setLevel(logging.WARNING)
+
 
 class NoSuchService(Exception):
     def __init__(self, service_name):
