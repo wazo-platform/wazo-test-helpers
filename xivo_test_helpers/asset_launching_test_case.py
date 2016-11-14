@@ -49,6 +49,8 @@ class AssetLaunchingTestCase(unittest.TestCase):
     * assets_root: The location of the assets
     """
 
+    cur_dir = None
+
     @classmethod
     def setUpClass(cls):
         cls.launch_service_with_asset()
@@ -61,10 +63,31 @@ class AssetLaunchingTestCase(unittest.TestCase):
     def launch_service_with_asset(cls):
         cls.container_name = cls.asset
         asset_path = os.path.join(cls.assets_root, cls.asset)
+        cls.pushd(asset_path)
+        cls.rm_containers()
+        cls.start_containers(bootstrap_container='sync')
+
+    @classmethod
+    def pushd(cls, path):
         cls.cur_dir = os.getcwd()
-        os.chdir(asset_path)
+        os.chdir(path)
+
+    @classmethod
+    def popd(cls):
+        if cls.cur_dir:
+            os.chdir(cls.cur_dir)
+
+    @classmethod
+    def rm_containers(cls):
         _run_cmd(['docker-compose', 'rm', '--force'])
-        _run_cmd(['docker-compose', 'run', '--rm', 'sync'])
+
+    @classmethod
+    def start_containers(cls, bootstrap_container):
+        _run_cmd(['docker-compose', 'run', '--rm', bootstrap_container])
+
+    @classmethod
+    def kill_containers(cls):
+        _run_cmd(['docker-compose', 'kill'])
 
     @classmethod
     def service_status(cls, service_name=None):
@@ -97,8 +120,8 @@ class AssetLaunchingTestCase(unittest.TestCase):
 
     @classmethod
     def stop_service_with_asset(cls):
-        _run_cmd(['docker-compose', 'kill'])
-        os.chdir(cls.cur_dir)
+        cls.kill_containers()
+        cls.popd()
 
     @classmethod
     def restart_service(cls, service_name=None):
