@@ -90,6 +90,10 @@ class AssetLaunchingTestCase(unittest.TestCase):
         _run_cmd(['docker-compose', 'kill'])
 
     @classmethod
+    def log_containers(cls):
+        return _run_cmd(['docker-compose', 'logs', '--no-color'])
+
+    @classmethod
     def service_status(cls, service_name=None):
         if not service_name:
             service_name = cls.service
