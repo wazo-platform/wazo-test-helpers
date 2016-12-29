@@ -1,7 +1,7 @@
 xivo-test-helpers
 =================
 
-Common test helpers used in XiVO
+Common test helpers used in Wazo
 
 To install
 ----------
