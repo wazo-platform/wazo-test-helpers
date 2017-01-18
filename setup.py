@@ -33,6 +33,6 @@ setup(
     url='http://wazo.community',
 
     packages=find_packages(),
-    install_requires=['docker-py'],
+    install_requires=['docker'],
     download_url='https://github.com/wazo-pbx/xivo-test-helpers/tarball/{}'.format(VERSION),
 )

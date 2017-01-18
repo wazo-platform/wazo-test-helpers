@@ -20,13 +20,13 @@ import os
 import subprocess
 import unittest
 
-from docker import Client
+from docker import APIClient
 
 logger = logging.getLogger(__name__)
 
 if os.environ.get('TEST_LOGS') != 'verbose':
     logging.getLogger('requests.packages.urllib3.connectionpool').setLevel(logging.WARNING)
-    logging.getLogger('docker.auth.auth').setLevel(logging.INFO)
+    logging.getLogger('docker.auth').setLevel(logging.INFO)
     logger.setLevel(logging.WARNING)
 
 
@@ -98,7 +98,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
         if not service_name:
             service_name = cls.service
 
-        with Client(base_url='unix://var/run/docker.sock') as docker:
+        with APIClient(base_url='unix://var/run/docker.sock') as docker:
             return docker.inspect_container(_container_id(service_name))
 
     @classmethod
@@ -114,7 +114,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
         if not service_name:
             service_name = cls.service
 
-        with Client(base_url='unix://var/run/docker.sock') as docker:
+        with APIClient(base_url='unix://var/run/docker.sock') as docker:
             result = docker.port(_container_id(service_name), internal_port)
 
         if not result:
@@ -132,7 +132,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
         if not service_name:
             service_name = cls.service
 
-        with Client(base_url='unix://var/run/docker.sock') as docker:
+        with APIClient(base_url='unix://var/run/docker.sock') as docker:
             docker.restart(_container_id(service_name))
 
     @classmethod
@@ -140,7 +140,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
         if not service_name:
             service_name = cls.service
 
-        with Client(base_url='unix://var/run/docker.sock') as docker:
+        with APIClient(base_url='unix://var/run/docker.sock') as docker:
             docker.stop(_container_id(service_name))
 
     @classmethod
@@ -148,7 +148,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
         if not service_name:
             service_name = cls.service
 
-        with Client(base_url='unix://var/run/docker.sock') as docker:
+        with APIClient(base_url='unix://var/run/docker.sock') as docker:
             docker.start(_container_id(service_name))
 
     def docker_exec(cls, command, service_name=None):
