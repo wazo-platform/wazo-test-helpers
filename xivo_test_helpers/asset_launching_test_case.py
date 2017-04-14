@@ -20,7 +20,7 @@ import os
 import subprocess
 import unittest
 
-from docker import APIClient
+import docker as docker_client
 
 logger = logging.getLogger(__name__)
 
@@ -98,8 +98,8 @@ class AssetLaunchingTestCase(unittest.TestCase):
         if not service_name:
             service_name = cls.service
 
-        with APIClient(base_url='unix://var/run/docker.sock') as docker:
-            return docker.inspect_container(_container_id(service_name))
+        docker = docker_client.from_env().api
+        return docker.inspect_container(_container_id(service_name))
 
     @classmethod
     def service_logs(cls, service_name=None):
@@ -114,8 +114,8 @@ class AssetLaunchingTestCase(unittest.TestCase):
         if not service_name:
             service_name = cls.service
 
-        with APIClient(base_url='unix://var/run/docker.sock') as docker:
-            result = docker.port(_container_id(service_name), internal_port)
+        docker = docker_client.from_env().api
+        result = docker.port(_container_id(service_name), internal_port)
 
         if not result:
             raise NoSuchPort(service_name, internal_port)
@@ -132,24 +132,24 @@ class AssetLaunchingTestCase(unittest.TestCase):
         if not service_name:
             service_name = cls.service
 
-        with APIClient(base_url='unix://var/run/docker.sock') as docker:
-            docker.restart(_container_id(service_name))
+        docker = docker_client.from_env().api
+        docker.restart(_container_id(service_name))
 
     @classmethod
     def stop_service(cls, service_name=None):
         if not service_name:
             service_name = cls.service
 
-        with APIClient(base_url='unix://var/run/docker.sock') as docker:
-            docker.stop(_container_id(service_name))
+        docker = docker_client.from_env().api
+        docker.stop(_container_id(service_name))
 
     @classmethod
     def start_service(cls, service_name=None):
         if not service_name:
             service_name = cls.service
 
-        with APIClient(base_url='unix://var/run/docker.sock') as docker:
-            docker.start(_container_id(service_name))
+        docker = docker_client.from_env().api
+        docker.start(_container_id(service_name))
 
     def docker_exec(cls, command, service_name=None):
         if not service_name:
