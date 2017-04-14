@@ -23,20 +23,22 @@ class NoMoreTries(Exception):
 
 
 def assert_(assert_function, *args, **kwargs):
-    """Run <assert_function> <tries> times, spaced with 1 second. Stops when
-    <function> does not throw AssertionError.
+    """Run <assert_function> <tries> times, spaced with <interval> seconds. Stops
+    when <function> does not throw AssertionError.
 
     Useful for waiting until an assert is True (or assert_that from hamcrest).
 
     Arguments:
 
         - assert_function: the function making the assertion
-        - tries: the number of times to run <function>
         - message: the message raised if <function> does not return something
           after <tries> times
+        - tries: the number of times to run <function> (default: 1)
+        - interval: the seconds between 2 tries (default: 1)
     """
     message = kwargs.pop('message', None)
     tries = kwargs.pop('tries', 1)
+    interval = kwargs.pop('interval', 1)
     errors = []
 
     for _ in xrange(tries):
@@ -45,7 +47,7 @@ def assert_(assert_function, *args, **kwargs):
             return
         except AssertionError as e:
             errors.append(unicode(e))
-            time.sleep(1)
+            time.sleep(interval)
     else:
         if message:
             raise NoMoreTries(message)
@@ -63,18 +65,20 @@ def true(function, *args, **kwargs):
         - function: the function detecting the event
         - message: the message raised if <function> does not return something
           after <tries> times
-        - tries: the number of times to run <function>
+        - tries: the number of times to run <function> (default: 1)
+        - interval: the seconds between 2 tries (default: 1)
     """
 
     message = kwargs.pop('message', None)
     tries = kwargs.pop('tries', 1)
+    interval = kwargs.pop('interval', 1)
     return_value = False
 
     for _ in xrange(tries):
         return_value = function(*args, **kwargs)
         if return_value:
             return return_value
-        time.sleep(1)
+        time.sleep(interval)
     else:
         raise NoMoreTries(message)
 
@@ -90,17 +94,19 @@ def false(function, *args, **kwargs):
         - function: the function detecting the event
         - message: the message raised if <function> does not return something
           after <tries> times
-        - tries: the number of times to run <function>
+        - tries: the number of times to run <function> (default: 1)
+        - interval: the seconds between 2 tries (default: 1)
     """
 
     message = kwargs.pop('message', None)
     tries = kwargs.pop('tries', 1)
+    interval = kwargs.pop('interval', 1)
     return_value = False
 
     for _ in xrange(tries):
         return_value = function(*args, **kwargs)
         if not return_value:
             return return_value
-        time.sleep(1)
+        time.sleep(interval)
     else:
         raise NoMoreTries(message)
