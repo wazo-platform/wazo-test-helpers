@@ -32,7 +32,10 @@ def assert_(assert_function, *args, **kwargs):
 
         - assert_function: the function making the assertion
         - tries: the number of times to run <function>
+        - message: the message raised if <function> does not return something
+          after <tries> times
     """
+    message = kwargs.pop('message', None)
     tries = kwargs.pop('tries', 1)
     errors = []
 
@@ -44,6 +47,8 @@ def assert_(assert_function, *args, **kwargs):
             errors.append(unicode(e))
             time.sleep(1)
     else:
+        if message:
+            raise NoMoreTries(message)
         raise NoMoreTries('\n'.join(errors))
 
 
