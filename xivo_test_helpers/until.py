@@ -15,7 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import logging
 import time
+
+logger = logging.getLogger(__name__)
 
 
 class NoMoreTries(Exception):
@@ -108,5 +111,49 @@ def false(function, *args, **kwargs):
         if not return_value:
             return return_value
         time.sleep(interval)
+    else:
+        raise NoMoreTries(message)
+
+
+def return_(function, *args, **kwargs):
+    """Periodically run <function> for <timeout> seconds, spaced with <interval>
+    seconds. Stops when <function> returns something, then return this value.
+
+    Useful for waiting for a function that throws an exception when not ready.
+
+    Arguments:
+
+        - function: the function detecting the event
+        - message: the message raised if <function> does not return something
+          after <timeout> seconds
+        - timeout: maximum number of seconds to run <function>
+        - interval: the seconds between 2 runs of <function> (default: 1)
+
+    """
+
+    timeout = kwargs.pop('timeout')
+    interval = kwargs.pop('interval')
+    message = kwargs.pop('message', None)
+    return_value = False
+
+    def executions():
+        start_time = time.time()
+        time_spent = interval / 10  # schedule the first execution a bit later, because start_time is now in the past
+        while time_spent < timeout:
+            yield start_time + time_spent
+            time_spent += interval
+
+    for next_execution in executions():
+        if time.time() > next_execution:
+            logger.debug('Execution of %s skipped', function)
+            continue
+
+        delay = next_execution - time.time()
+        time.sleep(delay)
+
+        try:
+            return function(*args, **kwargs)
+        except Exception as e:
+            logger.debug('Exception caught while waiting for %s to return', function, exc_info=True)
     else:
         raise NoMoreTries(message)
