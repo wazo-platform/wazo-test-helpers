@@ -29,7 +29,7 @@ class AdminUIAssetLaunchingTestCase(AssetLaunchingTestCase):
     def setup_browser(cls):
         virtual = os.environ.get('VIRTUAL_DISPLAY', '1') == '1'
         username = os.environ.get('WEBI_USERNAME', 'root')
-        password = os.environ.get('WEBI_PASSWORD', 'proformatique')
+        password = os.environ.get('WEBI_PASSWORD', 'password')
         url = os.environ.get('ADMIN_UI_URL')
         if not url:
             port = cls.service_port(9296, 'admin-ui')
