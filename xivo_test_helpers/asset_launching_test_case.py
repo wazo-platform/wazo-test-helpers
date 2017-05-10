@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
@@ -143,7 +143,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
             service_name = cls.service
 
         docker_command = ['docker', 'exec', _container_id(service_name)] + command
-        _run_cmd(docker_command)
+        return _run_cmd(docker_command)
 
     @classmethod
     def _run_cmd(cls, cmd):
