@@ -51,8 +51,12 @@ class AssetLaunchingTestCase(unittest.TestCase):
         cls.container_name = cls.asset
         asset_path = os.path.join(cls.assets_root, cls.asset)
         cls.pushd(asset_path)
+        logger.debug('Removing containers...')
         cls.rm_containers()
+        logger.debug('Done.')
+        logger.debug('Starting containers...')
         cls.start_containers(bootstrap_container='sync')
+        logger.debug('Done.')
 
     @classmethod
     def pushd(cls, path):
@@ -111,8 +115,10 @@ class AssetLaunchingTestCase(unittest.TestCase):
 
     @classmethod
     def stop_service_with_asset(cls):
+        logger.debug('Killing containers...')
         cls.kill_containers()
         cls.popd()
+        logger.debug('Done.')
 
     @classmethod
     def restart_service(cls, service_name=None):
