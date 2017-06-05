@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
+import six
 import time
 
 logger = logging.getLogger(__name__)
@@ -31,12 +32,12 @@ def assert_(assert_function, *args, **kwargs):
     interval = kwargs.pop('interval', 1)
     errors = []
 
-    for _ in xrange(tries):
+    for _ in six.moves.range(tries):
         try:
             assert_function(*args, **kwargs)
             return
         except AssertionError as e:
-            errors.append(unicode(e))
+            errors.append(six.text_type(e))
             time.sleep(interval)
     else:
         if message:
@@ -64,7 +65,7 @@ def true(function, *args, **kwargs):
     interval = kwargs.pop('interval', 1)
     return_value = False
 
-    for _ in xrange(tries):
+    for _ in six.moves.range(tries):
         return_value = function(*args, **kwargs)
         if return_value:
             return return_value
@@ -93,7 +94,7 @@ def false(function, *args, **kwargs):
     interval = kwargs.pop('interval', 1)
     return_value = False
 
-    for _ in xrange(tries):
+    for _ in six.moves.range(tries):
         return_value = function(*args, **kwargs)
         if not return_value:
             return return_value

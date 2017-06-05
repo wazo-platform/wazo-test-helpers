@@ -9,6 +9,7 @@
 
 from weakref import ref
 import sys
+import six
 from hamcrest.core.base_matcher import BaseMatcher
 from hamcrest.core.compat import is_callable
 
@@ -70,7 +71,7 @@ class Raises(BaseMatcher):
                        .append_text(' because ')
             self.matcher.describe_mismatch(self.actual, description)
         else:
-            description.append_text('%s was raised instead: %s' % (type(self.actual), unicode(self.actual)))
+            description.append_text('%s was raised instead: %s' % (type(self.actual), six.text_type(self.actual)))
 
 
 def raises(exception, matcher=None):
