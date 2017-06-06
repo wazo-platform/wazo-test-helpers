@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright 2015-2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 from setuptools import setup
@@ -20,6 +20,6 @@ setup(
     url='http://wazo.community',
 
     packages=find_packages(),
-    install_requires=['docker'],
+    install_requires=['docker', 'six'],
     download_url='https://github.com/wazo-pbx/xivo-test-helpers/tarball/{}'.format(VERSION),
 )
