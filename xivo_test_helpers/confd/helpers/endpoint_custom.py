@@ -19,7 +19,7 @@
 import random
 import string
 
-from test_api import confd
+from .. import confd
 
 
 def add_custom(**params):

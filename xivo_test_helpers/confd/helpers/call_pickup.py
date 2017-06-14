@@ -19,7 +19,7 @@
 import random
 import string
 
-from test_api import db
+from .. import db
 
 
 def generate_call_pickup(**parameters):

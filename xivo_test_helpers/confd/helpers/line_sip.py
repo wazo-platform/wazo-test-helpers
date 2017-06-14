@@ -1,5 +1,5 @@
-from test_api import confd
-from test_api import config
+from .. import confd
+from .. import config
 
 
 def add_line(**params):

@@ -1,4 +1,4 @@
-from test_api import confd
+from .. import confd
 
 
 def add_user(**params):

@@ -19,8 +19,8 @@
 import random
 import string
 
-from test_api import confd
-from test_api.config import CONTEXT
+from .. import confd
+from ..config import CONTEXT
 
 
 def generate_outcall(**parameters):

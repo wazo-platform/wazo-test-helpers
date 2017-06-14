@@ -19,7 +19,7 @@
 import random
 import string
 
-from test_api import confd
+from .. import confd
 
 
 def generate_context(**parameters):

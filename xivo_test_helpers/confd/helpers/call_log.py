@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from test_api import db
+from .. import db
 
 
 def generate_call_log(date, date_answer, date_end, source_name, source_exten, destination_exten, user_field=''):

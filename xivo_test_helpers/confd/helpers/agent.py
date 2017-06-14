@@ -18,7 +18,7 @@
 
 import random
 
-from test_api import db
+from .. import db
 
 
 def generate_agent(**parameters):

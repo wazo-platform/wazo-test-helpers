@@ -18,7 +18,7 @@
 
 from wrappers import IsolatedAction
 
-import helpers as h
+from . import helpers as h
 
 
 class user(IsolatedAction):

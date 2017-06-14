@@ -19,8 +19,7 @@
 import random
 import string
 
-from test_api import db
-from test_api import confd
+from .. import db, confd
 
 
 def generate_cti_profile(**parameters):

@@ -16,7 +16,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from test_api import confd
+from .. import confd
 
 
 def associate(user_id, line_id, check=True):

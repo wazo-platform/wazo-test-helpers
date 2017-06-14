@@ -19,8 +19,8 @@
 import string
 import hashlib
 
-from test_api import confd
-from test_api import provd
+from .. import confd
+from .. import provd
 
 from random import randrange, choice, randint, random
 

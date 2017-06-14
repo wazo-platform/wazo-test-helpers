@@ -25,7 +25,7 @@ from xivo_test_helpers import until
 
 from .bus import BusClient
 
-import errors as e
+from . import errors as e
 
 
 class RelationScenario(object):

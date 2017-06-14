@@ -19,7 +19,7 @@
 import string
 import random
 
-from test_api import confd
+from .. import confd
 
 
 def generate_entity(**params):

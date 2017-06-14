@@ -18,7 +18,7 @@
 
 from contextlib import contextmanager
 
-from test_api import helpers as h
+from . import helpers as h
 
 
 @contextmanager

@@ -1,6 +1,6 @@
-from test_api import confd
-from test_api import config
-from test_api.helpers.context import generate_context
+from .. import confd
+from .. import config
+from .context import generate_context
 
 
 def generate_voicemail(**kwargs):

@@ -21,10 +21,10 @@ from __future__ import unicode_literals
 import csv
 from cStringIO import StringIO
 
-from test_api.helpers import words
-from test_api import config
-from test_api.setup import new_client
-from test_api.helpers import voicemail, extension, call_permission
+from . import words
+from . import voicemail, extension, call_permission
+from .. import config
+from .. import new_client
 
 
 def csv_client():

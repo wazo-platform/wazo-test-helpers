@@ -5,41 +5,19 @@
 
 import os
 
-from .client import ConfdClient
 from .sysconfd import SysconfdMock
-from .config import confd_host, confd_port, confd_https
-from . import provd
-from . import database
-
-
-def new_client(headers=None, encoder=None):
-    xivo_host = confd_host()
-    xivo_confd_port = confd_port()
-    xivo_confd_login = os.environ.get('LOGIN', 'admin')
-    xivo_confd_password = os.environ.get('PASSWORD', 'proformatique')
-    xivo_https = confd_https()
-    client = ConfdClient.from_options(host=xivo_host,
-                                      port=xivo_confd_port,
-                                      username=xivo_confd_login,
-                                      password=xivo_confd_password,
-                                      https=xivo_https,
-                                      headers=headers,
-                                      encoder=encoder)
-    return client
-
-
-def new_confd(headers=None):
-    return new_client(headers).url
+from .provd import create_helper as provd_create_helper
+from .database import create_helper as database_create_helper
 
 
 def setup_provd():
-    helper = provd.create_helper()
+    helper = provd_create_helper()
     helper.reset()
     return helper
 
 
 def setup_database():
-    helper = database.create_helper()
+    helper = database_create_helper()
     helper.recreate()
     return helper
 
