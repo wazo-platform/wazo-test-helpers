@@ -13,6 +13,10 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as ec
 
 
+class SubmitException(Exception):
+    pass
+
+
 class Page(object):
 
     TIMEOUT = 4
@@ -89,14 +93,19 @@ class Page(object):
         try:
             container = self.driver.find_element_by_class_name("alert-error")
         except NoSuchElementException:
-            return []
+            return ''
 
-        return container.text
+        return container.get_attribute('innerHTML')
 
     def save(self):
         btn = self.driver.find_element_by_id("submit")
         btn.click()
-        self.wait_for(By.CSS_SELECTOR, 'tbody tr')
+        self.wait_for(By.CSS_SELECTOR, '.alert')
+
+        try:
+            self.driver.find_element_by_class_name("alert-success")
+        except NoSuchElementException:
+            raise SubmitException(self.extract_errors())
 
 
 class InputElement(WebElement):
