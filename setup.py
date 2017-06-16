@@ -15,7 +15,7 @@ setup(
     description='XiVO test helpers',
 
     author='Wazo Authors',
-    author_email='dev.wazo@gmail.com',
+    author_email='dev@wazo.community',
 
     url='http://wazo.community',
 
