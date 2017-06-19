@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2016 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import uuid
@@ -57,6 +57,17 @@ class BusMessageAccumulator(object):
         self._events = []
 
     def accumulate(self):
+        self._pull_events()
+        return self._events
+
+    def pop(self):
+        self._pull_events()
+        return self._events.pop(0)
+
+    def push_back(self, event):
+        self._events.insert(0, event)
+
+    def _pull_events(self):
         with Connection(self._url) as conn:
             with Consumer(conn, self._queue, callbacks=[self._on_event]):
                 try:
@@ -64,8 +75,6 @@ class BusMessageAccumulator(object):
                         conn.drain_events(timeout=0.5)
                 except TimeoutError:
                     pass
-
-        return self._events
 
     def _on_event(self, body, message):
         # events are already decoded, thanks to the content-type
