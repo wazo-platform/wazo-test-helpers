@@ -2,13 +2,19 @@
 # Copyright 2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import abc
 import urllib
 
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.alert import Alert
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as ec
+
+
+class SubmitException(Exception):
+    pass
 
 
 class Page(object):
@@ -87,9 +93,19 @@ class Page(object):
         try:
             container = self.driver.find_element_by_class_name("alert-error")
         except NoSuchElementException:
-            return []
+            return ''
 
-        return container.text
+        return container.get_attribute('innerHTML')
+
+    def save(self):
+        btn = self.driver.find_element_by_id("submit")
+        btn.click()
+        self.wait_for(By.CSS_SELECTOR, '.alert')
+
+        try:
+            self.driver.find_element_by_class_name("alert-success")
+        except NoSuchElementException:
+            raise SubmitException(self.extract_errors())
 
 
 class InputElement(WebElement):
@@ -103,3 +119,115 @@ class InputElement(WebElement):
             return errors.find_element_by_css_selector('ul li')
         except NoSuchElementException:
             return errors
+
+
+class ListPage(Page):
+
+    __metaclass__ = abc.ABCMeta
+
+    line_xpath = "//tr[td[contains(., '{name}')]]"
+    edit_xpath = "{}/td/a[@title='Edit']".format(line_xpath)
+    delete_xpath = "{}/td/a[@title='Delete']".format(line_xpath)
+
+    list_selector = (By.CSS_SELECTOR, 'tbody tr')
+    form_selector = (By.CSS_SELECTOR, 'form')
+
+    @abc.abstractproperty
+    def url(self):
+        return
+
+    @abc.abstractproperty
+    def form_page(self):
+        return
+
+    def go(self):
+        url = self.build_url(self.url)
+        self.driver.get(url)
+
+        self.wait_for_list_table()
+
+        return self
+
+    def add(self):
+        self.add_form()
+        self.wait_for_form()
+        return self.form_page(self.driver)
+
+    def add_form(self):
+        btn = self.driver.find_element_by_id('add-form')
+        btn.click()
+
+    def display_add_form(self):
+        self.add_form()
+        return self.driver.find_element_by_css_selector('form')
+
+    def wait_for_form(self):
+        condition = ec.presence_of_element_located(self.form_selector)
+        self.wait().until(condition)
+
+    def wait_for_list_table(self):
+        condition = ec.presence_of_element_located(self.list_selector)
+        self.wait().until(condition)
+
+    def edit(self, name):
+        xpath = self.edit_xpath.format(name=name)
+
+        button = self.driver.find_element_by_xpath(xpath)
+        button.click()
+
+        self.wait_for_form()
+
+        return self.form_page(self.driver)
+
+    def edit_by_id(self, id_):
+        url = self.build_url(self.url, str(id_))
+        self.driver.get(url)
+        self.wait_for_form()
+        return self.form_page(self.driver)
+
+    def delete(self, name):
+        xpath = self.delete_xpath.format(name=name)
+
+        button = self.driver.find_element_by_xpath(xpath)
+        button.click()
+
+        condition = ec.alert_is_present()
+        self.wait().until(condition)
+        Alert(self.driver).accept()
+
+        condition = ec.presence_of_element_located((By.XPATH, xpath))
+        self.wait().until_not(condition)
+
+    def delete_by_id(self, id_):
+        url = self.build_url(self.url, 'delete', str(id_))
+        self.driver.get(url)
+        self.wait_for_list_table()
+
+    def get_row(self, text):
+        table = self.driver.find_element_by_css_selector("table tbody")
+        xpath = '//tr[td[contains(., "{}")]]'.format(text)
+        headers = self._extract_headers(table)
+        return ListRow(table.find_element_by_xpath(xpath), headers=headers)
+
+    def _extract_headers(self, table):
+        xpath = '//tr/th'
+        headers = table.find_elements_by_xpath(xpath)
+        return [header.text for header in headers]
+
+    def find_row(self, text):
+        try:
+            return self.get_row(text)
+        except NoSuchElementException:
+            return None
+
+
+class ListRow(object):
+
+    def __init__(self, row, headers):
+        self.row = row
+        self.headers = headers
+
+    def extract(self, column):
+        index = self.headers.index(column)
+        box = self.row.find_element_by_css_selector('td:nth-child({})'.format(index+1))
+        return box.text
