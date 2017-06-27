@@ -8,6 +8,21 @@ from .. import confd
 
 def add_user(**params):
     response = confd.users.post(params)
+    user_uuid = response.item['uuid']
+    if 'services' in params:
+        if 'dnd' in params['services']:
+            response = confd.users(user_uuid).services.dnd.put(params['services']['dnd'])
+            response.assert_updated()
+        if 'incallfilter' in params['services']:
+            response = confd.users(user_uuid).services.incallfilter.put(params['services']['incallfilter'])
+            response.assert_updated()
+    if 'fallbacks' in params:
+        response = confd.users(user_uuid).fallbacks.put(params['fallbacks'])
+        response.assert_updated()
+
+    if 'services' in params or 'fallbacks' in params:
+        response = confd.users(user_uuid).get()
+
     return response.item
 
 
