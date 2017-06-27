@@ -20,7 +20,11 @@ def add_user(**params):
         response = confd.users(user_uuid).fallbacks.put(params['fallbacks'])
         response.assert_updated()
 
-    if 'services' in params or 'fallbacks' in params:
+    if 'forwards' in params:
+        response = confd.users(user_uuid).forwards.put(params['forwards'])
+        response.assert_updated()
+
+    if 'services' in params or 'fallbacks' in params or 'forwards' in params:
         response = confd.users(user_uuid).get()
 
     return response.item
