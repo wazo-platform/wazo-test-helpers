@@ -79,6 +79,14 @@ class Page(object):
         element = root.find_element_by_id(id_)
         return element.get_attribute('value')
 
+    def get_checked(self, id_, root=None):
+        root = root or self.driver
+        element = root.find_element_by_id(id_)
+        checked = element.get_attribute('checked')
+        if checked:
+            return True
+        return False
+
     def get_selected_option_value(self, id_, root=None):
         root = root or self.driver
         element = root.find_element_by_id(id_)
