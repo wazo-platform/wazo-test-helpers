@@ -12,6 +12,8 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as ec
 
+from .select2 import Select2
+
 
 class SubmitException(Exception):
     pass
@@ -63,10 +65,13 @@ class Page(object):
     def fill_id(self, id_, value, root=None):
         self.fill(By.ID, id_, value, root)
 
-    def select(self, by, arg, value, root=None):
+    def select2(self, by, arg, root=None):
         root = root or self.driver
         element = root.find_element(by, arg)
-        Select(element).select_by_visible_text(value)
+        return Select2(element, root)
+
+    def select(self, by, arg, value, root=None):
+        self.select2(by, arg, root).select(value)
 
     def select_name(self, name, value, root=None):
         self.select(By.NAME, name, value, root)
