@@ -38,13 +38,13 @@ class Page(object):
     def wait(self):
         return WebDriverWait(self.driver, self.TIMEOUT, poll_frequency=self.POLL_FREQUENCY)
 
-    def wait_for(self, by, arg):
+    def wait_for(self, by, arg, message=None):
         condition = ec.presence_of_element_located((by, arg))
-        self.wait().until(condition)
+        self.wait().until(condition, message=message)
 
-    def wait_visible(self, by, arg):
+    def wait_visible(self, by, arg, message=None):
         condition = ec.visibility_of_element_located((by, arg))
-        self.wait().until(condition)
+        self.wait().until(condition, message=message)
 
     def fill(self, by, arg, value, root=None):
         root = root or self.driver
