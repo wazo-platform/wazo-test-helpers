@@ -22,6 +22,7 @@ class SubmitException(Exception):
 class Page(object):
 
     TIMEOUT = 4
+    POLL_FREQUENCY = 0.2
     CONFIG = {'base_url': 'https://localhost:9296'}
 
     def __init__(self, driver):
@@ -35,7 +36,7 @@ class Page(object):
         return url
 
     def wait(self):
-        return WebDriverWait(self.driver, self.TIMEOUT)
+        return WebDriverWait(self.driver, self.TIMEOUT, poll_frequency=self.POLL_FREQUENCY)
 
     def wait_for(self, by, arg):
         condition = ec.presence_of_element_located((by, arg))
