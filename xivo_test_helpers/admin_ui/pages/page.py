@@ -121,6 +121,18 @@ class Page(object):
         except NoSuchElementException:
             raise SubmitException(self.extract_errors())
 
+    def is_not_savable(self):
+        self.wait_for(By.XPATH,
+                      '//input[@id="submit" and contains(@class, "disabled")]',
+                      message='Submit is savable')
+        return True
+
+    def is_savable(self):
+        self.wait_for(By.XPATH,
+                      '//input[@id="submit" and not(contains(@class, "disabled"))]',
+                      message='Submit is not savable')
+        return True
+
 
 class InputElement(WebElement):
 
