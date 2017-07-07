@@ -12,6 +12,8 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as ec
 
+from .select2 import Select2
+
 
 class SubmitException(Exception):
     pass
@@ -20,6 +22,7 @@ class SubmitException(Exception):
 class Page(object):
 
     TIMEOUT = 4
+    POLL_FREQUENCY = 0.2
     CONFIG = {'base_url': 'https://localhost:9296'}
 
     def __init__(self, driver):
@@ -33,15 +36,15 @@ class Page(object):
         return url
 
     def wait(self):
-        return WebDriverWait(self.driver, self.TIMEOUT)
+        return WebDriverWait(self.driver, self.TIMEOUT, poll_frequency=self.POLL_FREQUENCY)
 
-    def wait_for(self, by, arg):
+    def wait_for(self, by, arg, message=None):
         condition = ec.presence_of_element_located((by, arg))
-        self.wait().until(condition)
+        self.wait().until(condition, message=message)
 
-    def wait_visible(self, by, arg):
+    def wait_visible(self, by, arg, message=None):
         condition = ec.visibility_of_element_located((by, arg))
-        self.wait().until(condition)
+        self.wait().until(condition, message=message)
 
     def fill(self, by, arg, value, root=None):
         root = root or self.driver
@@ -63,10 +66,13 @@ class Page(object):
     def fill_id(self, id_, value, root=None):
         self.fill(By.ID, id_, value, root)
 
-    def select(self, by, arg, value, root=None):
+    def select2(self, by, arg, root=None):
         root = root or self.driver
         element = root.find_element(by, arg)
-        Select(element).select_by_visible_text(value)
+        return Select2(element, root)
+
+    def select(self, by, arg, value, root=None):
+        self.select2(by, arg, root).select(value)
 
     def select_name(self, name, value, root=None):
         self.select(By.NAME, name, value, root)
@@ -78,6 +84,14 @@ class Page(object):
         root = root or self.driver
         element = root.find_element_by_id(id_)
         return element.get_attribute('value')
+
+    def get_checked(self, id_, root=None):
+        root = root or self.driver
+        element = root.find_element_by_id(id_)
+        checked = element.get_attribute('checked')
+        if checked:
+            return True
+        return False
 
     def get_selected_option_value(self, id_, root=None):
         root = root or self.driver
@@ -106,6 +120,18 @@ class Page(object):
             self.driver.find_element_by_class_name("alert-success")
         except NoSuchElementException:
             raise SubmitException(self.extract_errors())
+
+    def is_not_savable(self):
+        self.wait_for(By.XPATH,
+                      '//input[@id="submit" and contains(@class, "disabled")]',
+                      message='Submit is savable')
+        return True
+
+    def is_savable(self):
+        self.wait_for(By.XPATH,
+                      '//input[@id="submit" and not(contains(@class, "disabled"))]',
+                      message='Submit is not savable')
+        return True
 
 
 class InputElement(WebElement):
