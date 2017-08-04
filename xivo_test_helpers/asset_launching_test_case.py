@@ -40,7 +40,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
 
     @staticmethod
     def is_managing_containers():
-        return os.environ['TEST_DOCKER'] != 'ignore'
+        return os.environ.get('TEST_DOCKER', 'manage') != 'ignore'
 
     @classmethod
     def setUpClass(cls):
