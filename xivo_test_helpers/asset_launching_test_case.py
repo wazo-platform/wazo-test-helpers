@@ -38,16 +38,26 @@ class AssetLaunchingTestCase(unittest.TestCase):
 
     cur_dir = None
 
+    @staticmethod
+    def is_managing_containers():
+        return os.environ['TEST_DOCKER'] != 'ignore'
+
     @classmethod
     def setUpClass(cls):
         cls.container_name = cls.asset
         asset_path = os.path.join(cls.assets_root, cls.asset)
         cls.pushd(asset_path)
-        cls.launch_service_with_asset()
+        if cls.is_managing_containers():
+            cls.launch_service_with_asset()
+        else:
+            logger.debug('Container management disabled.')
 
     @classmethod
     def tearDownClass(cls):
-        cls.stop_service_with_asset()
+        if cls.is_managing_containers():
+            cls.stop_service_with_asset()
+        else:
+            logger.debug('Container management disabled.')
         cls.popd()
 
     @classmethod

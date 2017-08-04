@@ -21,8 +21,16 @@ Edit setup.py and increase version number.
     git push --tags
 
 
-## Logging
+## Environment variables
+
+### Logging
 
 Tests that use the AssetLaunchTestCase class will be stripped of some logs. To restore the default logging levels, set the environment variable:
 
     TEST_LOGS=verbose
+
+### Docker containers management
+
+In some cases, it is easier to manage Docker containers manually or via an external script. When doing that, the tests must be told to not manage the containers and this is done with the variable:
+
+    TEST_DOCKER=ignore
