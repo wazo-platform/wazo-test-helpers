@@ -40,17 +40,18 @@ class AssetLaunchingTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.container_name = cls.asset
+        asset_path = os.path.join(cls.assets_root, cls.asset)
+        cls.pushd(asset_path)
         cls.launch_service_with_asset()
 
     @classmethod
     def tearDownClass(cls):
         cls.stop_service_with_asset()
+        cls.popd()
 
     @classmethod
     def launch_service_with_asset(cls):
-        cls.container_name = cls.asset
-        asset_path = os.path.join(cls.assets_root, cls.asset)
-        cls.pushd(asset_path)
         logger.debug('Removing containers...')
         cls.rm_containers()
         logger.debug('Done.')
@@ -117,7 +118,6 @@ class AssetLaunchingTestCase(unittest.TestCase):
     def stop_service_with_asset(cls):
         logger.debug('Killing containers...')
         cls.kill_containers()
-        cls.popd()
         logger.debug('Done.')
 
     @classmethod
