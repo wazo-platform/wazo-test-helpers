@@ -154,6 +154,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
         docker = docker_client.from_env().api
         docker.start(_container_id(service_name))
 
+    @classmethod
     def docker_exec(cls, command, service_name=None):
         if not service_name:
             service_name = cls.service
