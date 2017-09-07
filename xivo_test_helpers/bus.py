@@ -43,10 +43,11 @@ class BusClient(object):
             accumulator = BusMessageAccumulator(self._url, queue)
         return accumulator
 
-    def publish(self, payload, routing_key):
+    def publish(self, payload, routing_key, headers=None):
+        headers = headers or {}
         with Connection(self._url) as connection:
             producer = Producer(connection, exchange=BUS_EXCHANGE_XIVO, auto_declare=True)
-            producer.publish(payload, routing_key=routing_key)
+            producer.publish(payload, routing_key=routing_key, headers=headers)
 
 
 class BusMessageAccumulator(object):
