@@ -44,9 +44,6 @@ class AssetLaunchingTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.container_name = cls.asset
-        asset_path = os.path.join(cls.assets_root, cls.asset)
-        cls.pushd(asset_path)
         if cls.is_managing_containers():
             cls.launch_service_with_asset()
         else:
@@ -58,7 +55,6 @@ class AssetLaunchingTestCase(unittest.TestCase):
             cls.stop_service_with_asset()
         else:
             logger.debug('Container management disabled.')
-        cls.popd()
 
     @classmethod
     def launch_service_with_asset(cls):
@@ -70,30 +66,24 @@ class AssetLaunchingTestCase(unittest.TestCase):
         logger.debug('Done.')
 
     @classmethod
-    def pushd(cls, path):
-        cls.cur_dir = os.getcwd()
-        os.chdir(path)
-
-    @classmethod
-    def popd(cls):
-        if cls.cur_dir:
-            os.chdir(cls.cur_dir)
-
-    @classmethod
     def rm_containers(cls):
-        _run_cmd(['docker-compose', 'rm', '--force'])
+        _run_cmd(['docker-compose'] + cls._docker_compose_options() +
+                 ['rm', '--force'])
 
     @classmethod
     def start_containers(cls, bootstrap_container):
-        _run_cmd(['docker-compose', 'run', '--rm', bootstrap_container])
+        _run_cmd(['docker-compose'] + cls._docker_compose_options() +
+                 ['run', '--rm', bootstrap_container])
 
     @classmethod
     def kill_containers(cls):
-        _run_cmd(['docker-compose', 'kill'])
+        _run_cmd(['docker-compose'] + cls._docker_compose_options() +
+                 ['kill'])
 
     @classmethod
     def log_containers(cls):
-        return _run_cmd(['docker-compose', 'logs', '--no-color'])
+        return _run_cmd(['docker-compose'] + cls._docker_compose_options() +
+                        ['logs', '--no-color'])
 
     @classmethod
     def service_status(cls, service_name=None):
@@ -101,14 +91,14 @@ class AssetLaunchingTestCase(unittest.TestCase):
             service_name = cls.service
 
         docker = docker_client.from_env().api
-        return docker.inspect_container(_container_id(service_name))
+        return docker.inspect_container(cls._container_id(service_name))
 
     @classmethod
     def service_logs(cls, service_name=None):
         if not service_name:
             service_name = cls.service
 
-        status = _run_cmd(['docker', 'logs', _container_id(service_name)])
+        status = _run_cmd(['docker', 'logs', cls._container_id(service_name)])
         return status
 
     @classmethod
@@ -117,7 +107,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
             service_name = cls.service
 
         docker = docker_client.from_env().api
-        result = docker.port(_container_id(service_name), internal_port)
+        result = docker.port(cls._container_id(service_name), internal_port)
 
         if not result:
             raise NoSuchPort(service_name, internal_port)
@@ -136,7 +126,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
             service_name = cls.service
 
         docker = docker_client.from_env().api
-        docker.restart(_container_id(service_name))
+        docker.restart(cls._container_id(service_name))
 
     @classmethod
     def stop_service(cls, service_name=None):
@@ -144,7 +134,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
             service_name = cls.service
 
         docker = docker_client.from_env().api
-        docker.stop(_container_id(service_name))
+        docker.stop(cls._container_id(service_name))
 
     @classmethod
     def start_service(cls, service_name=None):
@@ -152,35 +142,43 @@ class AssetLaunchingTestCase(unittest.TestCase):
             service_name = cls.service
 
         docker = docker_client.from_env().api
-        docker.start(_container_id(service_name))
+        docker.start(cls._container_id(service_name))
 
     @classmethod
     def docker_exec(cls, command, service_name=None):
         if not service_name:
             service_name = cls.service
 
-        docker_command = ['docker', 'exec', _container_id(service_name)] + command
+        docker_command = ['docker', 'exec', cls._container_id(service_name)] + command
         return _run_cmd(docker_command)
 
     @classmethod
     def _run_cmd(cls, cmd):
         _run_cmd(cmd.split(' '))
 
+    @classmethod
+    def _container_id(cls, service_name):
+        result = _run_cmd(['docker-compose'] + cls._docker_compose_options() +
+                          ['ps', '-q', service_name], stderr=False).strip()
+        result = result.decode('utf-8')
+        if '\n' in result:
+            raise AssertionError('There is more than one container running with name {}'.format(service_name))
+        if not result:
+            raise NoSuchService(service_name)
+        return result
+
+    @classmethod
+    def _docker_compose_options(cls):
+        return [
+            '--file', os.path.join(cls.assets_root, cls.asset, 'docker-compose.yml'),
+        ]
+
 
 def _run_cmd(cmd, stderr=True):
+    logger.debug('%s', cmd)
     with open(os.devnull, "w") as null:
         stderr = subprocess.STDOUT if stderr else null
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=stderr)
         out, _ = process.communicate()
     logger.info('%s', out)
     return out
-
-
-def _container_id(service_name):
-    result = _run_cmd(['docker-compose', 'ps', '-q', service_name], stderr=False).strip()
-    result = result.decode('utf-8')
-    if '\n' in result:
-        raise AssertionError('There is more than one container running with name {}'.format(service_name))
-    if not result:
-        raise NoSuchService(service_name)
-    return result
