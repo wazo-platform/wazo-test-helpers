@@ -13,7 +13,7 @@ port = int(sys.argv[1])
 
 context = ('/usr/local/share/ssl/auth/server.crt', '/usr/local/share/ssl/auth/server.key')
 
-valid_tokens = {'valid-token': 'uuid'}
+valid_tokens = {'valid-token': {'auth_id': 'uuid'}}
 wrong_acl_tokens = {'invalid-acl-token'}
 invalid_username_passwords = [('test', 'foobar')]
 token_that_will_be_invalid_when_used = [('test', 'iddqd')]
@@ -23,9 +23,8 @@ token_that_will_be_invalid_when_used = [('test', 'iddqd')]
 def add_token():
     request_body = request.get_json()
     token = request_body['token']
-    auth_id = request_body['auth_id']
 
-    valid_tokens[token] = auth_id
+    valid_tokens[token] = request_body
 
     return '', 204
 
@@ -45,12 +44,10 @@ def token_get(token):
     if token not in valid_tokens:
         return '', 404
 
+    result = dict(valid_tokens[token])
+    result.setdefault('xivo_user_uuid', result['auth_id'])
     return jsonify({
-        'data': {
-            'auth_id': valid_tokens[token],
-            'token': token,
-            'xivo_user_uuid': valid_tokens[token]
-        }
+        'data': result
     })
 
 
