@@ -1,9 +1,10 @@
 # Copyright (C) 2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-import requests
-
 import logging
+import requests
+import uuid
+
 logger = logging.getLogger(__name__)
 
 
@@ -34,12 +35,14 @@ class AuthClient(object):
 
 class MockUserToken(object):
 
-    def __init__(self, token, user_uuid):
+    def __init__(self, token, user_uuid, wazo_uuid=None):
         self._token = token
         self._auth_id = user_uuid
+        self._wazo_uuid = wazo_uuid or str(uuid.uuid4())
 
     def to_dict(self):
         return {
             'token': self._token,
             'auth_id': self._auth_id,
+            'xivo_uuid': self._wazo_uuid,
         }
