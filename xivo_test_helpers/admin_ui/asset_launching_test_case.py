@@ -17,8 +17,11 @@ class AdminUIAssetLaunchingTestCase(AssetLaunchingTestCase):
     @classmethod
     def setUpClass(cls):
         super(AdminUIAssetLaunchingTestCase, cls).setUpClass()
-        cls.browser = cls.setup_browser()
-        cls.browser.start()
+        try:
+            cls.browser = cls.setup_browser()
+            cls.browser.start()
+        except Exception:
+            super(AdminUIAssetLaunchingTestCase, cls).tearDownClass()
 
     @classmethod
     def tearDownClass(cls):
