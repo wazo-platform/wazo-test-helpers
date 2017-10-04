@@ -22,6 +22,7 @@ class AdminUIAssetLaunchingTestCase(AssetLaunchingTestCase):
             cls.browser.start()
         except Exception:
             super(AdminUIAssetLaunchingTestCase, cls).tearDownClass()
+            raise
 
     @classmethod
     def tearDownClass(cls):
