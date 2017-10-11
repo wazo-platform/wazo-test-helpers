@@ -13,7 +13,7 @@ port = int(sys.argv[1])
 
 context = ('/usr/local/share/ssl/auth/server.crt', '/usr/local/share/ssl/auth/server.key')
 
-valid_tokens = {'valid-token': {'auth_id': 'uuid'}}
+valid_tokens = {'valid-token': {'auth_id': 'uuid', 'token': 'valid-token'}}
 wrong_acl_tokens = {'invalid-acl-token'}
 invalid_username_passwords = [('test', 'foobar')]
 token_that_will_be_invalid_when_used = [('test', 'iddqd')]
@@ -57,10 +57,10 @@ def token_post():
     if auth in invalid_username_passwords:
         return '', 401
     elif auth in token_that_will_be_invalid_when_used:
-        return jsonify({'data': {'auth_id': valid_tokens['valid-token'],
+        return jsonify({'data': {'auth_id': valid_tokens['valid-token']['auth_id'],
                                  'token': 'expired'}})
     else:
-        return jsonify({'data': {'auth_id': valid_tokens['valid-token'],
+        return jsonify({'data': {'auth_id': valid_tokens['valid-token']['auth_id'],
                                  'token': 'valid-token'}})
 
 
