@@ -75,8 +75,8 @@ def true(function, *args, **kwargs):
 
 
 def false(function, *args, **kwargs):
-    """Run <function> <tries> times, spaced with 1 second. Stops when <function>
-    returns an object evaluating to False, and returns it.
+    """Run <function> <tries> times, spaced with <interval> seconds. Stops when
+    <function> returns an object evaluating to False, and returns it.
 
     Useful for waiting for an event.
 
@@ -120,7 +120,7 @@ def return_(function, *args, **kwargs):
     """
 
     timeout = kwargs.pop('timeout')
-    interval = kwargs.pop('interval')
+    interval = kwargs.pop('interval', 1)
     message = kwargs.pop('message', None)
     return_value = False
 
@@ -141,7 +141,7 @@ def return_(function, *args, **kwargs):
 
         try:
             return function(*args, **kwargs)
-        except Exception as e:
+        except Exception:
             logger.debug('Exception caught while waiting for %s to return', function, exc_info=True)
     else:
         raise NoMoreTries(message)
