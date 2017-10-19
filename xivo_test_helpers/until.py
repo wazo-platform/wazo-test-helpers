@@ -6,11 +6,28 @@ import logging
 import six
 import time
 
+from functools import partial
+
 logger = logging.getLogger(__name__)
 
 
 class NoMoreTries(Exception):
     pass
+
+
+def tries_executions(tries, interval):
+    for _ in six.moves.range(tries):
+        yield
+        time.sleep(interval)
+
+
+def timeout_executions(timeout, interval):
+    end_time = time.time() + timeout
+    while time.time() < end_time:
+        yield
+        time_left = end_time - time.time()
+        delay = time_left % interval
+        time.sleep(delay)
 
 
 def assert_(assert_function, *args, **kwargs):
@@ -24,21 +41,28 @@ def assert_(assert_function, *args, **kwargs):
         - assert_function: the function making the assertion
         - message: the message raised if <function> does not return something
           after <tries> times
-        - tries: the number of times to run <function> (default: 1)
+        - timeout: the amount of seconds to try running <function>. Overrides `tries`.
+        - tries: the number of times to run <function> (default: 1). Overriden by `timeout`.
         - interval: the seconds between 2 tries (default: 1)
     """
+
     message = kwargs.pop('message', None)
     tries = kwargs.pop('tries', 1)
+    timeout = kwargs.pop('timeout', None)
     interval = kwargs.pop('interval', 1)
     errors = []
 
-    for _ in six.moves.range(tries):
+    if timeout:
+        executions = partial(timeout_executions, timeout, interval)
+    else:
+        executions = partial(tries_executions, tries, interval)
+
+    for _ in executions():
         try:
             assert_function(*args, **kwargs)
             return
         except AssertionError as e:
             errors.append(six.text_type(e))
-            time.sleep(interval)
     else:
         if message:
             raise NoMoreTries(message)
@@ -56,20 +80,26 @@ def true(function, *args, **kwargs):
         - function: the function detecting the event
         - message: the message raised if <function> does not return something
           after <tries> times
-        - tries: the number of times to run <function> (default: 1)
+        - timeout: the amount of seconds to try running <function>. Overrides `tries`.
+        - tries: the number of times to run <function> (default: 1). Overriden by `timeout`.
         - interval: the seconds between 2 tries (default: 1)
     """
 
     message = kwargs.pop('message', None)
+    timeout = kwargs.pop('timeout', None)
     tries = kwargs.pop('tries', 1)
     interval = kwargs.pop('interval', 1)
     return_value = False
 
-    for _ in six.moves.range(tries):
+    if timeout:
+        executions = partial(timeout_executions, timeout, interval)
+    else:
+        executions = partial(tries_executions, tries, interval)
+
+    for _ in executions():
         return_value = function(*args, **kwargs)
         if return_value:
             return return_value
-        time.sleep(interval)
     else:
         raise NoMoreTries(message)
 
@@ -85,20 +115,27 @@ def false(function, *args, **kwargs):
         - function: the function detecting the event
         - message: the message raised if <function> does not return something
           after <tries> times
-        - tries: the number of times to run <function> (default: 1)
+        - timeout: the amount of seconds to try running <function>. Overrides `tries`.
+        - tries: the number of times to run <function> (default: 1). Overriden by `timeout`.
         - interval: the seconds between 2 tries (default: 1)
+
     """
 
     message = kwargs.pop('message', None)
+    timeout = kwargs.pop('timeout', None)
     tries = kwargs.pop('tries', 1)
     interval = kwargs.pop('interval', 1)
     return_value = False
 
-    for _ in six.moves.range(tries):
+    if timeout:
+        executions = partial(timeout_executions, timeout, interval)
+    else:
+        executions = partial(tries_executions, tries, interval)
+
+    for _ in executions():
         return_value = function(*args, **kwargs)
         if not return_value:
             return return_value
-        time.sleep(interval)
     else:
         raise NoMoreTries(message)
 
@@ -114,7 +151,7 @@ def return_(function, *args, **kwargs):
         - function: the function detecting the event
         - message: the message raised if <function> does not return something
           after <timeout> seconds
-        - timeout: maximum number of seconds to run <function>
+        - timeout: the amount of seconds to try running <function>.
         - interval: the seconds between 2 runs of <function> (default: 1)
 
     """
@@ -122,23 +159,8 @@ def return_(function, *args, **kwargs):
     timeout = kwargs.pop('timeout')
     interval = kwargs.pop('interval', 1)
     message = kwargs.pop('message', None)
-    return_value = False
 
-    def executions():
-        start_time = time.time()
-        time_spent = interval / 10  # schedule the first execution a bit later, because start_time is now in the past
-        while time_spent < timeout:
-            yield start_time + time_spent
-            time_spent += interval
-
-    for next_execution in executions():
-        if time.time() > next_execution:
-            logger.debug('Execution of %s skipped', function)
-            continue
-
-        delay = next_execution - time.time()
-        time.sleep(delay)
-
+    for _ in timeout_executions(timeout, interval):
         try:
             return function(*args, **kwargs)
         except Exception:
