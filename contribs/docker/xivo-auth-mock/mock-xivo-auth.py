@@ -29,6 +29,16 @@ def add_token():
     return '', 204
 
 
+@app.route("/_remove_token/<token_id>", methods=['DELETE'])
+def set_token(token_id):
+    try:
+        del valid_tokens[token_id]
+    except KeyError:
+        return '', 404
+    else:
+        return '', 204
+
+
 @app.route("/0.1/token/<token>", methods=['HEAD'])
 def token_head_ok(token):
     if token in wrong_acl_tokens:
