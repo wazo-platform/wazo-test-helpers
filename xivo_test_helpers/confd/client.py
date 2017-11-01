@@ -55,6 +55,9 @@ class ConfdClient(object):
             data = unicode(data, encoding='utf8')
         logger.info(u'%s %s params: %s body: %s', method, url, parameters, data)
 
+    def head(self, url, **parameters):
+        return self.request('HEAD', url, parameters=parameters)
+
     def get(self, url, **parameters):
         return self.request('GET', url, parameters=parameters)
 
@@ -89,6 +92,11 @@ class RestUrlClient(UrlFragment):
 
     def __repr__(self):
         return "<Client '{}'>".format('/'.join(self.fragments))
+
+    def head(self, **params):
+        url = str(self)
+        params = self._merge_params(params, self.body)
+        return self.client.head(url, **params)
 
     def get(self, **params):
         url = str(self)
