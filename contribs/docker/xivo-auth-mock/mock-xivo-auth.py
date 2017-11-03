@@ -44,7 +44,9 @@ def token_head_ok(token):
     if token in wrong_acl_tokens:
         return '', 403
     elif token in valid_tokens:
-        return '', 204
+        if _valid_acl(token):
+            return '', 204
+        return '', 403
     else:
         return '', 401
 
@@ -54,11 +56,24 @@ def token_get(token):
     if token not in valid_tokens:
         return '', 404
 
+    if not _valid_acl(token):
+        return '', 403
+
     result = dict(valid_tokens[token])
     result.setdefault('xivo_user_uuid', result['auth_id'])
     return jsonify({
         'data': result
     })
+
+
+def _valid_acl(token_id):
+    required_acl = request.args.get('scope')
+    if required_acl and 'acls' in valid_tokens[token_id]:
+        if required_acl in valid_tokens[token_id]['acls']:
+            return True
+        else:
+            return False
+    return True
 
 
 @app.route("/0.1/token", methods=['POST'])
