@@ -3,7 +3,6 @@
 # Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-import os
 import sqlalchemy as sa
 
 from contextlib import contextmanager
@@ -779,11 +778,5 @@ class DatabaseQueries(object):
         return ctidirectories_configured and fields_configured
 
 
-def create_helper():
-    user = os.environ.get('DB_USER', 'asterisk')
-    password = os.environ.get('DB_PASSORD', 'proformatique')
-    host = os.environ.get('DB_HOST', 'localhost')
-    port = os.environ.get('DB_PORT', 15432)
-    db = os.environ.get('DB_NAME', 'asterisk')
-
+def create_helper(user='asterisk', password='proformatique', host='localhost', port=5432, db='asterisk'):
     return DbHelper.build(user, password, host, port, db)

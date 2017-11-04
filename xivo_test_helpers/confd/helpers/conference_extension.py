@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 
-from .. import confd
+from . import confd
 
 
 def associate(conference_id, extension_id, check=True):

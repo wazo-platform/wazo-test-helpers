@@ -6,7 +6,8 @@
 import random
 import string
 
-from .. import db, confd
+from . import db
+from . import confd
 
 
 def generate_cti_profile(**parameters):

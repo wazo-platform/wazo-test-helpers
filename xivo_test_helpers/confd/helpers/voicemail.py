@@ -1,4 +1,4 @@
-from .. import confd
+from . import confd
 from .. import config
 from .context import generate_context
 

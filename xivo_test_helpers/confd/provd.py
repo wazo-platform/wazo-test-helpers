@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0+
 
 import docker
-import os
 
 from datetime import datetime
 
@@ -149,9 +148,7 @@ class ProvdHelper(object):
                 return client.logs(container['Id'], since=timestamp)
 
 
-def create_helper():
-    host = os.environ.get('PROVD_HOST', 'localhost')
-    port = os.environ.get('PROVD_PORT', 8666)
+def create_helper(host='localhost', port='8666'):
     url = "http://{host}:{port}/provd".format(host=host, port=port)
     client = new_provisioning_client(url)
     return ProvdHelper(client)

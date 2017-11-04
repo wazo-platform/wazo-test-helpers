@@ -3,7 +3,7 @@
 # Copyright 2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from .. import confd
+from . import confd
 
 
 def associate(paging_id, user_uuids, check=True):

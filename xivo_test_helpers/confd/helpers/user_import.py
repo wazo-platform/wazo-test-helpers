@@ -8,15 +8,25 @@ from __future__ import unicode_literals
 import csv
 from cStringIO import StringIO
 
+from .. import config
 from . import words
 from . import voicemail, extension, call_permission
-from .. import config
-from .. import new_client
+from . import new_client
+
+
+class CsvClientWrapper(object):
+
+    def __init__(self, headers, encoder):
+        self.headers = headers
+        self.encoder = encoder
+
+    def __getattr__(self, attr):
+        return getattr(new_client.create_client(self.headers, self.encoder), attr)
 
 
 def csv_client():
-    return new_client(headers={"Content-Type": "text/csv; charset=utf-8"},
-                      encoder=generate_csv)
+    return CsvClientWrapper(headers={"Content-Type": "text/csv; charset=utf-8"},
+                            encoder=generate_csv)
 
 
 def generate_csv(rows):

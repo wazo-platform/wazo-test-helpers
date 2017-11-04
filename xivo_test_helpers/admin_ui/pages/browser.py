@@ -2,10 +2,17 @@
 # Copyright 2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import logging
+
 from selenium import webdriver
+from selenium.webdriver.remote.remote_connection import LOGGER
+from easyprocess import log as easyprocess_logger
 from pyvirtualdisplay import Display
 
 from .login import LoginPage
+
+easyprocess_logger.setLevel(logging.CRITICAL)
+LOGGER.setLevel(logging.CRITICAL)
 
 
 class Browser(object):

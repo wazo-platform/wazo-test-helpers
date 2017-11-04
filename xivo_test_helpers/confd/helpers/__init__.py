@@ -3,6 +3,61 @@
 # Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+from ..client import ConfdClient
+
+
+class ConfdWrapper(object):
+    def __init__(self):
+        self.confd = None
+
+    def set_confd(self, confd):
+        self.confd = confd
+
+    def __getattr__(self, attr):
+        return getattr(self.confd, attr)
+
+
+class NewClientWrapper(object):
+
+    def set_config(self, host, port):
+        self.host = host
+        self.port = port
+
+    def create_client(self, headers, encoder):
+        return ConfdClient.from_options(host=self.host,
+                                        port=self.port,
+                                        headers=headers,
+                                        encoder=encoder)
+
+
+class DatabaseWrapper(object):
+    def __init__(self):
+        self.db = None
+
+    def set_database(self, db):
+        self.db = db
+
+    def __getattr__(self, attr):
+        return getattr(self.db, attr)
+
+
+confd = ConfdWrapper()
+new_client = NewClientWrapper()
+db = DatabaseWrapper()
+
+
+def setup_confd(confd_):
+    confd.set_confd(confd_.url)
+
+
+def setup_new_client(host, port):
+    new_client.set_config(host, port)
+
+
+def setup_database(database):
+    db.set_database(database)
+
+
 import destination
 
 import agent

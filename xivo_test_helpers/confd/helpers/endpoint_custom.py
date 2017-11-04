@@ -6,7 +6,7 @@
 import random
 import string
 
-from .. import confd
+from . import confd
 
 
 def add_custom(**params):

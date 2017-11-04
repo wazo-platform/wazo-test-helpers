@@ -6,7 +6,7 @@
 import string
 import random
 
-from .. import confd
+from . import confd
 
 
 def generate_call_permission(**params):

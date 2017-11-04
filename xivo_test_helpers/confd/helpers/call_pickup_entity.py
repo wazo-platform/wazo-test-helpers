@@ -3,7 +3,7 @@
 # Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from .. import db
+from . import db
 
 
 def associate(call_pickup_id, entity_id, check=True):

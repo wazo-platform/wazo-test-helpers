@@ -42,7 +42,7 @@ class LoginPage(Page):
         btn = self.driver.find_element_by_id("submit")
         btn.click()
         if waiting:
-            self.wait_for(By.CLASS_NAME, 'user-header')
+            self.wait_for(By.CLASS_NAME, 'logo-lg')
         else:
             self.wait_for(By.NAME, 'username')
 
