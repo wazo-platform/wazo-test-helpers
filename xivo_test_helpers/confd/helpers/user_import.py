@@ -14,19 +14,11 @@ from . import voicemail, extension, call_permission
 from . import new_client
 
 
-class CsvClientWrapper(object):
-
-    def __init__(self, headers, encoder):
-        self.headers = headers
-        self.encoder = encoder
-
-    def __getattr__(self, attr):
-        return getattr(new_client.create_client(self.headers, self.encoder), attr)
-
-
 def csv_client():
-    return CsvClientWrapper(headers={"Content-Type": "text/csv; charset=utf-8"},
-                            encoder=generate_csv)
+    new_client.headers = {"Content-Type": "text/csv; charset=utf-8",
+                          "X-Auth-Token": "valid-token"}
+    new_client.encoder = generate_csv
+    return new_client
 
 
 def generate_csv(rows):

@@ -6,11 +6,9 @@
 import string
 import hashlib
 
-from . import confd
+from . import confd, provd
 
 from random import randrange, choice, randint, random
-
-provd = None
 
 
 def generate_device(**params):
