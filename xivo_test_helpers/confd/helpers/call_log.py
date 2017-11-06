@@ -3,7 +3,7 @@
 # Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from .. import db
+from . import db
 
 
 def generate_call_log(date, date_answer, date_end, source_name, source_exten, destination_exten, user_field=''):

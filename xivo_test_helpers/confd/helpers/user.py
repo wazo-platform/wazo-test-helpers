@@ -3,7 +3,7 @@
 # Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from .. import confd
+from . import confd
 
 
 def add_user(**params):

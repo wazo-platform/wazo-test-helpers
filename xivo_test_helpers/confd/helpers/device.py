@@ -6,8 +6,7 @@
 import string
 import hashlib
 
-from .. import confd
-from .. import provd
+from . import confd, provd
 
 from random import randrange, choice, randint, random
 

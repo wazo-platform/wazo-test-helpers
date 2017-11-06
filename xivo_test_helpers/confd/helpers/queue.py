@@ -6,7 +6,7 @@
 import random
 import string
 
-from .. import db
+from . import db
 
 
 def generate_queue(**parameters):

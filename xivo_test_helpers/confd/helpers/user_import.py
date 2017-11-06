@@ -8,15 +8,17 @@ from __future__ import unicode_literals
 import csv
 from cStringIO import StringIO
 
+from .. import config
 from . import words
 from . import voicemail, extension, call_permission
-from .. import config
-from .. import new_client
+from . import new_client
 
 
 def csv_client():
-    return new_client(headers={"Content-Type": "text/csv; charset=utf-8"},
-                      encoder=generate_csv)
+    new_client.headers = {"Content-Type": "text/csv; charset=utf-8",
+                          "X-Auth-Token": "valid-token"}
+    new_client.encoder = generate_csv
+    return new_client
 
 
 def generate_csv(rows):
