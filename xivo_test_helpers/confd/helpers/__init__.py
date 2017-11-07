@@ -152,3 +152,4 @@ import user_import
 import user_line
 import user_voicemail
 import voicemail
+import voicemail_zonemessages

@@ -217,3 +217,8 @@ class moh(IsolatedAction):
     id_field = 'uuid'
     actions = {'generate': h.moh.generate_moh,
                'delete': h.moh.delete_moh}
+
+
+class voicemail_zonemessages(IsolatedAction):
+
+    actions = {'generate': h.voicemail_zonemessages.generate_voicemail_zonemessages}
