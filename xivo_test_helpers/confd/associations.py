@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-
 # Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
@@ -178,6 +177,14 @@ def group_extension(group, extension, check=True):
     h.group_extension.associate(group['id'], extension['id'], check)
     yield
     h.group_extension.dissociate(group['id'], extension['id'], check)
+
+
+@contextmanager
+def group_member_extension(group, *extensions, **kwargs):
+    check = kwargs.get('check', True)
+    h.group_member_extension.associate(group['id'], extensions, check=check)
+    yield
+    h.group_member_extension.dissociate(group['id'], check=check)
 
 
 @contextmanager
