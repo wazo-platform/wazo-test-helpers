@@ -134,11 +134,11 @@ def random_digits(length):
 
 
 def check_bus_event(routing_key, url, body=None):
-    BusClient.listen_events(routing_key)
+    bus_events = BusClient.accumulator(routing_key)
     url(body) if body else url()
 
     def assert_function():
-        assert_that(BusClient.events(), has_length(1))
+        assert_that(bus_events.accumulate(), has_length(1))
 
     until.assert_(assert_function, tries=5)
 
