@@ -133,6 +133,7 @@ import parking_lot
 import parking_lot_extension
 import outcall
 import outcall_extension
+import outcall_schedule
 import outcall_trunk
 import queue
 import queue_extension
