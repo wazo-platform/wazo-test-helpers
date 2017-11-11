@@ -241,3 +241,10 @@ def incall_schedule(incall, schedule, check=True):
     h.incall_schedule.associate(incall['id'], schedule['id'], check)
     yield
     h.incall_schedule.dissociate(incall['id'], schedule['id'], check)
+
+
+@contextmanager
+def user_schedule(user, schedule, check=True):
+    h.user_schedule.associate(user['uuid'], schedule['id'], check)
+    yield
+    h.user_schedule.dissociate(user['uuid'], schedule['id'], check)
