@@ -111,6 +111,7 @@ import group
 import group_extension
 import group_member_extension
 import group_member_user
+import group_schedule
 import incall
 import incall_extension
 import incall_schedule
