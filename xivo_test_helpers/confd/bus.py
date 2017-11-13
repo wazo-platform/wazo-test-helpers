@@ -1,49 +1,29 @@
 # -*- coding: utf-8 -*-
-
-# Copyright 2016-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
-from kombu import Connection
-from kombu import Consumer
-from kombu import Exchange
-from kombu import Queue
-from kombu.exceptions import TimeoutError
-
-BUS_EXCHANGE_NAME = 'xivo'
-BUS_EXCHANGE_TYPE = 'topic'
-BUS_URL = 'amqp://guest:guest@localhost:5672//'
-BUS_QUEUE_NAME = 'integration'
+from xivo_test_helpers import bus
 
 
-class BusClient(object):
+class BusClientWrapper(object):
 
-    @classmethod
-    def listen_events(cls, routing_key, exchange=BUS_EXCHANGE_NAME):
-        exchange = Exchange(exchange, type=BUS_EXCHANGE_TYPE)
-        with Connection(BUS_URL) as conn:
-            queue = Queue(BUS_QUEUE_NAME, exchange=exchange, routing_key=routing_key, channel=conn.channel())
-            queue.declare()
-            queue.purge()
-            cls.bus_queue = queue
+    def __init__(self):
+        self.host = None
+        self.port = None
+        self._bus = None
 
-    @classmethod
-    def events(cls):
-        events = []
+    def __getattr__(self, attr):
+        if self._bus is None:
+            self._bus = self._create_client()
+        return getattr(self._bus, attr)
 
-        def on_event(body, message):
-            events.append(body)
-            message.ack()
+    def _create_client(self):
+        return bus.BusClient.from_connection_fields(host=self.host, port=self.port)
 
-        cls._drain_events(on_event=on_event)
 
-        return events
+BusClient = BusClientWrapper()
 
-    @classmethod
-    def _drain_events(cls, on_event):
-        with Connection(BUS_URL) as conn:
-            with Consumer(conn, cls.bus_queue, callbacks=[on_event]):
-                try:
-                    while True:
-                        conn.drain_events(timeout=0.5)
-                except TimeoutError:
-                    pass
+
+def setup_bus(host, port):
+    BusClient.host = host
+    BusClient.port = port
