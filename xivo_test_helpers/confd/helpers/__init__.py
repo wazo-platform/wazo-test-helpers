@@ -151,6 +151,7 @@ import user_entity
 import user_funckey_template
 import user_import
 import user_line
+import user_schedule
 import user_voicemail
 import voicemail
 import voicemail_zonemessages
