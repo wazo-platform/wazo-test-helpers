@@ -248,3 +248,10 @@ def user_schedule(user, schedule, check=True):
     h.user_schedule.associate(user['uuid'], schedule['id'], check)
     yield
     h.user_schedule.dissociate(user['uuid'], schedule['id'], check)
+
+
+@contextmanager
+def group_schedule(group, schedule, check=True):
+    h.group_schedule.associate(group['id'], schedule['id'], check)
+    yield
+    h.group_schedule.dissociate(group['id'], schedule['id'], check)
