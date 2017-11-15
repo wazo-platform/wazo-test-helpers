@@ -99,7 +99,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
             service_name = cls.service
 
         status = _run_cmd(['docker', 'logs', cls._container_id(service_name)])
-        return status
+        return status.decode('utf-8')
 
     @classmethod
     def service_port(cls, internal_port, service_name=None):
