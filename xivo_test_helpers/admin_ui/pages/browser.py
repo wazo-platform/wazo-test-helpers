@@ -26,7 +26,7 @@ class Browser(object):
 
     def start(self):
         self.display.start()
-        self.driver = webdriver.Firefox(capabilities={'marionette': False})
+        self.driver = webdriver.Firefox()
         self.driver.set_window_size(1024, 768)
         self._login()
 
