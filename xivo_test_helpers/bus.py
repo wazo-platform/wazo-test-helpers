@@ -68,6 +68,10 @@ class BusMessageAccumulator(object):
     def push_back(self, event):
         self._events.insert(0, event)
 
+    def reset(self):
+        self._pull_events()
+        self._events = []
+
     def _pull_events(self):
         with Connection(self._url) as conn:
             with Consumer(conn, self._queue, callbacks=[self._on_event]):
