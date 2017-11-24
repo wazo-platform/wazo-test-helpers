@@ -137,6 +137,7 @@ import outcall_trunk
 import queue
 import queue_extension
 import queue_member_agent
+import register_sip
 import schedule
 import schedule_entity
 import switchboard
