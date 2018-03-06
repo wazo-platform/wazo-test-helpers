@@ -128,7 +128,7 @@ def users_put(user_uuid):
     args = request.get_json()
     args['uuid'] = user['uuid']
     args['emails'] = user['emails']
-    args['enabled'] = user.get('enabled', True)
+    args['enabled'] = args.get('enabled', True)
     users[args['uuid']] = args
     return jsonify(args)
 
