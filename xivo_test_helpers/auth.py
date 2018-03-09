@@ -36,8 +36,22 @@ class AuthClient(object):
         url = self.url('_remove_token', token_id)
         requests.delete(url, verify=False)
 
+    def set_invalid_credentials(self, credentials):
+        url = self.url('_add_invalid_credentials')
+        requests.post(url, json=credentials.to_dict(), verify=False)
+
+    def set_credentials_for_invalid_token(self, credentials):
+        url = self.url('_add_credentials_for_invalid_token')
+        requests.post(url, json=credentials.to_dict(), verify=False)
+
 
 class MockUserToken(object):
+
+    @classmethod
+    def some_token(cls, **kwargs):
+        kwargs.setdefault('token', str(uuid.uuid4()))
+        kwargs.setdefault('user_uuid', str(uuid.uuid4()))
+        return cls(**kwargs)
 
     def __init__(self, token, user_uuid, wazo_uuid=None, metadata=None):
         self.token_id = token
@@ -51,4 +65,17 @@ class MockUserToken(object):
             'auth_id': self.auth_id,
             'xivo_uuid': self.wazo_uuid,
             'metadata': self.metadata,
+        }
+
+
+class MockCredentials(object):
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+    def to_dict(self):
+        return {
+            'username': self.username,
+            'password': self.password,
         }

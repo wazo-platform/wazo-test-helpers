@@ -74,6 +74,24 @@ def set_token(token_id):
         return '', 204
 
 
+@app.route("/_add_invalid_credentials", methods=['POST'])
+def add_invalid_credentials():
+    request_body = request.get_json()
+    invalid_username_passwords.append((request_body['username'],
+                                       request_body['password']))
+
+    return '', 204
+
+
+@app.route("/_add_credentials_for_invalid_token", methods=['POST'])
+def add_credentials_for_invalid_token():
+    request_body = request.get_json()
+    token_that_will_be_invalid_when_used.append((request_body['username'],
+                                                 request_body['password']))
+
+    return '', 204
+
+
 @app.route("/0.1/token/<token>", methods=['HEAD'])
 def token_head_ok(token):
     if token in wrong_acl_tokens:
