@@ -14,7 +14,20 @@ port = int(sys.argv[1])
 
 context = ('/usr/local/share/ssl/auth/server.crt', '/usr/local/share/ssl/auth/server.key')
 
-valid_tokens = {'valid-token': {'auth_id': 'uuid', 'token': 'valid-token'}}
+valid_tokens = {
+    'valid-token': {
+        'auth_id': 'uuid',
+        'token': 'valid-token',
+        'metadata': {
+            'tenants': [
+                {
+                    'uuid': 'ffffffff-ffff-ffff-ffff-ffffffffffff',
+                    'name': 'valid-tenant',
+                }
+            ]
+        }
+    },
+}
 wrong_acl_tokens = {'invalid-acl-token'}
 invalid_username_passwords = [('test', 'foobar')]
 token_that_will_be_invalid_when_used = [('test', 'iddqd')]
