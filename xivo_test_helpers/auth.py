@@ -39,14 +39,16 @@ class AuthClient(object):
 
 class MockUserToken(object):
 
-    def __init__(self, token, user_uuid, wazo_uuid=None):
+    def __init__(self, token, user_uuid, wazo_uuid=None, metadata=None):
         self.token_id = token
         self.auth_id = user_uuid
         self.wazo_uuid = wazo_uuid or str(uuid.uuid4())
+        self.metadata = metadata or {}
 
     def to_dict(self):
         return {
             'token': self.token_id,
             'auth_id': self.auth_id,
             'xivo_uuid': self.wazo_uuid,
+            'metadata': self.metadata,
         }
