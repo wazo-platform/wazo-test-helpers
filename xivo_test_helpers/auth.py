@@ -40,13 +40,13 @@ class AuthClient(object):
 class MockUserToken(object):
 
     def __init__(self, token, user_uuid, wazo_uuid=None):
-        self._token = token
-        self._auth_id = user_uuid
-        self._wazo_uuid = wazo_uuid or str(uuid.uuid4())
+        self.token_id = token
+        self.auth_id = user_uuid
+        self.wazo_uuid = wazo_uuid or str(uuid.uuid4())
 
     def to_dict(self):
         return {
-            'token': self._token,
-            'auth_id': self._auth_id,
-            'xivo_uuid': self._wazo_uuid,
+            'token': self.token_id,
+            'auth_id': self.auth_id,
+            'xivo_uuid': self.wazo_uuid,
         }
