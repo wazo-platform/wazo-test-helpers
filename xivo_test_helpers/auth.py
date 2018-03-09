@@ -32,6 +32,10 @@ class AuthClient(object):
         url = self.url('_set_token')
         requests.post(url, json=token.to_dict(), verify=False)
 
+    def revoke_token(self, token_id):
+        url = self.url('_remove_token', token_id)
+        requests.delete(url, verify=False)
+
 
 class MockUserToken(object):
 
