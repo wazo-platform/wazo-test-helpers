@@ -27,6 +27,26 @@ valid_tokens = {
             ]
         }
     },
+    'valid-token-multitenant': {
+        'auth_id': 'uuid-multitenant',
+        'token': 'valid-token-multitenant',
+        'metadata': {
+            'tenants': [
+                {
+                    'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
+                    'name': 'valid-tenant1',
+                },
+                {
+                    'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2',
+                    'name': 'valid-tenant2',
+                },
+                {
+                    'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee3',
+                    'name': 'valid-tenant3',
+                },
+            ]
+        }
+    }
 }
 wrong_acl_tokens = {'invalid-acl-token'}
 invalid_username_passwords = [('test', 'foobar')]
