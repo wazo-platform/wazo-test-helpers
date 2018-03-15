@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
@@ -68,7 +68,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
     @classmethod
     def rm_containers(cls):
         _run_cmd(['docker-compose'] + cls._docker_compose_options() +
-                 ['rm', '--force'])
+                 ['down', '--timeout', '0'])
 
     @classmethod
     def start_containers(cls, bootstrap_container):
