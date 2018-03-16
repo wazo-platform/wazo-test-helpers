@@ -147,6 +147,11 @@ def users_list():
     return jsonify({'items': [user for user in users.values()]})
 
 
+@app.route("/0.1/tenants", methods=['POST'])
+def tenants_post():
+    return jsonify(request.get_json())
+
+
 @app.route("/0.1/users", methods=['POST'])
 def users_post():
     args = request.get_json()
