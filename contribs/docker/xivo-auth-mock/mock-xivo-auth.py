@@ -19,6 +19,7 @@ valid_tokens = {
         'auth_id': 'uuid',
         'token': 'valid-token',
         'metadata': {
+            'uuid': 'uuid',
             'tenants': [
                 {
                     'uuid': 'ffffffff-ffff-ffff-ffff-ffffffffffff',
@@ -31,6 +32,7 @@ valid_tokens = {
         'auth_id': 'uuid-multitenant',
         'token': 'valid-token-multitenant',
         'metadata': {
+            'uuid': 'uuid-multitenant',
             'tenants': [
                 {
                     'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
