@@ -178,6 +178,29 @@ def users_get(user_uuid):
     return jsonify(user)
 
 
+@app.route("/0.1/users/<user_uuid>/tenants", methods=['GET'])
+def users_get_tenants(user_uuid):
+    tenants = None
+
+    for body in valid_tokens.itervalues():
+        if body['metadata']['uuid'] != user_uuid:
+            continue
+        tenants = body['metadata']['tenants']
+
+    print tenants
+    if tenants is None:
+        print 'did not find', user_uuid
+        return '', 404
+
+    result = {
+        'total': len(tenants),
+        'filtered': len(tenants),
+        'items': tenants,
+    }
+
+    return jsonify(result), 200
+
+
 @app.route("/0.1/users/<user_uuid>", methods=['PUT'])
 def users_put(user_uuid):
     user = users.get(user_uuid)
