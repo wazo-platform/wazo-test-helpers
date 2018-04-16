@@ -1,40 +1,43 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import uuid
 
-from kombu import Connection
-from kombu import Consumer
-from kombu import Exchange
-from kombu import Producer
-from kombu import Queue
+from kombu import (
+    Connection,
+    Consumer,
+    Exchange,
+    Producer,
+    Queue,
+)
 from kombu.exceptions import TimeoutError
-
-BUS_EXCHANGE_XIVO = Exchange('xivo', type='topic')
 
 
 class BusClient(object):
 
-    def __init__(self, url):
+    def __init__(self, url, exchange):
         self._url = url
+        self._default_exchange = exchange
 
     @classmethod
-    def from_connection_fields(cls, user='guest', password='guest', host='localhost', port=5672):
+    def from_connection_fields(cls, user='guest', password='guest', host='localhost', port=5672, exchange_name='xivo'):
         url = 'amqp://{user}:{password}@{host}:{port}//'.format(user=user, password=password, host=host, port=port)
-        return cls(url)
+        exchange = Exchange(exchange_name, type='topic')
+        return cls(url, exchange)
 
     def is_up(self):
         try:
             with Connection(self._url) as connection:
-                producer = Producer(connection, exchange=BUS_EXCHANGE_XIVO, auto_declare=True)
+                producer = Producer(connection, exchange=self._default_exchange, auto_declare=True)
                 producer.publish('', routing_key='test')
         except IOError:
             return False
         else:
             return True
 
-    def accumulator(self, routing_key, exchange=BUS_EXCHANGE_XIVO):
+    def accumulator(self, routing_key, exchange=None):
+        exchange = exchange or self._default_exchange
         queue_name = str(uuid.uuid4())
         with Connection(self._url) as conn:
             queue = Queue(name=queue_name, exchange=exchange, routing_key=routing_key, channel=conn.channel())
@@ -43,10 +46,11 @@ class BusClient(object):
             accumulator = BusMessageAccumulator(self._url, queue)
         return accumulator
 
-    def publish(self, payload, routing_key, headers=None):
+    def publish(self, payload, routing_key, headers=None, exchange=None):
+        exchange = exchange or self._default_exchange
         headers = headers or {}
         with Connection(self._url) as connection:
-            producer = Producer(connection, exchange=BUS_EXCHANGE_XIVO, auto_declare=True)
+            producer = Producer(connection, exchange=exchange, auto_declare=True)
             producer.publish(payload, routing_key=routing_key, headers=headers)
 
 
