@@ -53,6 +53,11 @@ class BusClient(object):
             producer = Producer(connection, exchange=exchange, auto_declare=True)
             producer.publish(payload, routing_key=routing_key, headers=headers)
 
+    def queue_declare(self, queue):
+        with Connection(self._url) as connection:
+            channel = connection.default_channel
+            queue.bind(channel).declare()
+
 
 class BusMessageAccumulator(object):
 
