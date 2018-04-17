@@ -16,7 +16,7 @@ from kombu.exceptions import TimeoutError
 
 class BusClient(object):
 
-    def __init__(self, url, exchange):
+    def __init__(self, url, exchange=None):
         self._url = url
         self._default_exchange = exchange
 
