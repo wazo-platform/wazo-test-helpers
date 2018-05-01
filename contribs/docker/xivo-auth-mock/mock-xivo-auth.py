@@ -105,7 +105,7 @@ def token_head_ok(token):
             return '', 204
         return '', 403
     else:
-        return '', 401
+        return '', 404
 
 
 @app.route("/0.1/token/<token>", methods=['GET'])
