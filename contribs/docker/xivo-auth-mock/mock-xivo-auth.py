@@ -50,7 +50,39 @@ valid_tokens = {
                 },
             ]
         }
-    }
+    },
+    'valid-token-master-tenant': {
+        'auth_id': 'uuid-tenant-master',
+        'token': 'valid-token-tenant-master',
+        'metadata': {
+            'uuid': 'uuid-tenant-master',
+            'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
+            'tenants': [
+                {
+                    'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
+                    'name': 'master-tenant',
+                },
+                {
+                    'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee20',
+                    'name': 'sub-tenant',
+                },
+            ]
+        }
+    },
+    'valid-token-sub-tenant': {
+        'auth_id': 'uuid-subtenant',
+        'token': 'valid-token-subtenant',
+        'metadata': {
+            'uuid': 'uuid-subtenant',
+            'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee11',
+            'tenants': [
+                {
+                    'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee11',
+                    'name': 'sub-tenant',
+                },
+            ]
+        }
+    },
 }
 wrong_acl_tokens = {'invalid-acl-token'}
 invalid_username_passwords = [('test', 'foobar')]
