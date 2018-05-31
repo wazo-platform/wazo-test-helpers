@@ -63,7 +63,7 @@ valid_tokens = {
                     'name': 'master-tenant',
                 },
                 {
-                    'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee20',
+                    'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee11',
                     'name': 'sub-tenant',
                 },
             ]
