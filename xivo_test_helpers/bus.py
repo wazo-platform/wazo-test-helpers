@@ -38,7 +38,7 @@ class BusClient(object):
 
     def accumulator(self, routing_key, exchange=None):
         exchange = exchange or self._default_exchange
-        queue_name = str(uuid.uuid4())
+        queue_name = 'test-{}'.format(str(uuid.uuid4()))
         with Connection(self._url) as conn:
             queue = Queue(name=queue_name, exchange=exchange, routing_key=routing_key, channel=conn.channel())
             queue.declare()
