@@ -247,6 +247,29 @@ def users_put(user_uuid):
     return jsonify(args)
 
 
+@app.route("/0.1/tenants", methods=['GET'])
+def tenants_get():
+    print request.headers
+    print request.headers['Wazo-Tenant']
+    specified_tenant = request.headers['Wazo-Tenant']
+    if specified_tenant == 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1':
+        return jsonify({
+            'items': [
+                {'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'},
+                {'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'},
+                {'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee3'},
+            ],
+            'total': 3,
+            'filtered': 3,
+        }), 200
+
+    return jsonify({
+        'items': [{'uuid': specified_tenant}],
+        'total': 1,
+        'filtered': 1,
+    }), 200
+
+
 @app.route("/0.1/users/<user_uuid>", methods=['DELETE'])
 def users_delete(user_uuid):
     del users[user_uuid]
