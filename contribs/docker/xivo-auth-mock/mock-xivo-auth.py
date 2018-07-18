@@ -249,8 +249,6 @@ def users_put(user_uuid):
 
 @app.route("/0.1/tenants", methods=['GET'])
 def tenants_get():
-    print request.headers
-    print request.headers['Wazo-Tenant']
     specified_tenant = request.headers['Wazo-Tenant']
     if specified_tenant == 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1':
         return jsonify({
