@@ -91,7 +91,7 @@ users = {}
 
 
 @app.route("/_set_token", methods=['POST'])
-def add_token():
+def set_token():
     request_body = request.get_json()
     token = request_body['token']
 
@@ -101,7 +101,7 @@ def add_token():
 
 
 @app.route("/_remove_token/<token_id>", methods=['DELETE'])
-def set_token(token_id):
+def remove_token(token_id):
     try:
         del valid_tokens[token_id]
     except KeyError:
