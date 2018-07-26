@@ -53,7 +53,7 @@ valid_tokens = {
     },
     'valid-token-master-tenant': {
         'auth_id': 'uuid-tenant-master',
-        'token': 'valid-token-tenant-master',
+        'token': 'valid-token-master-tenant',
         'metadata': {
             'uuid': 'uuid-tenant-master',
             'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
@@ -69,7 +69,7 @@ valid_tokens = {
             ]
         }
     },
-    'valid-token-sub-tenant': {
+    'valid-token-subtenant': {
         'auth_id': 'uuid-subtenant',
         'token': 'valid-token-subtenant',
         'metadata': {
