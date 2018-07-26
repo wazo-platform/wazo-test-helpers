@@ -250,17 +250,14 @@ def users_put(user_uuid):
 @app.route("/0.1/tenants", methods=['GET'])
 def tenants_get():
     specified_tenant = request.headers['Wazo-Tenant']
-    if specified_tenant == 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1':
-        return jsonify({
-            'items': [
-                {'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'},
-                {'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'},
-                {'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee3'},
-            ],
-            'total': 3,
-            'filtered': 3,
-        }), 200
-
+    for key, value in valid_tokens.items():
+        if valid_tokens[key]['metadata']['tenant_uuid'] == specified_tenant:
+            tenants = valid_tokens[key]['metadata']['tenants']
+            return jsonify({
+                'items': tenants,
+                'total': len(tenants),
+                'filtered': len(tenants),
+            }), 200
     return jsonify({
         'items': [{'uuid': specified_tenant}],
         'total': 1,
