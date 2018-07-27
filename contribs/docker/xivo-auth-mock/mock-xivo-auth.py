@@ -69,9 +69,9 @@ valid_tokens = {
             ]
         }
     },
-    'valid-token-subtenant': {
+    'valid-token-sub-tenant': {
         'auth_id': 'uuid-subtenant',
-        'token': 'valid-token-subtenant',
+        'token': 'valid-token-sub-tenant',
         'metadata': {
             'uuid': 'uuid-subtenant',
             'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee11',
