@@ -53,7 +53,7 @@ valid_tokens = {
     },
     'valid-token-master-tenant': {
         'auth_id': 'uuid-tenant-master',
-        'token': 'valid-token-tenant-master',
+        'token': 'valid-token-master-tenant',
         'metadata': {
             'uuid': 'uuid-tenant-master',
             'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
@@ -71,7 +71,7 @@ valid_tokens = {
     },
     'valid-token-sub-tenant': {
         'auth_id': 'uuid-subtenant',
-        'token': 'valid-token-subtenant',
+        'token': 'valid-token-sub-tenant',
         'metadata': {
             'uuid': 'uuid-subtenant',
             'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee11',
@@ -250,17 +250,14 @@ def users_put(user_uuid):
 @app.route("/0.1/tenants", methods=['GET'])
 def tenants_get():
     specified_tenant = request.headers['Wazo-Tenant']
-    if specified_tenant == 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1':
-        return jsonify({
-            'items': [
-                {'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1'},
-                {'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2'},
-                {'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee3'},
-            ],
-            'total': 3,
-            'filtered': 3,
-        }), 200
-
+    for key, value in valid_tokens.items():
+        if valid_tokens[key]['metadata']['tenant_uuid'] == specified_tenant:
+            tenants = valid_tokens[key]['metadata']['tenants']
+            return jsonify({
+                'items': tenants,
+                'total': len(tenants),
+                'filtered': len(tenants),
+            }), 200
     return jsonify({
         'items': [{'uuid': specified_tenant}],
         'total': 1,
