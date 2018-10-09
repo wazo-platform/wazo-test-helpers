@@ -265,6 +265,12 @@ def tenants_get():
     }), 200
 
 
+@app.route("/0.1/tenants/<tenant_uuid>", methods=['GET'])
+def tenant_get(tenant_uuid):
+    # Simulate master tenant
+    return jsonify({'uuid': tenant_uuid, 'parent_uuid': tenant_uuid}), 200
+
+
 @app.route("/0.1/users/<user_uuid>", methods=['DELETE'])
 def users_delete(user_uuid):
     del users[user_uuid]
