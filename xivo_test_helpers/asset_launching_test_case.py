@@ -27,6 +27,12 @@ class NoSuchPort(Exception):
         super(NoSuchPort, self).__init__('For service {}: No such port: {}'.format(service_name, port))
 
 
+class ContainerStartFailed(Exception):
+    def __init__(self, output):
+        super(ContainerStartFailed, self).__init__('Container start failed: {}'.format(output))
+        self.output = output
+
+
 class AssetLaunchingTestCase(unittest.TestCase):
     """
     Subclasses of this class MUST have the following fields:
@@ -62,7 +68,12 @@ class AssetLaunchingTestCase(unittest.TestCase):
         cls.rm_containers()
         logger.debug('Done.')
         logger.debug('Starting containers...')
-        cls.start_containers(bootstrap_container='sync')
+        try:
+            cls.start_containers(bootstrap_container='sync')
+        except ContainerStartFailed as e:
+            logger.error(e)
+            cls.rm_containers()
+            raise
         logger.debug('Done.')
 
     @classmethod
@@ -72,8 +83,10 @@ class AssetLaunchingTestCase(unittest.TestCase):
 
     @classmethod
     def start_containers(cls, bootstrap_container):
-        _run_cmd(['docker-compose'] + cls._docker_compose_options() +
-                 ['run', '--rm', bootstrap_container])
+        completed_process = _run_cmd(['docker-compose'] + cls._docker_compose_options() +
+                                     ['run', '--rm', bootstrap_container])
+        if completed_process.returncode != 0:
+            raise ContainerStartFailed(output=completed_process.stdout.decode('unicode-escape'))
 
     @classmethod
     def kill_containers(cls):
@@ -83,7 +96,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
     @classmethod
     def log_containers(cls):
         return _run_cmd(['docker-compose'] + cls._docker_compose_options() +
-                        ['logs', '--no-color'])
+                        ['logs', '--no-color']).stdout
 
     @classmethod
     def service_status(cls, service_name=None):
@@ -98,7 +111,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
         if not service_name:
             service_name = cls.service
 
-        status = _run_cmd(['docker', 'logs', cls._container_id(service_name)])
+        status = _run_cmd(['docker', 'logs', cls._container_id(service_name)]).stdout
         return status.decode('utf-8')
 
     @classmethod
@@ -150,7 +163,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
             service_name = cls.service
 
         docker_command = ['docker', 'exec', cls._container_id(service_name)] + command
-        return _run_cmd(docker_command)
+        return _run_cmd(docker_command).stdout
 
     @classmethod
     def _run_cmd(cls, cmd):
@@ -159,7 +172,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
     @classmethod
     def _container_id(cls, service_name):
         result = _run_cmd(['docker-compose'] + cls._docker_compose_options() +
-                          ['ps', '-q', service_name], stderr=False).strip()
+                          ['ps', '-q', service_name], stderr=False).stdout.strip()
         result = result.decode('utf-8')
         if '\n' in result:
             raise AssertionError('There is more than one container running with name {}'.format(service_name))
@@ -176,11 +189,20 @@ class AssetLaunchingTestCase(unittest.TestCase):
         ]
 
 
+class CompletedProcess(object):
+    '''Partially bakported from python3 subprocess'''
+
+    def __init__(self, process):
+        self.stdout, self.stderr = process.communicate()
+        self.returncode = process.returncode
+        self.args = process.args
+
+
 def _run_cmd(cmd, stderr=True):
     logger.debug('%s', cmd)
     with open(os.devnull, "w") as null:
         stderr = subprocess.STDOUT if stderr else null
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=stderr)
-        out, _ = process.communicate()
-    logger.info('%s', out)
-    return out
+        completed_process = CompletedProcess(process)
+    logger.info('%s', completed_process.stdout)
+    return completed_process
