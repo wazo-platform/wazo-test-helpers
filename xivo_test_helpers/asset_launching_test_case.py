@@ -72,7 +72,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
             cls.start_containers(bootstrap_container='sync')
         except ContainerStartFailed as e:
             logger.error(e)
-            cls.rm_containers()
+            cls.kill_containers()
             raise
         logger.debug('Done.')
 
