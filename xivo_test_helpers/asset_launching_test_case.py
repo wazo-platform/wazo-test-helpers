@@ -195,7 +195,6 @@ class CompletedProcess(object):
     def __init__(self, process):
         self.stdout, self.stderr = process.communicate()
         self.returncode = process.returncode
-        self.args = process.args
 
 
 def _run_cmd(cmd, stderr=True):
