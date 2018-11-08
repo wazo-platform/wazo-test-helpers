@@ -11,6 +11,10 @@ from flask import Flask, jsonify, request
 app = Flask(__name__)
 
 port = int(sys.argv[1])
+try:
+    url_prefix = sys.argv[2]
+except IndexError:
+    url_prefix = ''
 
 context = ('/usr/local/share/ssl/auth/server.crt', '/usr/local/share/ssl/auth/server.key')
 
@@ -90,7 +94,7 @@ token_that_will_be_invalid_when_used = [('test', 'iddqd')]
 users = {}
 
 
-@app.route("/_set_token", methods=['POST'])
+@app.route(url_prefix + "/_set_token", methods=['POST'])
 def set_token():
     request_body = request.get_json()
     token = request_body['token']
@@ -100,7 +104,7 @@ def set_token():
     return '', 204
 
 
-@app.route("/_remove_token/<token_id>", methods=['DELETE'])
+@app.route(url_prefix + "/_remove_token/<token_id>", methods=['DELETE'])
 def remove_token(token_id):
     try:
         del valid_tokens[token_id]
@@ -110,7 +114,7 @@ def remove_token(token_id):
         return '', 204
 
 
-@app.route("/_add_invalid_credentials", methods=['POST'])
+@app.route(url_prefix + "/_add_invalid_credentials", methods=['POST'])
 def add_invalid_credentials():
     request_body = request.get_json()
     invalid_username_passwords.append((request_body['username'],
@@ -119,7 +123,7 @@ def add_invalid_credentials():
     return '', 204
 
 
-@app.route("/_add_credentials_for_invalid_token", methods=['POST'])
+@app.route(url_prefix + "/_add_credentials_for_invalid_token", methods=['POST'])
 def add_credentials_for_invalid_token():
     request_body = request.get_json()
     token_that_will_be_invalid_when_used.append((request_body['username'],
@@ -128,7 +132,7 @@ def add_credentials_for_invalid_token():
     return '', 204
 
 
-@app.route("/0.1/token/<token>", methods=['HEAD'])
+@app.route(url_prefix + "/0.1/token/<token>", methods=['HEAD'])
 def token_head_ok(token):
     if token in wrong_acl_tokens:
         return '', 403
@@ -140,7 +144,7 @@ def token_head_ok(token):
         return '', 404
 
 
-@app.route("/0.1/token/<token>", methods=['GET'])
+@app.route(url_prefix + "/0.1/token/<token>", methods=['GET'])
 def token_get(token):
     if token not in valid_tokens:
         return '', 404
@@ -165,7 +169,7 @@ def _valid_acl(token_id):
     return True
 
 
-@app.route("/0.1/token", methods=['POST'])
+@app.route(url_prefix + "/0.1/token", methods=['POST'])
 def token_post():
     auth = request.authorization['username'], request.authorization['password']
     if auth in invalid_username_passwords:
@@ -178,17 +182,17 @@ def token_post():
                                  'token': 'valid-token'}})
 
 
-@app.route("/0.1/users", methods=['GET'])
+@app.route(url_prefix + "/0.1/users", methods=['GET'])
 def users_list():
     return jsonify({'items': [user for user in users.values()]})
 
 
-@app.route("/0.1/tenants", methods=['POST'])
+@app.route(url_prefix + "/0.1/tenants", methods=['POST'])
 def tenants_post():
     return jsonify(request.get_json())
 
 
-@app.route("/0.1/users", methods=['POST'])
+@app.route(url_prefix + "/0.1/users", methods=['POST'])
 def users_post():
     args = request.get_json()
     email = {'address': args['email_address']} if args.get('email_address') else None
@@ -204,7 +208,7 @@ def users_post():
     return jsonify(user)
 
 
-@app.route("/0.1/users/<user_uuid>", methods=['GET'])
+@app.route(url_prefix + "/0.1/users/<user_uuid>", methods=['GET'])
 def users_get(user_uuid):
     user = users.get(user_uuid)
     if not user:
@@ -212,7 +216,7 @@ def users_get(user_uuid):
     return jsonify(user)
 
 
-@app.route("/0.1/users/<user_uuid>/tenants", methods=['GET'])
+@app.route(url_prefix + "/0.1/users/<user_uuid>/tenants", methods=['GET'])
 def users_get_tenants(user_uuid):
     tenants = None
 
@@ -234,7 +238,7 @@ def users_get_tenants(user_uuid):
     return jsonify(result), 200
 
 
-@app.route("/0.1/users/<user_uuid>", methods=['PUT'])
+@app.route(url_prefix + "/0.1/users/<user_uuid>", methods=['PUT'])
 def users_put(user_uuid):
     user = users.get(user_uuid)
     if not user:
@@ -247,7 +251,7 @@ def users_put(user_uuid):
     return jsonify(args)
 
 
-@app.route("/0.1/tenants", methods=['GET'])
+@app.route(url_prefix + "/0.1/tenants", methods=['GET'])
 def tenants_get():
     specified_tenant = request.headers['Wazo-Tenant']
     for key, value in valid_tokens.items():
@@ -265,19 +269,19 @@ def tenants_get():
     }), 200
 
 
-@app.route("/0.1/tenants/<tenant_uuid>", methods=['GET'])
+@app.route(url_prefix + "/0.1/tenants/<tenant_uuid>", methods=['GET'])
 def tenant_get(tenant_uuid):
     # Simulate master tenant
     return jsonify({'uuid': tenant_uuid, 'parent_uuid': tenant_uuid}), 200
 
 
-@app.route("/0.1/users/<user_uuid>", methods=['DELETE'])
+@app.route(url_prefix + "/0.1/users/<user_uuid>", methods=['DELETE'])
 def users_delete(user_uuid):
     del users[user_uuid]
     return '', 204
 
 
-@app.route("/0.1/users/password/reset", methods=['POST'])
+@app.route(url_prefix + "/0.1/users/password/reset", methods=['POST'])
 def users_password_reset():
     user_uuid = request.args.get('user_uuid')
     user = users.get(user_uuid)
@@ -286,7 +290,7 @@ def users_password_reset():
     return '', 204
 
 
-@app.route("/0.1/admin/users/<user_uuid>/emails", methods=['PUT'])
+@app.route(url_prefix + "/0.1/admin/users/<user_uuid>/emails", methods=['PUT'])
 def admin_users_emails_put(user_uuid):
     user = users.get(user_uuid)
     if not user:
