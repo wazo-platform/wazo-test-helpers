@@ -25,6 +25,8 @@ _EMPTY_RESPONSES = {
             'name': 'default',
         },
     },
+    'wizard_discover': {},
+    'wizard': {},
 }
 
 app = Flask(__name__)
@@ -147,6 +149,16 @@ def moh():
     recurse = request.args.get('recurse')
     items = _responses['moh'].values() if recurse else []
     return jsonify({'items': items})
+
+
+@app.route('/1.1/wizard/discover')
+def wizard_discover():
+    return jsonify(_responses['wizard_discover'])
+
+
+@app.route('/1.1/wizard')
+def wizard():
+    return jsonify(_responses['wizard'])
 
 
 if __name__ == '__main__':
