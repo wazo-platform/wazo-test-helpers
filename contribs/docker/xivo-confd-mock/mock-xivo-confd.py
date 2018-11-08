@@ -46,7 +46,7 @@ def _reset():
 
 @app.before_request
 def log_request():
-    if not request.path.startswith('/_requests'):
+    if not request.path.startswith('/_'):
         path = request.path
         log = {'method': request.method,
                'path': path,
