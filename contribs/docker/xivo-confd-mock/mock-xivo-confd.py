@@ -159,7 +159,12 @@ def wizard_discover():
 
 
 @app.route('/1.1/wizard')
-def wizard():
+def wizard_get():
+    return jsonify(_responses['wizard'])
+
+
+@app.route('/1.1/wizard', methods=['POST'])
+def wizard_post():
     return jsonify(_responses['wizard'])
 
 
