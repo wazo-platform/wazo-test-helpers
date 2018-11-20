@@ -183,9 +183,11 @@ class AssetLaunchingTestCase(unittest.TestCase):
     @classmethod
     def _docker_compose_options(cls):
         return [
-            '--file', os.path.join(cls.assets_root, cls.asset, 'docker-compose.yml'),
-            # separator is 0, because docker-compose does not allow anything other than [a-z0-9]...
-            '--project-name', '{project}0{asset}'.format(project=cls.service, asset=cls.asset),
+            '--file', os.path.join(cls.assets_root, 'docker-compose.yml'),
+            '--file', os.path.join(
+                cls.assets_root, 'docker-compose.{}.override.yml'.format(cls.asset)
+            ),
+            '--project-name', cls.service,
         ]
 
 
