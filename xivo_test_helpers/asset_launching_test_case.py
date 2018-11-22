@@ -79,7 +79,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
     @classmethod
     def rm_containers(cls):
         _run_cmd(['docker-compose'] + cls._docker_compose_options() +
-                 ['down', '--timeout', '0'])
+                 ['down', '--timeout', '0', '--volumes'])
 
     @classmethod
     def start_containers(cls, bootstrap_container):
