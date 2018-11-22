@@ -136,7 +136,7 @@ def switchboards():
 
 @app.route('/1.1/infos')
 def infos():
-    return jsonify({'items': _responses['infos'].values()})
+    return jsonify(_responses['infos'])
 
 
 @app.route('/1.1/switchboards/<switchboard_uuid>')
