@@ -28,9 +28,13 @@ class NoSuchPort(Exception):
 
 
 class ContainerStartFailed(Exception):
-    def __init__(self, output):
-        super(ContainerStartFailed, self).__init__('Container start failed: {}'.format(output))
-        self.output = output
+    def __init__(self, stdout, stderr, return_code):
+        message = 'Container start failed (code {}): output follows.\nstdout:\n{}\nstderr:\n{}'.format(return_code, stdout, stderr)
+        super(ContainerStartFailed, self).__init__(message)
+
+        self.stdout = stdout
+        self.stderr = stderr
+        self.return_code = return_code
 
 
 class AssetLaunchingTestCase(unittest.TestCase):
@@ -86,7 +90,9 @@ class AssetLaunchingTestCase(unittest.TestCase):
         completed_process = _run_cmd(['docker-compose'] + cls._docker_compose_options() +
                                      ['run', '--rm', bootstrap_container])
         if completed_process.returncode != 0:
-            raise ContainerStartFailed(output=completed_process.stdout.decode('unicode-escape'))
+            raise ContainerStartFailed(stdout=completed_process.stdout.decode('unicode-escape'),
+                                       stderr=completed_process.stderr.decode('unicode-escape'),
+                                       return_code=completed_process.returncode)
 
     @classmethod
     def kill_containers(cls):
@@ -183,6 +189,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
     @classmethod
     def _docker_compose_options(cls):
         return [
+            '--no-ansi',
             '--file', os.path.join(cls.assets_root, 'docker-compose.yml'),
             '--file', os.path.join(
                 cls.assets_root, 'docker-compose.{}.override.yml'.format(cls.asset)
@@ -196,6 +203,8 @@ class CompletedProcess(object):
 
     def __init__(self, process):
         self.stdout, self.stderr = process.communicate()
+        self.stdout = self.stdout or b''
+        self.stderr = self.stderr or b''
         self.returncode = process.returncode
 
 
