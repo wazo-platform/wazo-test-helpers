@@ -165,6 +165,8 @@ def wizard_get():
 
 @app.route('/1.1/wizard', methods=['POST'])
 def wizard_post():
+    if _responses['wizard'].get('fail'):
+        raise RuntimeError('Raising expected failure')
     return jsonify(_responses['wizard'])
 
 
