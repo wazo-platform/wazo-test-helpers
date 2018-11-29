@@ -100,6 +100,14 @@ def user(user_uuid):
     return jsonify(_responses['users'][user_uuid])
 
 
+@app.route('/1.1/lines')
+def lines():
+    lines = _responses['lines'].values()
+    if 'name' in request.args:
+        lines = [line for line in lines if line['name'] == request.args['name']]
+    return jsonify({'items': lines})
+
+
 @app.route('/1.1/lines/<line_id>')
 def line(line_id):
     if line_id not in _responses['lines']:
