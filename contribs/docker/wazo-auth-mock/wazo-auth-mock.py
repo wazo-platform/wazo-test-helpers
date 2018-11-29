@@ -22,6 +22,7 @@ valid_tokens = {
     'valid-token': {
         'auth_id': 'uuid',
         'token': 'valid-token',
+        'xivo_user_uuid': 'uuid',
         'metadata': {
             'uuid': 'uuid',
             'tenant_uuid': 'ffffffff-ffff-ffff-ffff-ffffffffffff',
@@ -36,6 +37,7 @@ valid_tokens = {
     'valid-token-multitenant': {
         'auth_id': 'uuid-multitenant',
         'token': 'valid-token-multitenant',
+        'xivo_user_uuid': 'uuid-multitenant',
         'metadata': {
             'uuid': 'uuid-multitenant',
             'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
@@ -58,6 +60,7 @@ valid_tokens = {
     'valid-token-master-tenant': {
         'auth_id': 'uuid-tenant-master',
         'token': 'valid-token-master-tenant',
+        'xivo_user_uuid': 'uuid-tenant-master',
         'metadata': {
             'uuid': 'uuid-tenant-master',
             'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
@@ -76,6 +79,7 @@ valid_tokens = {
     'valid-token-sub-tenant': {
         'auth_id': 'uuid-subtenant',
         'token': 'valid-token-sub-tenant',
+        'xivo_user_uuid': 'uuid-subtenant',
         'metadata': {
             'uuid': 'uuid-subtenant',
             'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee11',
@@ -87,6 +91,15 @@ valid_tokens = {
             ]
         }
     },
+    'non-user-token': {
+        'auth_id': 'uuid-non-user',
+        'token': 'non-user-token',
+        'xivo_user_uuid': None,
+        'metadata': {
+            'uuid': None,
+            'tenant_uuid': 'dddddddd-dddd-dddd-dddd-dddddddddd11',
+        }
+    }
 }
 wrong_acl_tokens = {'invalid-acl-token'}
 invalid_username_passwords = [('test', 'foobar')]
