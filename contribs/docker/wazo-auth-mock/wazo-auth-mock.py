@@ -3,10 +3,13 @@
 # Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
+import logging
 import uuid
 import sys
 
 from flask import Flask, jsonify, request
+
+logger = logging.getLogger()
 
 app = Flask(__name__)
 
@@ -105,6 +108,52 @@ wrong_acl_tokens = {'invalid-acl-token'}
 invalid_username_passwords = [('test', 'foobar')]
 token_that_will_be_invalid_when_used = [('test', 'iddqd')]
 users = {}
+
+_requests = []
+
+
+def _reset():
+    global _requests
+    _requests = []
+
+
+@app.before_request
+def log_request():
+    if not request.path.startswith('/_'):
+        path = request.path
+        log = {'method': request.method,
+               'path': path,
+               'query': request.args.items(multi=True),
+               'body': request.data,
+               'json': request.json,
+               'headers': dict(request.headers)}
+        _requests.append(log)
+
+
+@app.after_request
+def print_request_response(response):
+    logger.debug('request: %s', {
+        'method': request.method,
+        'path': request.path,
+        'query': request.args.items(multi=True),
+        'body': request.data,
+        'headers': dict(request.headers)
+    })
+    logger.debug('response: %s', {
+        'body': response.data,
+    })
+    return response
+
+
+@app.route('/0.1/_requests', methods=['GET'])
+def list_requests():
+    return jsonify(requests=_requests)
+
+
+@app.route('/0.1/_reset', methods=['POST'])
+def reset():
+    _reset()
+    return '', 204
 
 
 @app.route(url_prefix + "/_set_token", methods=['POST'])
