@@ -140,12 +140,15 @@ class AssetLaunchingTestCase(unittest.TestCase):
         logger.debug('Done.')
 
     @classmethod
-    def restart_service(cls, service_name=None):
+    def restart_service(cls, service_name=None, signal=None):
         if not service_name:
             service_name = cls.service
 
         docker = docker_client.from_env().api
-        docker.restart(cls._container_id(service_name))
+        container_id = cls._container_id(service_name)
+        if signal:
+            docker.kill(container_id, signal=signal)
+        docker.restart(container_id)
 
     @classmethod
     def stop_service(cls, service_name=None, timeout=10):
