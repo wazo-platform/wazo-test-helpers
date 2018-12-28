@@ -15,6 +15,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 _EMPTY_RESPONSES = {
     'applications': {},
+    'conferences': {},
     'lines': {},
     'switchboards': {},
     'user_lines': {},
@@ -91,6 +92,14 @@ def set_response():
     set_response_body = request_body['content']
     _responses[set_response] = set_response_body
     return '', 204
+
+
+@app.route('/1.1/conferences')
+def conferences():
+    conferences = _responses['conferences'].values()
+    if 'name' in request.args:
+        conferences = [conference for conference in conferences if conference['name'] == request.args['name']]
+    return jsonify({'items': conferences})
 
 
 @app.route('/1.1/users/<user_uuid>')
