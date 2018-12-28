@@ -16,17 +16,17 @@ logging.basicConfig(level=logging.DEBUG)
 _EMPTY_RESPONSES = {
     'applications': {},
     'conferences': {},
-    'lines': {},
-    'switchboards': {},
-    'user_lines': {},
-    'users': {},
     'infos': {},
+    'lines': {},
     'moh': {
         '60f123e6-147b-487c-b08a-36395d43346e': {
             'uuid': '60f123e6-147b-487c-b08a-36395d43346e',
             'name': 'default',
         },
     },
+    'switchboards': {},
+    'user_lines': {},
+    'users': {},
     'wizard_discover': {},
     'wizard': {},
 }
@@ -94,6 +94,18 @@ def set_response():
     return '', 204
 
 
+@app.route('/1.1/applications')
+def applications():
+    return jsonify({'items': _responses['applications'].values()})
+
+
+@app.route('/1.1/applications/<application_uuid>')
+def application(application_uuid):
+    if application_uuid not in _responses['applications']:
+        return '', 404
+    return jsonify(_responses['applications'][application_uuid])
+
+
 @app.route('/1.1/conferences')
 def conferences():
     conferences = _responses['conferences'].values()
@@ -102,11 +114,9 @@ def conferences():
     return jsonify({'items': conferences})
 
 
-@app.route('/1.1/users/<user_uuid>')
-def user(user_uuid):
-    if user_uuid not in _responses['users']:
-        return '', 404
-    return jsonify(_responses['users'][user_uuid])
+@app.route('/1.1/infos')
+def infos():
+    return jsonify(_responses['infos'])
 
 
 @app.route('/1.1/lines')
@@ -124,36 +134,16 @@ def line(line_id):
     return jsonify(_responses['lines'][line_id])
 
 
-@app.route('/1.1/users/<user_uuid>/lines')
-def lines_of_user(user_uuid):
-    if user_uuid not in _responses['users']:
-        return '', 404
-
-    return jsonify({
-        'items': _responses['user_lines'].get(user_uuid, [])
-    })
-
-
-@app.route('/1.1/applications/<application_uuid>')
-def application(application_uuid):
-    if application_uuid not in _responses['applications']:
-        return '', 404
-    return jsonify(_responses['applications'][application_uuid])
-
-
-@app.route('/1.1/applications')
-def applications():
-    return jsonify({'items': _responses['applications'].values()})
+@app.route('/1.1/moh')
+def moh():
+    recurse = request.args.get('recurse')
+    items = _responses['moh'].values() if recurse else []
+    return jsonify({'items': items})
 
 
 @app.route('/1.1/switchboards')
 def switchboards():
     return jsonify({'items': _responses['switchboards'].values()})
-
-
-@app.route('/1.1/infos')
-def infos():
-    return jsonify(_responses['infos'])
 
 
 @app.route('/1.1/switchboards/<switchboard_uuid>')
@@ -163,16 +153,21 @@ def switchboard(switchboard_uuid):
     return jsonify(_responses['switchboards'][switchboard_uuid])
 
 
-@app.route('/1.1/moh')
-def moh():
-    recurse = request.args.get('recurse')
-    items = _responses['moh'].values() if recurse else []
-    return jsonify({'items': items})
+@app.route('/1.1/users/<user_uuid>')
+def user(user_uuid):
+    if user_uuid not in _responses['users']:
+        return '', 404
+    return jsonify(_responses['users'][user_uuid])
 
 
-@app.route('/1.1/wizard/discover')
-def wizard_discover():
-    return jsonify(_responses['wizard_discover'])
+@app.route('/1.1/users/<user_uuid>/lines')
+def lines_of_user(user_uuid):
+    if user_uuid not in _responses['users']:
+        return '', 404
+
+    return jsonify({
+        'items': _responses['user_lines'].get(user_uuid, [])
+    })
 
 
 @app.route('/1.1/wizard')
@@ -185,6 +180,11 @@ def wizard_post():
     if _responses['wizard'].get('fail'):
         raise RuntimeError('Raising expected failure')
     return jsonify(_responses['wizard'])
+
+
+@app.route('/1.1/wizard/discover')
+def wizard_discover():
+    return jsonify(_responses['wizard_discover'])
 
 
 if __name__ == '__main__':
