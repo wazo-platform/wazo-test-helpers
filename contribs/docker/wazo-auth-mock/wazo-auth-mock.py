@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
@@ -8,6 +8,8 @@ import uuid
 import sys
 
 from flask import Flask, jsonify, request
+
+logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger()
 
@@ -20,6 +22,13 @@ except IndexError:
     url_prefix = ''
 
 context = ('/usr/local/share/ssl/auth/server.crt', '/usr/local/share/ssl/auth/server.key')
+
+DEFAULT_POLICIES = {
+    'wazo_default_admin_policy': {
+        'uuid': '00000000-0000-0000-0000-000000000001',
+        'name': 'wazo_default_admin_policy',
+    }
+}
 
 valid_tokens = {
     'valid-token': {
@@ -288,7 +297,6 @@ def users_get_tenants(user_uuid):
         tenants = body['metadata']['tenants']
 
     if tenants is None:
-        print 'did not find', user_uuid
         return '', 404
 
     result = {
@@ -360,6 +368,24 @@ def admin_users_emails_put(user_uuid):
     emails = request.get_json()['emails']
     users[user['uuid']]['emails'] = emails
     return jsonify(emails)
+
+
+@app.route(url_prefix + "/0.1/policies", methods=['GET'])
+def policies_get():
+    policies_dict = dict(DEFAULT_POLICIES)
+    name = request.args.get('name')
+    policies = [policies_dict.get(name)] if name else policies_dict.items()
+
+    return jsonify({
+        'items': policies,
+        'total': len(policies),
+        'filtered': len(policies),
+    }), 200
+
+
+@app.route(url_prefix + "/0.1/users/<user_uuid>/policies/<policy_uuid>", methods=['PUT'])
+def users_policies_put(user_uuid, policy_uuid):
+    return '', 204
 
 
 if __name__ == "__main__":
