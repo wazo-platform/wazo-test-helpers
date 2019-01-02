@@ -297,7 +297,6 @@ def users_get_tenants(user_uuid):
         tenants = body['metadata']['tenants']
 
     if tenants is None:
-        print 'did not find', user_uuid
         return '', 404
 
     result = {
