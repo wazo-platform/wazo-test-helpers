@@ -9,6 +9,8 @@ import sys
 
 from flask import Flask, jsonify, request
 
+logging.basicConfig(level=logging.DEBUG)
+
 logger = logging.getLogger()
 
 app = Flask(__name__)
