@@ -117,13 +117,16 @@ wrong_acl_tokens = {'invalid-acl-token'}
 invalid_username_passwords = [('test', 'foobar')]
 token_that_will_be_invalid_when_used = [('test', 'iddqd')]
 users = {}
+tenants = {}
 
 _requests = []
 
 
 def _reset():
     global _requests
+    global _tenants
     _requests = []
+    _tenants = {}
 
 
 @app.before_request
@@ -162,6 +165,13 @@ def list_requests():
 @app.route('/0.1/_reset', methods=['POST'])
 def reset():
     _reset()
+    return '', 204
+
+
+@app.route(url_prefix + "/_set_tenants", methods=['POST'])
+def set_tenants():
+    global tenants
+    tenants = request.get_json()
     return '', 204
 
 
@@ -323,6 +333,17 @@ def users_put(user_uuid):
 
 @app.route(url_prefix + "/0.1/tenants", methods=['GET'])
 def tenants_get():
+    if tenants:
+        return tenant_list()
+    else:
+        return old_tenants_list()
+
+
+def tenant_list():
+    return jsonify(tenants), 200
+
+
+def old_tenants_list():
     specified_tenant = request.headers['Wazo-Tenant']
     for key, value in valid_tokens.items():
         if valid_tokens[key]['metadata']['tenant_uuid'] == specified_tenant:

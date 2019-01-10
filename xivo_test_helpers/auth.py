@@ -1,4 +1,4 @@
-# Copyright (C) 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright (C) 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0+
 
 import logging
@@ -27,6 +27,10 @@ class AuthClient(object):
         except requests.RequestException as e:
             logger.debug(e)
             return False
+
+    def set_tenants(self, tenants):
+        url = self.url('_set_tenants')
+        requests.post(url, json=tenants, verify=False)
 
     def set_token(self, token):
         url = self.url('_set_token')
