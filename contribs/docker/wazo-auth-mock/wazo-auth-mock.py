@@ -118,6 +118,7 @@ invalid_username_passwords = [('test', 'foobar')]
 token_that_will_be_invalid_when_used = [('test', 'iddqd')]
 users = {}
 tenants = {}
+sessions = {}
 
 _requests = []
 
@@ -182,6 +183,13 @@ def set_token():
 
     valid_tokens[token] = request_body
 
+    return '', 204
+
+
+@app.route(url_prefix + "/_set_sessions", methods=['POST'])
+def set_sessions():
+    global sessions
+    sessions = request.get_json()
     return '', 204
 
 
@@ -329,6 +337,11 @@ def users_put(user_uuid):
     args['enabled'] = args.get('enabled', True)
     users[args['uuid']] = args
     return jsonify(args)
+
+
+@app.route(url_prefix + "/0.1/sessions", methods=['GET'])
+def sessions_get():
+    return jsonify(sessions), 200
 
 
 @app.route(url_prefix + "/0.1/tenants", methods=['GET'])
