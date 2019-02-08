@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -151,6 +151,11 @@ def switchboard(switchboard_uuid):
     if switchboard_uuid not in _responses['switchboards']:
         return '', 404
     return jsonify(_responses['switchboards'][switchboard_uuid])
+
+
+@app.route('/1.1/users')
+def users():
+    return jsonify({'items': _responses['users'].values()})
 
 
 @app.route('/1.1/users/<user_uuid>')
