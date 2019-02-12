@@ -32,6 +32,10 @@ class AuthClient(object):
         url = self.url('_set_tenants')
         requests.post(url, json=tenants, verify=False)
 
+    def set_sessions(self, sessions):
+        url = self.url('_set_sessions')
+        requests.post(url, json=sessions, verify=False)
+
     def set_token(self, token):
         url = self.url('_set_token')
         requests.post(url, json=token.to_dict(), verify=False)
