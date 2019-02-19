@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
-import uuid
 import sys
+import uuid
 
 from flask import Flask, jsonify, request
 

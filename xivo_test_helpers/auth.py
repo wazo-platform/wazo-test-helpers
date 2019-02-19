@@ -2,8 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
-import requests
 import uuid
+
+import requests
 
 logger = logging.getLogger(__name__)
 
