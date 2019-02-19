@@ -115,12 +115,13 @@ valid_tokens = {
 }
 
 valid_credentials = {}
-wrong_acl_tokens = {'invalid-acl-token'}
+external = {}
 invalid_username_passwords = [('test', 'foobar')]
+sessions = {}
+tenants = {}
 token_that_will_be_invalid_when_used = [('test', 'iddqd')]
 users = {}
-tenants = {}
-sessions = {}
+wrong_acl_tokens = {'invalid-acl-token'}
 
 _requests = []
 
@@ -130,6 +131,26 @@ def _reset():
     global _tenants
     _requests = []
     _tenants = {}
+
+
+@app.route(url_prefix + "/0.1/users/<user_uuid>/external/microsoft", methods=['GET'])
+def external_auth_microsoft_get(user_uuid):
+    if external:
+        return jsonify(external)
+    else:
+        return '', 404
+
+@app.route(url_prefix + "/_reset_external_auth", methods=['POST'])
+def external_auth_reset():
+    global external
+    external = {}
+    return '', 204
+
+@app.route(url_prefix + "/_set_external_auth", methods=['POST'])
+def external_auth_set():
+    global external
+    external = request.get_json()
+    return '', 201
 
 
 @app.before_request
