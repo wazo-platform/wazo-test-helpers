@@ -113,6 +113,8 @@ valid_tokens = {
         }
     }
 }
+
+valid_credentials = {}
 wrong_acl_tokens = {'invalid-acl-token'}
 invalid_username_passwords = [('test', 'foobar')]
 token_that_will_be_invalid_when_used = [('test', 'iddqd')]
@@ -221,6 +223,18 @@ def add_credentials_for_invalid_token():
     return '', 204
 
 
+@app.route(url_prefix + "/_add_valid_credentials", methods=['POST'])
+def add_valid_credentials():
+    request_body = request.get_json()
+    valid_credentials[request_body['username']] = {
+        'username': request_body['username'],
+        'password': request_body['password'],
+        'token': request_body['token'],
+    }
+
+    return '', 204
+
+
 @app.route(url_prefix + "/0.1/token/<token>", methods=['HEAD'])
 def token_head_ok(token):
     if token in wrong_acl_tokens:
@@ -266,6 +280,15 @@ def token_post():
     elif auth in token_that_will_be_invalid_when_used:
         return jsonify({'data': {'auth_id': valid_tokens['valid-token']['auth_id'],
                                  'token': 'expired'}})
+    elif request.authorization['username'] in valid_credentials:
+        username = request.authorization['username']
+        password = request.authorization['password']
+        if password == valid_credentials[username]['password']:
+            token = valid_credentials[username]['token']
+            if token in valid_tokens:
+                return jsonify({'data': {'auth_id': valid_tokens[token]['auth_id'],
+                                         'token': token}})
+        return '', 401
     else:
         return jsonify({'data': {'auth_id': valid_tokens['valid-token']['auth_id'],
                                  'token': 'valid-token'}})

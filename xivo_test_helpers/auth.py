@@ -48,6 +48,12 @@ class AuthClient(object):
         url = self.url('_add_invalid_credentials')
         requests.post(url, json=credentials.to_dict(), verify=False)
 
+    def set_valid_credentials(self, credentials, token):
+        url = self.url('_add_valid_credentials')
+        credentials_with_token = credentials.to_dict()
+        credentials_with_token['token'] = token
+        requests.post(url, json=credentials_with_token, verify=False)
+
     def set_credentials_for_invalid_token(self, credentials):
         url = self.url('_add_credentials_for_invalid_token')
         requests.post(url, json=credentials.to_dict(), verify=False)
