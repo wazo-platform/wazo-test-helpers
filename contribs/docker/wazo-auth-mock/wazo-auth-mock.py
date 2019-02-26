@@ -290,8 +290,8 @@ def token_post():
                                          'token': token}})
         return '', 401
     else:
-        return jsonify({'data': {'auth_id': valid_tokens['valid-token']['auth_id'],
-                                 'token': 'valid-token'}})
+        return jsonify({'data': {'auth_id': valid_tokens['valid-token-multitenant']['auth_id'],
+                                 'token': 'valid-token-multitenant'}})
 
 
 @app.route(url_prefix + "/0.1/users", methods=['GET'])
