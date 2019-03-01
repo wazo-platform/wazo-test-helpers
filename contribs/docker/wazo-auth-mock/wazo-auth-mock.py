@@ -315,6 +315,7 @@ def users_post():
         'username': args.get('username', None),
         'emails': [email] if email else [],
         'enabled': args.get('enabled', True),
+        'tenant_uuid': request.headers.get('Wazo-Tenant', None)
     }
     users[user['uuid']] = user
     return jsonify(user)
