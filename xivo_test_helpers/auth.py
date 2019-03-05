@@ -2,8 +2,9 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
-import requests
 import uuid
+
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,14 @@ class AuthClient(object):
         except requests.RequestException as e:
             logger.debug(e)
             return False
+
+    def reset_external_auth(self):
+        url = self.url('_reset_external_auth')
+        requests.post(url, verify=False)
+
+    def set_external_auth(self, auth_info):
+        url = self.url('_set_external_auth')
+        requests.post(url, json=auth_info, verify=False)
 
     def set_tenants(self, tenants):
         url = self.url('_set_tenants')
