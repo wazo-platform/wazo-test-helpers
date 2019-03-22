@@ -37,11 +37,11 @@ class AuthClient(object):
         url = self.url('_set_external_auth')
         requests.post(url, json=auth_info, verify=False)
 
-    def set_tenants(self, tenants):
+    def set_tenants(self, *tenants):
         url = self.url('_set_tenants')
         requests.post(url, json=tenants, verify=False)
 
-    def set_sessions(self, sessions):
+    def set_sessions(self, *sessions):
         url = self.url('_set_sessions')
         requests.post(url, json=sessions, verify=False)
 
