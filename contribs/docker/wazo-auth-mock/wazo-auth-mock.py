@@ -38,12 +38,6 @@ valid_tokens = {
         'metadata': {
             'uuid': 'uuid',
             'tenant_uuid': 'ffffffff-ffff-ffff-ffff-ffffffffffff',
-            'tenants': [
-                {
-                    'uuid': 'ffffffff-ffff-ffff-ffff-ffffffffffff',
-                    'name': 'valid-tenant',
-                }
-            ]
         }
     },
     'valid-token-multitenant': {
@@ -53,20 +47,6 @@ valid_tokens = {
         'metadata': {
             'uuid': 'uuid-multitenant',
             'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
-            'tenants': [
-                {
-                    'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
-                    'name': 'valid-tenant1',
-                },
-                {
-                    'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2',
-                    'name': 'valid-tenant2',
-                },
-                {
-                    'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee3',
-                    'name': 'valid-tenant3',
-                },
-            ]
         }
     },
     'valid-token-master-tenant': {
@@ -76,16 +56,6 @@ valid_tokens = {
         'metadata': {
             'uuid': 'uuid-tenant-master',
             'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
-            'tenants': [
-                {
-                    'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
-                    'name': 'master-tenant',
-                },
-                {
-                    'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee11',
-                    'name': 'sub-tenant',
-                },
-            ]
         }
     },
     'valid-token-sub-tenant': {
@@ -95,12 +65,6 @@ valid_tokens = {
         'metadata': {
             'uuid': 'uuid-subtenant',
             'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee11',
-            'tenants': [
-                {
-                    'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee11',
-                    'name': 'sub-tenant',
-                },
-            ]
         }
     },
     'non-user-token': {
@@ -118,7 +82,40 @@ valid_credentials = {}
 external = {}
 invalid_username_passwords = [('test', 'foobar')]
 sessions = {}
-tenants = {}
+tenants = [
+    {
+        'uuid': 'ffffffff-ffff-ffff-ffff-ffffffffffff',
+        'name': 'valid-tenant',
+        'parent_uuid': 'ffffffff-ffff-ffff-ffff-ffffffffffff',
+    },
+
+    {
+        'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
+        'name': 'valid-tenant1',
+        'parent_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
+    },
+    {
+        'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2',
+        'name': 'valid-tenant2',
+        'parent_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
+    },
+    {
+        'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee3',
+        'name': 'valid-tenant3',
+        'parent_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
+    },
+
+    {
+        'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
+        'name': 'master-tenant',
+        'parent_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
+    },
+    {
+        'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee11',
+        'name': 'sub-tenant',
+        'parent_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
+    },
+]
 token_that_will_be_invalid_when_used = [('test', 'iddqd')]
 users = {}
 wrong_acl_tokens = {'invalid-acl-token'}
@@ -372,13 +369,6 @@ def sessions_get():
 
 @app.route(url_prefix + "/0.1/tenants", methods=['GET'])
 def tenants_get():
-    if tenants:
-        return tenant_list()
-    else:
-        return old_tenants_list()
-
-
-def tenant_list():
     specified_tenant_uuid = request.headers.get('Wazo-Tenant')
     if not specified_tenant_uuid:
         return jsonify(tenants), 200
@@ -400,37 +390,20 @@ def tenant_list():
 
 
 def _find_tenant(tenant_uuid):
-    for tenant in tenants['items']:
+    for tenant in tenants:
         if tenant_uuid == tenant['uuid']:
             return tenant
 
 
 def _find_tenant_children(search_tenant):
     result = []
-    for tenant in tenants['items']:
+    for tenant in tenants:
         if tenant['uuid'] == search_tenant['uuid']:
             continue
         if tenant['parent_uuid'] == search_tenant['uuid']:
             result.append(tenant)
             result = result + _find_tenant_children(tenant)
     return result
-
-
-def old_tenants_list():
-    specified_tenant = request.headers['Wazo-Tenant']
-    for key, value in valid_tokens.items():
-        if valid_tokens[key]['metadata']['tenant_uuid'] == specified_tenant:
-            tenants = valid_tokens[key]['metadata']['tenants']
-            return jsonify({
-                'items': tenants,
-                'total': len(tenants),
-                'filtered': len(tenants),
-            }), 200
-    return jsonify({
-        'items': [{'uuid': specified_tenant}],
-        'total': 1,
-        'filtered': 1,
-    }), 200
 
 
 @app.route(url_prefix + "/0.1/tenants/<tenant_uuid>", methods=['GET'])
