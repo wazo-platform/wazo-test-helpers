@@ -364,7 +364,12 @@ def users_put(user_uuid):
 
 @app.route(url_prefix + "/0.1/sessions", methods=['GET'])
 def sessions_get():
-    return jsonify(sessions), 200
+    result = {
+        'items': sessions,
+        'total': len(sessions),
+        'filtered': len(sessions),
+    }
+    return jsonify(result), 200
 
 
 @app.route(url_prefix + "/0.1/tenants", methods=['GET'])
