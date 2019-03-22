@@ -140,11 +140,13 @@ def external_auth_microsoft_get(user_uuid):
     else:
         return '', 404
 
+
 @app.route(url_prefix + "/_reset_external_auth", methods=['POST'])
 def external_auth_reset():
     global external
     external = {}
     return '', 204
+
 
 @app.route(url_prefix + "/_set_external_auth", methods=['POST'])
 def external_auth_set():
@@ -350,27 +352,6 @@ def users_get(user_uuid):
     return jsonify(user)
 
 
-@app.route(url_prefix + "/0.1/users/<user_uuid>/tenants", methods=['GET'])
-def users_get_tenants(user_uuid):
-    tenants = None
-
-    for body in valid_tokens.itervalues():
-        if body['metadata']['uuid'] != user_uuid:
-            continue
-        tenants = body['metadata']['tenants']
-
-    if tenants is None:
-        return '', 404
-
-    result = {
-        'total': len(tenants),
-        'filtered': len(tenants),
-        'items': tenants,
-    }
-
-    return jsonify(result), 200
-
-
 @app.route(url_prefix + "/0.1/users/<user_uuid>", methods=['PUT'])
 def users_put(user_uuid):
     user = users.get(user_uuid)
@@ -398,7 +379,41 @@ def tenants_get():
 
 
 def tenant_list():
-    return jsonify(tenants), 200
+    specified_tenant_uuid = request.headers.get('Wazo-Tenant')
+    if not specified_tenant_uuid:
+        return jsonify(tenants), 200
+
+    specified_tenant = _find_tenant(specified_tenant_uuid)
+
+    if not specified_tenant:
+        return 'Unauthorized tenant', 401
+
+    children = _find_tenant_children(specified_tenant)
+
+    tenants_found = [specified_tenant] + children
+    result = {
+        'items': tenants_found,
+        'total': len(tenants_found),
+        'filtered': len(tenants_found),
+    }
+    return jsonify(result), 200
+
+
+def _find_tenant(tenant_uuid):
+    for tenant in tenants['items']:
+        if tenant_uuid == tenant['uuid']:
+            return tenant
+
+
+def _find_tenant_children(search_tenant):
+    result = []
+    for tenant in tenants['items']:
+        if tenant['uuid'] == search_tenant['uuid']:
+            continue
+        if tenant['parent_uuid'] == search_tenant['uuid']:
+            result.append(tenant)
+            result = result + _find_tenant_children(tenant)
+    return result
 
 
 def old_tenants_list():
