@@ -18,14 +18,14 @@ app = Flask(__name__)
 logger = logging.getLogger('amid-mock')
 
 _requests = []
-_responses = {}
+_responses = {'action': {'DeviceStateList': []}}
 
 
 def _reset():
     global _requests
     global _responses
     _requests = []
-    _responses = {}
+    _responses = {'action': {'DeviceStateList': []}}
 
 
 @app.before_request
