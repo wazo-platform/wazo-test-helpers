@@ -369,18 +369,30 @@ def sessions_get():
 
 @app.route(url_prefix + "/0.1/tenants", methods=['GET'])
 def tenants_get():
+    token_uuid = request.headers['X-Auth-Token']
+    token_tenant_uuid = valid_tokens[token_uuid]['metadata']['tenant_uuid']
+
+    token_tenant = _find_tenant(token_tenant_uuid)
+    if not token_tenant:
+        return 'Tenant not found: {}'.format(token_tenant_uuid), 500
+
+    token_tenant_children = _find_tenant_children(token_tenant)
+
     specified_tenant_uuid = request.headers.get('Wazo-Tenant')
-    if not specified_tenant_uuid:
-        return jsonify(tenants), 200
+    if specified_tenant_uuid:
+        specified_tenant = _find_tenant(specified_tenant_uuid)
+        if not specified_tenant:
+            return 'Tenant not found: {}'.format(specified_tenant_uuid), 500
 
-    specified_tenant = _find_tenant(specified_tenant_uuid)
+        specified_tenant_children = _find_tenant_children(token_tenant)
 
-    if not specified_tenant:
-        return 'Unauthorized tenant', 401
+        if specified_tenant not in [token_tenant] + token_tenant_children:
+            return 'Unauthorized token', 401
+    else:
+        specified_tenant = token_tenant
+        specified_tenant_children = token_tenant_children
 
-    children = _find_tenant_children(specified_tenant)
-
-    tenants_found = [specified_tenant] + children
+    tenants_found = [specified_tenant] + specified_tenant_children
     result = {
         'items': tenants_found,
         'total': len(tenants_found),
