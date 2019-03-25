@@ -194,7 +194,11 @@ def reset():
 @app.route(url_prefix + "/_set_tenants", methods=['POST'])
 def set_tenants():
     global tenants
-    tenants = request.get_json()
+    new_tenants = request.get_json()
+    for tenant in new_tenants:
+        tenant.setdefault('name', tenant['uuid'])
+        tenant.setdefault('parent_uuid', tenant['uuid'])
+    tenants = new_tenants
     return '', 204
 
 
