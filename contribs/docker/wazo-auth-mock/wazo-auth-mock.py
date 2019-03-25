@@ -393,7 +393,7 @@ def tenants_get():
         if not specified_tenant:
             return 'Tenant not found: {}'.format(specified_tenant_uuid), 500
 
-        specified_tenant_children = _find_tenant_children(token_tenant)
+        specified_tenant_children = _find_tenant_children(specified_tenant)
 
         if specified_tenant not in [token_tenant] + token_tenant_children:
             return 'Unauthorized token', 401
