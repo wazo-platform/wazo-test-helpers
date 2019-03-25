@@ -398,10 +398,13 @@ def tenants_get():
         specified_tenant_children = token_tenant_children
 
     tenants_found = [specified_tenant] + specified_tenant_children
+
+    tenants_filtered = _filter_tenants(tenants_found, **request.args.to_dict())
+
     result = {
-        'items': tenants_found,
+        'items': tenants_filtered,
+        'filtered': len(tenants_filtered),
         'total': len(tenants_found),
-        'filtered': len(tenants_found),
     }
     return jsonify(result), 200
 
@@ -420,6 +423,14 @@ def _find_tenant_children(search_tenant):
         if tenant['parent_uuid'] == search_tenant['uuid']:
             result.append(tenant)
             result = result + _find_tenant_children(tenant)
+    return result
+
+
+def _filter_tenants(tenants, name=None, **kwargs):
+    if not name:
+        return tenants
+
+    result = [tenant for tenant in tenants if tenant['name'] == name]
     return result
 
 
