@@ -130,8 +130,8 @@ def _reset():
     _tenants = {}
 
 
-@app.route(url_prefix + "/0.1/users/<user_uuid>/external/microsoft", methods=['GET'])
-def external_auth_microsoft_get(user_uuid):
+@app.route(url_prefix + "/0.1/users/<user_uuid>/external/<external_service>", methods=['GET'])
+def external_auth_external_service_get(user_uuid, external_service):
     if external:
         return jsonify(external)
     else:
