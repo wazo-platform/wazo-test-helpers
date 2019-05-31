@@ -191,14 +191,18 @@ class AssetLaunchingTestCase(unittest.TestCase):
 
     @classmethod
     def _docker_compose_options(cls):
-        return [
+        options = [
             '--no-ansi',
+            '--project-name', cls.service,
             '--file', os.path.join(cls.assets_root, 'docker-compose.yml'),
             '--file', os.path.join(
                 cls.assets_root, 'docker-compose.{}.override.yml'.format(cls.asset)
             ),
-            '--project-name', cls.service,
         ]
+        extra = os.getenv("WAZO_TEST_DOCKER_OVERRIDE_EXTRA")
+        if extra:
+            options.extend(["--file", extra])
+        return options
 
 
 class CompletedProcess(object):
