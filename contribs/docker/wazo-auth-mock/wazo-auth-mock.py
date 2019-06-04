@@ -310,8 +310,7 @@ def token_post():
         if password == valid_credentials[username]['password']:
             token = valid_credentials[username]['token']
             if token in valid_tokens:
-                return jsonify({'data': {'auth_id': valid_tokens[token]['auth_id'],
-                                         'token': token}})
+                return jsonify({'data': valid_tokens[token]})
         return '', 401
     else:
         return jsonify({'data': {'auth_id': valid_tokens['valid-token-multitenant']['auth_id'],
