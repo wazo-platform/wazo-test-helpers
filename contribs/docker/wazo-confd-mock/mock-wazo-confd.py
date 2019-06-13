@@ -114,6 +114,13 @@ def conferences():
     return jsonify({'items': conferences})
 
 
+@app.route('/1.1/conferences/<conference_id>')
+def conference(conference_id):
+    if conference_id not in _responses['conferences']:
+        return '', 404
+    return jsonify(_responses['conferences'][conference_id])
+
+
 @app.route('/1.1/infos')
 def infos():
     return jsonify(_responses['infos'])
