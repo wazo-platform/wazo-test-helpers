@@ -36,3 +36,7 @@ In some cases, it is easier to manage Docker containers manually or via an exter
 doing that, the tests must be told to not manage the containers and this is done with the variable:
 
     TEST_DOCKER=ignore
+
+To add volumes without modifying original file (used by zuul).
+
+    WAZO_TEST_DOCKER_OVERRIDE_EXTRA=docker-compose.custom.yml
