@@ -27,6 +27,7 @@ _EMPTY_RESPONSES = {
     'switchboards': {},
     'user_lines': {},
     'users': {},
+    'voicemails': {},
     'wizard_discover': {},
     'wizard': {},
 }
@@ -180,6 +181,16 @@ def lines_of_user(user_uuid):
     return jsonify({
         'items': _responses['user_lines'].get(user_uuid, [])
     })
+
+
+@app.route('/1.1/voicemails')
+def voicemails():
+    return jsonify({'items': _responses['voicemails'].values()})
+
+
+@app.route('/1.1/voicemails/<voicemail_id>')
+def voicemail(voicemail_id):
+    return jsonify(_responses['voicemails'][voicemail_id])
 
 
 @app.route('/1.1/wizard')
