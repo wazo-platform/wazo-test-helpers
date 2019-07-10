@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
 import os
+import random
+import string
 import subprocess
+import tempfile
 import unittest
 
 import docker as docker_client
@@ -47,6 +50,17 @@ class AssetLaunchingTestCase(unittest.TestCase):
     """
 
     cur_dir = None
+    log_dir = None
+
+    @staticmethod
+    def get_log_directory():
+        if not AssetLaunchingTestCase.log_dir:
+            char_set = string.ascii_lowercase
+            AssetLaunchingTestCase.log_dir = '/tmp/wazo-integration-{}'.format(
+                ''.join(random.choice(char_set) for _ in range(8))
+            )
+            os.makedirs(AssetLaunchingTestCase.log_dir, mode=0o755)
+        return AssetLaunchingTestCase.log_dir
 
     @staticmethod
     def is_managing_containers():
@@ -137,6 +151,13 @@ class AssetLaunchingTestCase(unittest.TestCase):
     def stop_service_with_asset(cls):
         logger.debug('Killing containers...')
         cls.kill_containers()
+
+        filename_prefix = '{}.{}-'.format(cls.__module__, cls.__name__)
+        with tempfile.NamedTemporaryFile(dir=cls.get_log_directory(),
+                                         prefix=filename_prefix,
+                                         delete=False) as logfile:
+            logfile.write(cls.log_containers())
+            logger.debug('Container logs dumped to %s', logfile.name)
         logger.debug('Done.')
 
     @classmethod
