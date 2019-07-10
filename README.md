@@ -41,6 +41,10 @@ To add volumes without modifying original file (used by zuul):
 
     WAZO_TEST_DOCKER_OVERRIDE_EXTRA=docker-compose.custom.yml
 
+To enable the docker logs dumping:
+
+    WAZO_TEST_DOCKER_LOGS_ENABLED=1
+
 To choose the directory used for docker logs dumping:
 
     WAZO_TEST_DOCKER_LOGS_DIR=/tmp/wazo-test

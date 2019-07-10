@@ -152,13 +152,13 @@ class AssetLaunchingTestCase(unittest.TestCase):
     def stop_service_with_asset(cls):
         logger.debug('Killing containers...')
         cls.kill_containers()
-
-        filename_prefix = '{}.{}-'.format(cls.__module__, cls.__name__)
-        with tempfile.NamedTemporaryFile(dir=cls.get_log_directory(),
-                                         prefix=filename_prefix,
-                                         delete=False) as logfile:
-            logfile.write(cls.log_containers())
-            logger.debug('Container logs dumped to %s', logfile.name)
+        if os.getenv('WAZO_TEST_DOCKER_LOGS_ENABLED', '0') == '1':
+            filename_prefix = '{}.{}-'.format(cls.__module__, cls.__name__)
+            with tempfile.NamedTemporaryFile(dir=cls.get_log_directory(),
+                                             prefix=filename_prefix,
+                                             delete=False) as logfile:
+                logfile.write(cls.log_containers())
+                logger.debug('Container logs dumped to %s', logfile.name)
         logger.debug('Done.')
 
     @classmethod
