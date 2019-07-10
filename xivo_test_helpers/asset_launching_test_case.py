@@ -56,9 +56,10 @@ class AssetLaunchingTestCase(unittest.TestCase):
     def get_log_directory():
         if not AssetLaunchingTestCase.log_dir:
             char_set = string.ascii_lowercase
-            AssetLaunchingTestCase.log_dir = '/tmp/wazo-integration-{}'.format(
+            default_logging_dir = '/tmp/wazo-integration-{}'.format(
                 ''.join(random.choice(char_set) for _ in range(8))
             )
+            AssetLaunchingTestCase.log_dir = os.getenv('WAZO_TEST_DOCKER_LOGS_DIR', default_logging_dir)
             os.makedirs(AssetLaunchingTestCase.log_dir, mode=0o755)
         return AssetLaunchingTestCase.log_dir
 
