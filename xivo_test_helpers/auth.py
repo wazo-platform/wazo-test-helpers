@@ -29,6 +29,14 @@ class AuthClient(object):
             logger.debug(e)
             return False
 
+    def reset_external_config(self):
+        url = self.url('_reset_external_config')
+        requests.post(url, verify=False)
+
+    def set_external_config(self, config_info):
+        url = self.url('_set_external_config')
+        requests.post(url, json=config_info, verify=False)
+
     def reset_external_auth(self):
         url = self.url('_reset_external_auth')
         requests.post(url, verify=False)
