@@ -80,6 +80,7 @@ valid_tokens = {
 
 valid_credentials = {}
 external = {}
+external_config = {}
 invalid_username_passwords = [('test', 'foobar')]
 sessions = {}
 tenants = [
@@ -128,6 +129,28 @@ def _reset():
     global _tenants
     _requests = []
     _tenants = {}
+
+
+@app.route(url_prefix + "/0.1/external/<external_service>/config", methods=['GET'])
+def external_config_get(external_service):
+    if external_service in external_config:
+        return jsonify(external_config[external_service])
+    else:
+        return '', 404
+
+
+@app.route(url_prefix + "/_reset_external_config", methods=['POST'])
+def external_config_reset():
+    global external_config
+    external_config = {}
+    return '', 204
+
+
+@app.route(url_prefix + "/_set_external_config", methods=['POST'])
+def external_config_set():
+    global external_config
+    external_config = request.get_json()
+    return '', 201
 
 
 @app.route(url_prefix + "/0.1/users/<user_uuid>/external/<external_service>", methods=['GET'])
