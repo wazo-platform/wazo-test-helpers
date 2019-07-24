@@ -16,6 +16,7 @@ logging.basicConfig(level=logging.DEBUG)
 _EMPTY_RESPONSES = {
     'applications': {},
     'conferences': {},
+    'contexts': {},
     'infos': {},
     'lines': {},
     'moh': {
@@ -149,6 +150,18 @@ def moh():
     return jsonify({'items': items})
 
 
+@app.route('/1.1/contexts')
+def contexts():
+    return jsonify({'items': _responses['contexts'].values()})
+
+
+@app.route('/1.1/contexts/<context_id>')
+def context(context_id):
+    if context_id not in _responses['contexts']:
+        return '', 404
+    return jsonify(_responses['contexts'][context_id])
+
+
 @app.route('/1.1/switchboards')
 def switchboards():
     return jsonify({'items': _responses['switchboards'].values()})
@@ -214,5 +227,5 @@ if __name__ == '__main__':
     _reset()
 
     port = int(sys.argv[1])
-    context = ('/usr/local/share/ssl/confd/server.crt', '/usr/local/share/ssl/confd/server.key')
-    app.run(host='0.0.0.0', port=port, ssl_context=context, debug=True)
+    ssl_context = ('/usr/local/share/ssl/confd/server.crt', '/usr/local/share/ssl/confd/server.key')
+    app.run(host='0.0.0.0', port=port, ssl_context=ssl_context, debug=True)
