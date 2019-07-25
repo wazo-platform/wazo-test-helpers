@@ -1,4 +1,4 @@
-FROM debian:stretch
+FROM debian:buster
 MAINTAINER Wazo Maintainers <dev@wazo.community>
 
 RUN apt-get update && apt-get install -y netcat
