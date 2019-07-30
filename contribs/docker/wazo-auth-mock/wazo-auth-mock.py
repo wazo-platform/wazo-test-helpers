@@ -303,7 +303,8 @@ def token_get(token):
         return '', 403
 
     result = dict(valid_tokens[token])
-    result.setdefault('xivo_user_uuid', result['auth_id'])
+    result.setdefault('xivo_user_uuid', result['metadata']['uuid'])
+    result.setdefault('auth_id', result['metadata']['uuid'])
     return jsonify({
         'data': result
     })
