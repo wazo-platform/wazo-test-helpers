@@ -89,6 +89,7 @@ class MockUserToken(object):
         self.auth_id = user_uuid
         self.wazo_uuid = wazo_uuid or str(uuid.uuid4())
         self.metadata = metadata or {}
+        self.metadata.setdefault("uuid", user_uuid)
 
     def to_dict(self):
         return {
