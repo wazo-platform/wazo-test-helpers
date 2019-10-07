@@ -1,11 +1,11 @@
-# xivo-amid mock
+# wazo-amid mock
 
-This is the required files to build a docker image to be used as a xivo-amid mock
+This is the required files to build a docker image to be used as a wazo-amid mock
 for integration tests.
 
 ## Usage
 
-This mock exposes an interface similar to the official xivo-amid with a few exceptions.
+This mock exposes an interface similar to the official wazo-amid with a few exceptions.
 
 1. New endpoints have been added to customize the responses:
 
