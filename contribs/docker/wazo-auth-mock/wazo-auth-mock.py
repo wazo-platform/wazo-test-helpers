@@ -34,45 +34,45 @@ valid_tokens = {
     'valid-token': {
         'auth_id': 'uuid',
         'token': 'valid-token',
-        'xivo_user_uuid': 'uuid',
         'metadata': {
             'uuid': 'uuid',
+            'pbx_user_uuid': 'uuid',
             'tenant_uuid': 'ffffffff-ffff-ffff-ffff-ffffffffffff',
         }
     },
     'valid-token-multitenant': {
         'auth_id': 'uuid-multitenant',
         'token': 'valid-token-multitenant',
-        'xivo_user_uuid': 'uuid-multitenant',
         'metadata': {
             'uuid': 'uuid-multitenant',
+            'pbx_user_uuid': 'uuid-multitenant',
             'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
         }
     },
     'valid-token-master-tenant': {
         'auth_id': 'uuid-tenant-master',
         'token': 'valid-token-master-tenant',
-        'xivo_user_uuid': 'uuid-tenant-master',
         'metadata': {
             'uuid': 'uuid-tenant-master',
+            'pbx_user_uuid': 'uuid-tenant-master',
             'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
         }
     },
     'valid-token-sub-tenant': {
         'auth_id': 'uuid-subtenant',
         'token': 'valid-token-sub-tenant',
-        'xivo_user_uuid': 'uuid-subtenant',
         'metadata': {
             'uuid': 'uuid-subtenant',
+            'pbx_user_uuid': 'uuid-subtenant',
             'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee11',
         }
     },
     'non-user-token': {
         'auth_id': 'uuid-non-user',
         'token': 'non-user-token',
-        'xivo_user_uuid': None,
         'metadata': {
             'uuid': None,
+            'pbx_user_uuid': None,
             'tenant_uuid': 'dddddddd-dddd-dddd-dddd-dddddddddd11',
         }
     }
@@ -303,7 +303,7 @@ def token_get(token):
         return '', 403
 
     result = dict(valid_tokens[token])
-    result.setdefault('xivo_user_uuid', result['metadata']['uuid'])
+    result['metadata'].setdefault('pbx_user_uuid', result['metadata']['uuid'])
     result.setdefault('auth_id', result['metadata']['uuid'])
     return jsonify({
         'data': result
