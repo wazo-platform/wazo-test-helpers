@@ -118,7 +118,44 @@ tenants = [
     },
 ]
 token_that_will_be_invalid_when_used = [('test', 'iddqd')]
-users = {}
+users = {
+    'uuid': {
+        'uuid': 'uuid',
+        'firstname': None,
+        'lastname': None,
+        'username': None,
+        'emails': [],
+        'enabled': True,
+        'tenant_uuid': 'ffffffff-ffff-ffff-ffff-ffffffffffff',
+    },
+    'uuid-multitenant': {
+        'uuid': 'uuid-multitenant',
+        'firstname': None,
+        'lastname': None,
+        'username': None,
+        'emails': [],
+        'enabled': True,
+        'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
+    },
+    'uuid-tenant-master': {
+        'uuid': 'uuid-tenant-master',
+        'firstname': None,
+        'lastname': None,
+        'username': None,
+        'emails': [],
+        'enabled': True,
+        'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
+    },
+    'uuid-subtenant': {
+        'uuid': 'uuid-subtenant',
+        'firstname': None,
+        'lastname': None,
+        'username': None,
+        'emails': [],
+        'enabled': True,
+        'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee11',
+    },
+}
 wrong_acl_tokens = {'invalid-acl-token'}
 
 _requests = []
