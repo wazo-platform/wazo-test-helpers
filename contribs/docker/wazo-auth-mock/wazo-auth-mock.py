@@ -83,6 +83,7 @@ external = {}
 external_config = {}
 invalid_username_passwords = [('test', 'foobar')]
 sessions = {}
+refresh_tokens = {}
 tenants = [
     {
         'uuid': 'ffffffff-ffff-ffff-ffff-ffffffffffff',
@@ -242,6 +243,13 @@ def set_sessions():
     return '', 204
 
 
+@app.route(url_prefix + "/_set_refresh_tokens", methods=['POST'])
+def set_refresh_tokens():
+    global refresh_tokens
+    refresh_tokens = request.get_json()
+    return '', 204
+
+
 @app.route(url_prefix + "/_remove_token/<token_id>", methods=['DELETE'])
 def remove_token(token_id):
     try:
@@ -338,6 +346,16 @@ def token_post():
         return '', 401
     else:
         return jsonify({'data': valid_tokens['valid-token-multitenant']})
+
+
+@app.route(url_prefix + "/0.1/tokens", methods=['GET'])
+def tokens_get():
+    result = {
+        'items': refresh_tokens,
+        'total': len(refresh_tokens),
+        'filtered': len(refresh_tokens),
+    }
+    return jsonify(result), 200
 
 
 @app.route(url_prefix + "/0.1/users", methods=['GET'])
