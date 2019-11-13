@@ -53,6 +53,10 @@ class AuthClient(object):
         url = self.url('_set_sessions')
         requests.post(url, json=sessions, verify=False)
 
+    def set_refresh_tokens(self, *sessions):
+        url = self.url('_set_refresh_tokens')
+        requests.post(url, json=sessions, verify=False)
+
     def set_token(self, token):
         url = self.url('_set_token')
         requests.post(url, json=token.to_dict(), verify=False)
