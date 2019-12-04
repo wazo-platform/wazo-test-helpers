@@ -26,6 +26,7 @@ _EMPTY_RESPONSES = {
         },
     },
     'switchboards': {},
+    'trunks': {},
     'user_lines': {},
     'users': {},
     'voicemails': {},
@@ -194,6 +195,19 @@ def lines_of_user(user_uuid):
     return jsonify({
         'items': _responses['user_lines'].get(user_uuid, [])
     })
+
+
+
+@app.route('/1.1/trunks')
+def trunks():
+    items = _responses['trunks'].values()
+    total = len(items)
+    return jsonify({'items': items, 'total': total})
+
+
+@app.route('/1.1/trunks/<trunk_id>')
+def trunk(trunk_id):
+    return jsonify(_responses['trunks'][trunk_id])
 
 
 @app.route('/1.1/voicemails')
