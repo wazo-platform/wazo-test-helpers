@@ -480,8 +480,13 @@ def _filter_tenants(tenants, name=None, **kwargs):
 
 @app.route(url_prefix + "/0.1/tenants/<tenant_uuid>", methods=['GET'])
 def tenant_get(tenant_uuid):
-    # Simulate master tenant
-    return jsonify({'uuid': tenant_uuid, 'parent_uuid': tenant_uuid}), 200
+    # Simulate master tenant by default
+    parent_uuid = tenant_uuid
+    for tenant in tenants:
+        if tenant["uuid"] == tenant_uuid:
+            parent_uuid = tenant["parent_uuid"]
+            break
+    return jsonify({'uuid': tenant_uuid, 'parent_uuid': parent_uuid}), 200
 
 
 @app.route(url_prefix + "/0.1/users/<user_uuid>", methods=['DELETE'])
