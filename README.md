@@ -1,6 +1,6 @@
 # xivo-test-helpers
 
-Common test helpers used in Wazo. Compatible python 2 & 3. The folder admin_ui is only python 2
+Common test helpers used in Wazo.
 
 ## To install
 

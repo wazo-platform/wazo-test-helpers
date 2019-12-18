@@ -1,8 +1,7 @@
-# Copyright 2015-2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
-import six
 import time
 
 from functools import partial
@@ -15,7 +14,7 @@ class NoMoreTries(Exception):
 
 
 def tries_executions(tries, interval):
-    for _ in six.moves.range(tries):
+    for _ in range(tries):
         yield
         time.sleep(interval)
 
@@ -61,7 +60,7 @@ def assert_(assert_function, *args, **kwargs):
             assert_function(*args, **kwargs)
             return
         except AssertionError as e:
-            errors.append(six.text_type(e))
+            errors.append(str(e))
     else:
         if message:
             raise NoMoreTries(message)
