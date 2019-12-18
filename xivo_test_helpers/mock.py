@@ -1,10 +1,10 @@
-# Copyright 2017 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import uuid
 
 
-class _UUIDMatcher(object):
+class _UUIDMatcher:
 
     def __eq__(self, other):
         try:

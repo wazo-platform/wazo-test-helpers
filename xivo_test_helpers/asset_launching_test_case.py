@@ -240,7 +240,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
         return options
 
 
-class CompletedProcess(object):
+class CompletedProcess:
     '''Partially bakported from python3 subprocess'''
 
     def __init__(self, process):
