@@ -129,12 +129,25 @@ class AssetLaunchingTestCase(unittest.TestCase):
         return docker.inspect_container(cls._container_id(service_name))
 
     @classmethod
-    def service_logs(cls, service_name=None):
+    def service_logs(cls, service_name=None, since=None):
         if not service_name:
             service_name = cls.service
 
-        status = _run_cmd(['docker', 'logs', cls._container_id(service_name)]).stdout
+        cmd = ['docker', 'logs', cls._container_id(service_name)]
+        if since is not None:
+            cmd.append(f'--since={since}')
+        status = _run_cmd(cmd).stdout
         return status.decode('utf-8')
+
+    @classmethod
+    def database_logs(cls, service_name='postgres', since=None):
+        logs = cls.service_logs(service_name=service_name, since=since)
+        return logs.replace('\n\t', ' ')
+
+    @classmethod
+    def count_database_logs(cls, service_name='postgres', since=None):
+        logs = cls.database_logs(service_name=service_name, since=since)
+        return len(logs.split('\n'))
 
     @classmethod
     def service_port(cls, internal_port, service_name=None):
