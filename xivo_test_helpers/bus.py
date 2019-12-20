@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-# Copyright 2015-2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import uuid
@@ -14,7 +13,7 @@ from kombu import (
 from kombu.exceptions import TimeoutError
 
 
-class BusClient(object):
+class BusClient:
 
     def __init__(self, url, exchange):
         self._url = url
@@ -59,7 +58,7 @@ class BusClient(object):
             queue.bind(channel).declare()
 
 
-class BusMessageAccumulator(object):
+class BusMessageAccumulator:
 
     def __init__(self, url, queue):
         self._url = url

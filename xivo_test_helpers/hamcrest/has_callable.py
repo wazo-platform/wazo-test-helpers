@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2011 hamcrest.org
 # SPDX-License-Identifier: BSD-3-Clause
 

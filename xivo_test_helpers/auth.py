@@ -9,7 +9,7 @@ import requests
 logger = logging.getLogger(__name__)
 
 
-class AuthClient(object):
+class AuthClient:
 
     def __init__(self, host, port):
         self.host = host
@@ -80,7 +80,7 @@ class AuthClient(object):
         requests.post(url, json=credentials.to_dict(), verify=False)
 
 
-class MockUserToken(object):
+class MockUserToken:
 
     @classmethod
     def some_token(cls, **kwargs):
@@ -104,7 +104,7 @@ class MockUserToken(object):
         }
 
 
-class MockCredentials(object):
+class MockCredentials:
 
     def __init__(self, username, password):
         self.username = username

@@ -1,15 +1,13 @@
-# -*- coding: utf-8 -*-
 # Copyright 2011 hamcrest.org
 # SPDX-License-Identifier: BSD-3-Clause
 
-# Copyright 2017 The Wazo Authors  (see AUTHORS file)
+# Copyright 2017-2019 The Wazo Authors  (see AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Derived from https://github.com/hamcrest/PyHamcrest/blob/master/src/hamcrest/core/core/raises.py
 
 from weakref import ref
 import sys
-import six
 from hamcrest.core.base_matcher import BaseMatcher
 from hamcrest.core.compat import is_callable
 
@@ -71,7 +69,7 @@ class Raises(BaseMatcher):
                        .append_text(' because ')
             self.matcher.describe_mismatch(self.actual, description)
         else:
-            description.append_text('%s was raised instead: %s' % (type(self.actual), six.text_type(self.actual)))
+            description.append_text('%s was raised instead: %s' % (type(self.actual), str(self.actual)))
 
 
 def raises(exception, matcher=None):

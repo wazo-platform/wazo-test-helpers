@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -241,21 +240,9 @@ class AssetLaunchingTestCase(unittest.TestCase):
         return options
 
 
-class CompletedProcess(object):
-    '''Partially bakported from python3 subprocess'''
-
-    def __init__(self, process):
-        self.stdout, self.stderr = process.communicate()
-        self.stdout = self.stdout or b''
-        self.stderr = self.stderr or b''
-        self.returncode = process.returncode
-
-
 def _run_cmd(cmd, stderr=True):
     logger.debug('%s', cmd)
-    with open(os.devnull, "w") as null:
-        stderr = subprocess.STDOUT if stderr else null
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=stderr)
-        completed_process = CompletedProcess(process)
+    stderr = subprocess.STDOUT if stderr else None
+    completed_process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=stderr)
     logger.info('%s', completed_process.stdout)
     return completed_process
