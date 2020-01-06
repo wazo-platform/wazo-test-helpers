@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -105,9 +105,13 @@ class AssetLaunchingTestCase(unittest.TestCase):
         completed_process = _run_cmd(['docker-compose'] + cls._docker_compose_options() +
                                      ['run', '--rm', bootstrap_container])
         if completed_process.returncode != 0:
-            raise ContainerStartFailed(stdout=completed_process.stdout.decode('unicode-escape'),
-                                       stderr=completed_process.stderr.decode('unicode-escape'),
-                                       return_code=completed_process.returncode)
+            stdout = completed_process.stdout
+            stderr = completed_process.stderr
+            raise ContainerStartFailed(
+                stdout=stdout.decode('unicode-escape') if stdout else None,
+                stderr=stderr.decode('unicode-escape') if stderr else None,
+                return_code=completed_process.returncode,
+            )
 
     @classmethod
     def kill_containers(cls):
