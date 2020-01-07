@@ -1,7 +1,7 @@
 # Copyright 2011 hamcrest.org
 # SPDX-License-Identifier: BSD-3-Clause
 
-# Copyright 2017-2019 The Wazo Authors  (see AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Derived from https://github.com/hamcrest/PyHamcrest/blob/master/src/hamcrest/core/core/raises.py
@@ -9,7 +9,6 @@
 from weakref import ref
 import sys
 from hamcrest.core.base_matcher import BaseMatcher
-from hamcrest.core.compat import is_callable
 
 __author__ = "Per Fagrell"
 __copyright__ = "Copyright 2013 hamcrest.org"
@@ -28,7 +27,7 @@ class Raises(BaseMatcher):
         return self
 
     def _matches(self, function):
-        if not is_callable(function):
+        if not callable(function):
             return False
 
         self.function = ref(function)
@@ -51,7 +50,7 @@ class Raises(BaseMatcher):
         description.append_text('Expected a callable raising %s' % self.expected)
 
     def describe_mismatch(self, item, description):
-        if not is_callable(item):
+        if not callable(item):
             description.append_text('%s is not callable' % item)
             return
 
