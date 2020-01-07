@@ -1,11 +1,15 @@
-.PHONY: build
+DIRS = wait wazo-amid-mock wazo-auth-mock wazo-confd-mock xivo-sysconfd-mock
+
+docker-images:
+	for d in $(DIRS); do cd contribs/docker/$$d && docker build -t wazopbx/$$d . && cd ../../..; done
+
 build:
 	python setup.py sdist
 
-.PHONY: upload
 upload:
 	python setup.py sdist register upload
 
-.PHONY: clean
 clean:
 	rm -rf MANIFEST build dist xivo_ws.egg-info
+
+.PHONY: build upload clean
