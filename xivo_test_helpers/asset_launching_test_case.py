@@ -132,6 +132,9 @@ class AssetLaunchingTestCase(unittest.TestCase):
                 stderr=stderr.decode('unicode-escape') if stderr else None,
                 return_code=completed_process.returncode,
             )
+        if completed_process.stderr:
+            for line in str(completed_process.stderr).replace('\\r', '').split('\\n'):
+                logger.debug('stderr: %s', line)
 
     @classmethod
     def kill_containers(cls):
@@ -269,4 +272,7 @@ def _run_cmd(cmd, stderr=True):
     stderr = subprocess.STDOUT if stderr else None
     completed_process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=stderr)
     logger.info('%s', completed_process.stdout)
+    if completed_process.stdout:
+        for line in str(completed_process.stdout).replace('\\r', '').split('\\n'):
+            logger.info('stdout: %s', line)
     return completed_process
