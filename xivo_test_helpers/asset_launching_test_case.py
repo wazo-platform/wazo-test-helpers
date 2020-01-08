@@ -16,8 +16,8 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 if os.environ.get('TEST_LOGS') != 'verbose':
-    logging.getLogger('requests.packages.urllib3.connectionpool').setLevel(logging.WARNING)
-    logging.getLogger('docker.auth').setLevel(logging.INFO)
+    logging.getLogger('urllib3.connectionpool').setLevel(logging.WARNING)
+    logging.getLogger('docker').setLevel(logging.INFO)
     logger.setLevel(logging.WARNING)
 
 
