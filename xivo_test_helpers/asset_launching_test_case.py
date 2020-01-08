@@ -112,14 +112,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
 
     @classmethod
     def pull_containers(cls):
-        completed_process = _run_cmd(['docker-compose'] +
-                                     cls._docker_compose_options() +
-                                     ['pull'])
-        # ignore errors as locally built containers will make the
-        # command fail all the time
-        if completed_process.stderr:
-            for line in str(completed_process.stderr).replace('\\r', '').split('\\n'):
-                logger.debug('stderr: %s', line)
+        _run_cmd(['docker-compose'] + cls._docker_compose_options() + ['pull'])
 
     @classmethod
     def start_containers(cls, bootstrap_container):
@@ -133,9 +126,6 @@ class AssetLaunchingTestCase(unittest.TestCase):
                 stderr=stderr.decode('unicode-escape') if stderr else None,
                 return_code=completed_process.returncode,
             )
-        if completed_process.stderr:
-            for line in str(completed_process.stderr).replace('\\r', '').split('\\n'):
-                logger.debug('stderr: %s', line)
 
     @classmethod
     def kill_containers(cls):
@@ -272,8 +262,10 @@ def _run_cmd(cmd, stderr=True):
     logger.debug('%s', cmd)
     stderr = subprocess.STDOUT if stderr else None
     completed_process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=stderr)
-    logger.info('%s', completed_process.stdout)
     if completed_process.stdout:
         for line in str(completed_process.stdout).replace('\\r', '').split('\\n'):
             logger.info('stdout: %s', line)
+    if completed_process.stderr:
+        for line in str(completed_process.stderr).replace('\\r', '').split('\\n'):
+            logger.debug('stderr: %s', line)
     return completed_process
