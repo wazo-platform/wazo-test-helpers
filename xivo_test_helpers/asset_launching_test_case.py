@@ -13,6 +13,7 @@ import docker as docker_client
 
 logger = logging.getLogger(__name__)
 
+
 if os.environ.get('TEST_LOGS') != 'verbose':
     logging.getLogger('requests.packages.urllib3.connectionpool').setLevel(logging.WARNING)
     logging.getLogger('docker.auth').setLevel(logging.INFO)
@@ -86,6 +87,14 @@ class AssetLaunchingTestCase(unittest.TestCase):
         logger.debug('Removing containers...')
         cls.rm_containers()
         logger.debug('Done.')
+
+        if os.getenv('WAZO_TEST_NO_DOCKER_COMPOSE_PULL') == '1':
+            logger.debug('Not Pulling containers.')
+        else:
+            logger.debug('Pulling containers...')
+            cls.pull_containers()
+            logger.debug('Done.')
+
         logger.debug('Starting containers...')
         try:
             cls.start_containers(bootstrap_container='sync')
@@ -99,6 +108,17 @@ class AssetLaunchingTestCase(unittest.TestCase):
     def rm_containers(cls):
         _run_cmd(['docker-compose'] + cls._docker_compose_options() +
                  ['down', '--timeout', '0', '--volumes'])
+
+    @classmethod
+    def pull_containers(cls):
+        completed_process = _run_cmd(['docker-compose'] +
+                                     cls._docker_compose_options() +
+                                     ['pull'])
+        # ignore errors as locally built containers will make the
+        # command fail all the time
+        if completed_process.stderr:
+            for line in str(completed_process.stderr).replace('\\r', '').split('\\n'):
+                logger.debug('stderr: %s', line)
 
     @classmethod
     def start_containers(cls, bootstrap_container):
