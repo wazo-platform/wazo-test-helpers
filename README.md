@@ -48,3 +48,7 @@ To enable the docker logs dumping:
 To choose the directory used for docker logs dumping:
 
     WAZO_TEST_DOCKER_LOGS_DIR=/tmp/wazo-test
+
+To disable the `docker-compose pull` command and let `docker-compose run` do the job, do (used by zuul):
+
+    WAZO_TEST_NO_DOCKER_COMPOSE_PULL=1
