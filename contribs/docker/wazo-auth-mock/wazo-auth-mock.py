@@ -25,7 +25,7 @@ context = ('/usr/local/share/ssl/auth/server.crt', '/usr/local/share/ssl/auth/se
 
 DEFAULT_POLICIES = {
     'wazo_default_admin_policy': {
-        'uuid': '00000000-0000-0000-0000-000000000001',
+        'uuid': '00000000-0000-4c1c-ad1c-000000000001',
         'name': 'wazo_default_admin_policy',
     }
 }
@@ -37,7 +37,7 @@ valid_tokens = {
         'metadata': {
             'uuid': 'uuid',
             'pbx_user_uuid': 'uuid',
-            'tenant_uuid': 'ffffffff-ffff-ffff-ffff-ffffffffffff',
+            'tenant_uuid': 'ffffffff-ffff-4c1c-ad1c-ffffffffffff',
         }
     },
     'valid-token-multitenant': {
@@ -46,7 +46,7 @@ valid_tokens = {
         'metadata': {
             'uuid': 'uuid-multitenant',
             'pbx_user_uuid': 'uuid-multitenant',
-            'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
+            'tenant_uuid': 'eeeeeeee-eeee-4c1c-ad1c-eeeeeeeeeee1',
         }
     },
     'valid-token-master-tenant': {
@@ -55,7 +55,7 @@ valid_tokens = {
         'metadata': {
             'uuid': 'uuid-tenant-master',
             'pbx_user_uuid': 'uuid-tenant-master',
-            'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
+            'tenant_uuid': 'eeeeeeee-eeee-4c1c-ad1c-eeeeeeeeee10',
         }
     },
     'valid-token-sub-tenant': {
@@ -64,7 +64,7 @@ valid_tokens = {
         'metadata': {
             'uuid': 'uuid-subtenant',
             'pbx_user_uuid': 'uuid-subtenant',
-            'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee11',
+            'tenant_uuid': 'eeeeeeee-eeee-4c1c-ad1c-eeeeeeeeee11',
         }
     },
     'non-user-token': {
@@ -73,7 +73,7 @@ valid_tokens = {
         'metadata': {
             'uuid': None,
             'pbx_user_uuid': None,
-            'tenant_uuid': 'dddddddd-dddd-dddd-dddd-dddddddddd11',
+            'tenant_uuid': 'dddddddd-dddd-4c1c-ad1c-dddddddddd11',
         }
     }
 }
@@ -86,36 +86,36 @@ sessions = {}
 refresh_tokens = {}
 tenants = [
     {
-        'uuid': 'ffffffff-ffff-ffff-ffff-ffffffffffff',
+        'uuid': 'ffffffff-ffff-4c1c-ad1c-ffffffffffff',
         'name': 'valid-tenant',
-        'parent_uuid': 'ffffffff-ffff-ffff-ffff-ffffffffffff',
+        'parent_uuid': 'ffffffff-ffff-4c1c-ad1c-ffffffffffff',
     },
 
     {
-        'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
+        'uuid': 'eeeeeeee-eeee-4c1c-ad1c-eeeeeeeeeee1',
         'name': 'valid-tenant1',
-        'parent_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
+        'parent_uuid': 'eeeeeeee-eeee-4c1c-ad1c-eeeeeeeeeee1',
     },
     {
-        'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee2',
+        'uuid': 'eeeeeeee-eeee-4c1c-ad1c-eeeeeeeeeee2',
         'name': 'valid-tenant2',
-        'parent_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
+        'parent_uuid': 'eeeeeeee-eeee-4c1c-ad1c-eeeeeeeeeee1',
     },
     {
-        'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee3',
+        'uuid': 'eeeeeeee-eeee-4c1c-ad1c-eeeeeeeeeee3',
         'name': 'valid-tenant3',
-        'parent_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
+        'parent_uuid': 'eeeeeeee-eeee-4c1c-ad1c-eeeeeeeeeee1',
     },
 
     {
-        'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
+        'uuid': 'eeeeeeee-eeee-4c1c-ad1c-eeeeeeeeee10',
         'name': 'master-tenant',
-        'parent_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
+        'parent_uuid': 'eeeeeeee-eeee-4c1c-ad1c-eeeeeeeeee10',
     },
     {
-        'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee11',
+        'uuid': 'eeeeeeee-eeee-4c1c-ad1c-eeeeeeeeee11',
         'name': 'sub-tenant',
-        'parent_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
+        'parent_uuid': 'eeeeeeee-eeee-4c1c-ad1c-eeeeeeeeee10',
     },
 ]
 token_that_will_be_invalid_when_used = [('test', 'iddqd')]
