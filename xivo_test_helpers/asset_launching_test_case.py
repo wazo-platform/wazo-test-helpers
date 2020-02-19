@@ -228,6 +228,24 @@ class AssetLaunchingTestCase(unittest.TestCase):
         return _run_cmd(docker_command).stdout
 
     @classmethod
+    def docker_copy_to_container(cls, src, dst, service_name=None):
+        if not service_name:
+            service_name = cls.service
+
+        container_dst = '{}:{}'.format(cls._container_id(service_name), dst)
+        docker_command = ['docker', 'cp', src, container_dst]
+        return _run_cmd(docker_command)
+
+    @classmethod
+    def docker_copy_from_container(cls, src, dst, service_name=None):
+        if not service_name:
+            service_name = cls.service
+
+        container_src = '{}:{}'.format(cls._container_id(service_name), src)
+        docker_command = ['docker', 'cp', container_src, dst]
+        return _run_cmd(docker_command)
+
+    @classmethod
     def _run_cmd(cls, cmd):
         _run_cmd(cmd.split(' '))
 
