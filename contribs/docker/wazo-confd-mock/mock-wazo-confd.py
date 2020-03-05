@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -15,6 +15,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 _EMPTY_RESPONSES = {
     'applications': {},
+    'asterisk/rtp/general': {},
     'conferences': {},
     'contexts': {},
     'infos': {},
@@ -94,6 +95,16 @@ def set_response():
     set_response = request_body['response']
     set_response_body = request_body['content']
     _responses[set_response] = set_response_body
+    return '', 204
+
+
+@app.route('/1.1/asterisk/rtp/general')
+def asterisk_rtp_general():
+    return jsonify(_responses['asterisk/rtp/general'])
+
+
+@app.route('/1.1/asterisk/rtp/general', methods=['PUT'])
+def asterisk_rtp_general_put():
     return '', 204
 
 
