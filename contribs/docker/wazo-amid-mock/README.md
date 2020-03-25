@@ -12,15 +12,3 @@ This mock exposes an interface similar to the official wazo-amid with a few exce
 * `POST /_set_response`
 * `GET /_requests`
 * `POST /_reset`
-
-## Customisation
-
-Certificates can be customized and placed in the following location:
-
-`server.crt` `/usr/local/share/ssl/amid/server.crt`
-`server.key` `/usr/local/share/ssl/amid/server.key`
-
-
-## How to generate certificates
-
-openssl req -x509 -newkey rsa:4096 -keyout server.key -out server.crt -nodes -config openssl.cfg -days 3650
