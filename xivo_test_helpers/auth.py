@@ -1,4 +1,4 @@
-# Copyright (C) 2017-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -16,9 +16,11 @@ class AuthClient:
         self.port = port
 
     def url(self, *parts):
-        return 'https://{host}:{port}/{path}'.format(host=self.host,
-                                                     port=self.port,
-                                                     path='/'.join(parts))
+        return 'http://{host}:{port}/{path}'.format(
+            host=self.host,
+            port=self.port,
+            path='/'.join(parts)
+        )
 
     def is_up(self):
         url = self.url()
