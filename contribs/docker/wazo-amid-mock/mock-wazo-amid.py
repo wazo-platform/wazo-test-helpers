@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright 2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -86,5 +86,4 @@ if __name__ == '__main__':
     _reset()
 
     port = int(sys.argv[1])
-    context = ('/usr/local/share/ssl/amid/server.crt', '/usr/local/share/ssl/amid/server.key')
-    app.run(host='0.0.0.0', port=port, ssl_context=context, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=True)
