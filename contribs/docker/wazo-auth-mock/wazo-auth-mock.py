@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -20,8 +20,6 @@ try:
     url_prefix = sys.argv[2]
 except IndexError:
     url_prefix = ''
-
-context = ('/usr/local/share/ssl/auth/server.crt', '/usr/local/share/ssl/auth/server.key')
 
 DEFAULT_POLICIES = {
     'wazo_default_admin_policy': {
@@ -533,4 +531,4 @@ def users_policies_put(user_uuid, policy_uuid):
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=port, ssl_context=context, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=True)
