@@ -25,7 +25,7 @@ class AuthClient:
     def is_up(self):
         url = self.url()
         try:
-            response = requests.get(url, verify=False)
+            response = requests.get(url)
             return response.status_code == 404
         except requests.RequestException as e:
             logger.debug(e)
@@ -33,53 +33,53 @@ class AuthClient:
 
     def reset_external_config(self):
         url = self.url('_reset_external_config')
-        requests.post(url, verify=False)
+        requests.post(url)
 
     def set_external_config(self, config_info):
         url = self.url('_set_external_config')
-        requests.post(url, json=config_info, verify=False)
+        requests.post(url, json=config_info)
 
     def reset_external_auth(self):
         url = self.url('_reset_external_auth')
-        requests.post(url, verify=False)
+        requests.post(url)
 
     def set_external_auth(self, auth_info):
         url = self.url('_set_external_auth')
-        requests.post(url, json=auth_info, verify=False)
+        requests.post(url, json=auth_info)
 
     def set_tenants(self, *tenants):
         url = self.url('_set_tenants')
-        requests.post(url, json=tenants, verify=False)
+        requests.post(url, json=tenants)
 
     def set_sessions(self, *sessions):
         url = self.url('_set_sessions')
-        requests.post(url, json=sessions, verify=False)
+        requests.post(url, json=sessions)
 
     def set_refresh_tokens(self, *sessions):
         url = self.url('_set_refresh_tokens')
-        requests.post(url, json=sessions, verify=False)
+        requests.post(url, json=sessions)
 
     def set_token(self, token):
         url = self.url('_set_token')
-        requests.post(url, json=token.to_dict(), verify=False)
+        requests.post(url, json=token.to_dict())
 
     def revoke_token(self, token_id):
         url = self.url('_remove_token', token_id)
-        requests.delete(url, verify=False)
+        requests.delete(url)
 
     def set_invalid_credentials(self, credentials):
         url = self.url('_add_invalid_credentials')
-        requests.post(url, json=credentials.to_dict(), verify=False)
+        requests.post(url, json=credentials.to_dict())
 
     def set_valid_credentials(self, credentials, token):
         url = self.url('_add_valid_credentials')
         credentials_with_token = credentials.to_dict()
         credentials_with_token['token'] = token
-        requests.post(url, json=credentials_with_token, verify=False)
+        requests.post(url, json=credentials_with_token)
 
     def set_credentials_for_invalid_token(self, credentials):
         url = self.url('_add_credentials_for_invalid_token')
-        requests.post(url, json=credentials.to_dict(), verify=False)
+        requests.post(url, json=credentials.to_dict())
 
 
 class MockUserToken:
