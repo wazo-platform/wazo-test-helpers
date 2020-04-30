@@ -12,15 +12,3 @@ This mock exposes an interface similar to the official wazo-confd with a few exc
 * `POST /_set_response`
 * `GET /_requests`
 * `POST /_reset`
-
-## Customisation
-
-Certificates can be customized and placed in the following location:
-
-`server.crt` `/usr/local/share/ssl/confd/server.crt`
-`server.key` `/usr/local/share/ssl/confd/server.key`
-
-
-## How to generate certificates
-
-openssl req -x509 -newkey rsa:4096 -keyout server.key -out server.crt -nodes -config openssl.cfg -days 3650
