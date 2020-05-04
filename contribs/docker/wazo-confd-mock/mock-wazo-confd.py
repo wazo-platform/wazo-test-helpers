@@ -208,7 +208,6 @@ def lines_of_user(user_uuid):
     })
 
 
-
 @app.route('/1.1/trunks')
 def trunks():
     items = _responses['trunks'].values()
@@ -252,5 +251,4 @@ if __name__ == '__main__':
     _reset()
 
     port = int(sys.argv[1])
-    ssl_context = ('/usr/local/share/ssl/confd/server.crt', '/usr/local/share/ssl/confd/server.key')
-    app.run(host='0.0.0.0', port=port, ssl_context=ssl_context, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=True)
