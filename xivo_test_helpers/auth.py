@@ -90,20 +90,24 @@ class MockUserToken:
         kwargs.setdefault('user_uuid', str(uuid.uuid4()))
         return cls(**kwargs)
 
-    def __init__(self, token, user_uuid, wazo_uuid=None, metadata=None):
+    def __init__(self, token, user_uuid, wazo_uuid=None, acls=None, metadata=None):
         self.token_id = token
         self.auth_id = user_uuid
         self.wazo_uuid = wazo_uuid or str(uuid.uuid4())
+        self.acls = acls
         self.metadata = metadata or {}
         self.metadata.setdefault('uuid', user_uuid)
 
     def to_dict(self):
-        return {
+        result = {
             'token': self.token_id,
             'auth_id': self.auth_id,
             'xivo_uuid': self.wazo_uuid,
             'metadata': self.metadata,
         }
+        if self.acls is not None:
+            result['acls'] = self.acls
+        return result
 
 
 class MockCredentials:
