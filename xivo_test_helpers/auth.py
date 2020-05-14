@@ -90,7 +90,7 @@ class MockUserToken:
         kwargs.setdefault('user_uuid', str(uuid.uuid4()))
         return cls(**kwargs)
 
-    def __init__(self, token, user_uuid, wazo_uuid=None, acls=None, metadata=None):
+    def __init__(self, token, user_uuid, wazo_uuid=None, metadata=None, acls=None):
         self.token_id = token
         self.auth_id = user_uuid
         self.wazo_uuid = wazo_uuid or str(uuid.uuid4())
