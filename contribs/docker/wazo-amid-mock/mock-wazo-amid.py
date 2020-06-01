@@ -77,6 +77,16 @@ def set_response():
     return '', 204
 
 
+@app.route('/_set_response_action', methods=['POST'])
+def set_response_action():
+    global _responses
+    request_body = json.loads(request.data)
+    set_response = request_body['response']
+    set_response_body = request_body['content']
+    _responses['action'][set_response] = set_response_body
+    return '', 204
+
+
 @app.route('/1.0/action/<action>', methods=['POST'])
 def applications(action):
     return jsonify(_responses['action'][action])
