@@ -18,14 +18,14 @@ app = Flask(__name__)
 logger = logging.getLogger('amid-mock')
 
 _requests = []
-_responses = {'action': {'DeviceStateList': []}}
+_responses = {'action': {'DeviceStateList': [], 'CoreShowChannels': []}}
 
 
 def _reset():
     global _requests
     global _responses
     _requests = []
-    _responses = {'action': {'DeviceStateList': []}}
+    _responses = {'action': {'DeviceStateList': [], 'CoreShowChannels': []}}
 
 
 @app.before_request
@@ -74,6 +74,16 @@ def set_response():
     set_response = request_body['response']
     set_response_body = request_body['content']
     _responses[set_response] = set_response_body
+    return '', 204
+
+
+@app.route('/_set_response_action', methods=['POST'])
+def set_response_action():
+    global _responses
+    request_body = json.loads(request.data)
+    set_response = request_body['response']
+    set_response_body = request_body['content']
+    _responses['action'][set_response] = set_response_body
     return '', 204
 
 
