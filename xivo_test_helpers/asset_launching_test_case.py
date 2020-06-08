@@ -16,8 +16,10 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 if os.environ.get('TEST_LOGS') != 'verbose':
-    logging.getLogger('urllib3.connectionpool').setLevel(logging.WARNING)
+    logging.getLogger('amqp').setLevel(logging.INFO)
     logging.getLogger('docker').setLevel(logging.INFO)
+    logging.getLogger('stevedore.extension').setLevel(logging.INFO)
+    logging.getLogger('urllib3.connectionpool').setLevel(logging.WARNING)
     logger.setLevel(logging.WARNING)
 
 
