@@ -1,7 +1,7 @@
-FROM debian:buster
-MAINTAINER Wazo Maintainers <dev@wazo.community>
+FROM debian:buster-slim
+LABEL maintainer="Wazo Maintainers <dev@wazo.community>"
 
-RUN apt-get update && apt-get install -y netcat
+RUN apt-get -q update && apt-get install -yq netcat
 
 ADD wait /wait
 
