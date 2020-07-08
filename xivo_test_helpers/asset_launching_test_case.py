@@ -56,18 +56,6 @@ class AssetLaunchingTestCase(unittest.TestCase):
     log_dir = None
 
     @staticmethod
-    def get_log_directory():
-        if not AssetLaunchingTestCase.log_dir:
-            char_set = string.ascii_lowercase
-            default_logging_dir = '/tmp/wazo-integration-{}'.format(
-                ''.join(random.choice(char_set) for _ in range(8))
-            )
-            AssetLaunchingTestCase.log_dir = os.getenv('WAZO_TEST_DOCKER_LOGS_DIR', default_logging_dir)
-            if not os.path.exists(AssetLaunchingTestCase.log_dir):
-                os.makedirs(AssetLaunchingTestCase.log_dir, mode=0o755)
-        return AssetLaunchingTestCase.log_dir
-
-    @staticmethod
     def is_managing_containers():
         return os.environ.get('TEST_DOCKER', 'manage') != 'ignore'
 
@@ -103,7 +91,9 @@ class AssetLaunchingTestCase(unittest.TestCase):
             cls.start_containers(bootstrap_container='sync')
         except ContainerStartFailed as e:
             logger.error(e)
+
             cls.kill_containers()
+            cls._maybe_dump_docker_logs()
             raise
         logger.debug('Done.')
 
@@ -185,13 +175,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
     def stop_service_with_asset(cls):
         logger.debug('Killing containers...')
         cls.kill_containers()
-        if os.getenv('WAZO_TEST_DOCKER_LOGS_ENABLED', '0') == '1':
-            filename_prefix = '{}.{}-'.format(cls.__module__, cls.__name__)
-            with tempfile.NamedTemporaryFile(dir=cls.get_log_directory(),
-                                             prefix=filename_prefix,
-                                             delete=False) as logfile:
-                logfile.write(cls.log_containers())
-                logger.debug('Container logs dumped to %s', logfile.name)
+        cls._maybe_dump_docker_logs()
         logger.debug('Done.')
 
     @classmethod
@@ -276,6 +260,28 @@ class AssetLaunchingTestCase(unittest.TestCase):
         if extra:
             options.extend(["--file", extra])
         return options
+
+    @classmethod
+    def _maybe_dump_docker_logs(cls):
+        if os.getenv('WAZO_TEST_DOCKER_LOGS_ENABLED', '0') == '1':
+            filename_prefix = '{}.{}-'.format(cls.__module__, cls.__name__)
+            with tempfile.NamedTemporaryFile(dir=cls.get_log_directory(),
+                                             prefix=filename_prefix,
+                                             delete=False) as logfile:
+                logfile.write(cls.log_containers())
+            logger.debug('Container logs dumped to %s', logfile.name)
+
+    @staticmethod
+    def get_log_directory():
+        if not AssetLaunchingTestCase.log_dir:
+            char_set = string.ascii_lowercase
+            default_logging_dir = '/tmp/wazo-integration-{}'.format(
+                ''.join(random.choice(char_set) for _ in range(8))
+            )
+            AssetLaunchingTestCase.log_dir = os.getenv('WAZO_TEST_DOCKER_LOGS_DIR', default_logging_dir)
+            if not os.path.exists(AssetLaunchingTestCase.log_dir):
+                os.makedirs(AssetLaunchingTestCase.log_dir, mode=0o755)
+        return AssetLaunchingTestCase.log_dir
 
 
 def _run_cmd(cmd, stderr=True):
