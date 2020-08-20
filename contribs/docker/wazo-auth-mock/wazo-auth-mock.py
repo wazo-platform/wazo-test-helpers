@@ -290,7 +290,10 @@ def add_valid_credentials():
 
 @app.route(url_prefix + "/0.1/token/<token>", methods=['HEAD'])
 def token_head_ok(token):
+    required_acl = request.args.get('scope')
     if token in wrong_acl_tokens:
+        if not required_acl:
+            return '', 204
         return '', 403
     elif token in valid_tokens:
         if _valid_acl(token):
