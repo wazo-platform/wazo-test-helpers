@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import uuid
@@ -20,9 +20,9 @@ class BusClient:
         self._default_exchange = exchange
 
     @classmethod
-    def from_connection_fields(cls, user='guest', password='guest', host='localhost', port=5672, exchange_name='xivo'):
+    def from_connection_fields(cls, user='guest', password='guest', host='localhost', port=5672, exchange_name='xivo', exchange_type='topic'):
         url = 'amqp://{user}:{password}@{host}:{port}//'.format(user=user, password=password, host=host, port=port)
-        exchange = Exchange(exchange_name, type='topic')
+        exchange = Exchange(exchange_name, type=exchange_type)
         return cls(url, exchange)
 
     def is_up(self):
