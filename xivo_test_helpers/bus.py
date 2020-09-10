@@ -45,7 +45,7 @@ class BusClient:
             accumulator = BusMessageAccumulator(self._url, queue)
         return accumulator
 
-    def publish(self, payload, routing_key, headers=None, exchange=None):
+    def publish(self, payload, routing_key=None, headers=None, exchange=None):
         exchange = exchange or self._default_exchange
         headers = headers or {}
         with Connection(self._url) as connection:
