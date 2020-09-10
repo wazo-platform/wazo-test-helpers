@@ -20,15 +20,7 @@ class BusClient:
         self._default_exchange = exchange
 
     @classmethod
-    def from_connection_fields(
-        cls,
-        user='guest',
-        password='guest',
-        host='localhost',
-        port=5672,
-        exchange_name='xivo',
-        exchange_type='topic',
-    ):
+    def from_connection_fields(cls, user='guest', password='guest', host='localhost', port=5672, exchange_name='xivo', exchange_type='topic'):
         url = 'amqp://{user}:{password}@{host}:{port}//'.format(user=user, password=password, host=host, port=port)
         exchange = Exchange(exchange_name, type=exchange_type)
         return cls(url, exchange)
@@ -53,24 +45,12 @@ class BusClient:
             accumulator = BusMessageAccumulator(self._url, queue)
         return accumulator
 
-    def publish(
-        self,
-        payload,
-        routing_key=None,
-        headers=None,
-        exchange=None,
-        content_type='application/json',
-    ):
+    def publish(self, payload, routing_key, headers=None, exchange=None):
         exchange = exchange or self._default_exchange
         headers = headers or {}
         with Connection(self._url) as connection:
             producer = Producer(connection, exchange=exchange, auto_declare=True)
-            producer.publish(
-                payload,
-                routing_key=routing_key,
-                headers=headers,
-                content_type=content_type,
-            )
+            producer.publish(payload, routing_key=routing_key, headers=headers)
 
     def queue_declare(self, queue):
         with Connection(self._url) as connection:
