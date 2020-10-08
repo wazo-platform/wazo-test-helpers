@@ -1,7 +1,7 @@
 DIRS = wait wazo-amid-mock wazo-auth-mock wazo-confd-mock xivo-sysconfd-mock
 
 docker-images:
-	for d in $(DIRS); do cd contribs/docker/$$d && docker build -t wazopbx/$$d . && cd ../../..; done
+	for d in $(DIRS); do cd contribs/docker/$$d && docker build -t wazoplatform/$$d . && cd ../../..; done
 
 build:
 	python setup.py sdist
