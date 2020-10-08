@@ -1,4 +1,4 @@
-# wazopbx/wait
+# wazoplatform/wait
 
 This image is used to wait for containers to be ready. It does this by waiting
 for the specified TCP ports to be open.
