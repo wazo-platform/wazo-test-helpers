@@ -88,7 +88,7 @@ def set_response_action():
 
 
 @app.route('/1.0/action/<action>', methods=['POST'])
-def applications(action):
+def action(action):
     return jsonify(_responses['action'][action])
 
 
