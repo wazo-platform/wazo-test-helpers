@@ -432,7 +432,7 @@ def tenants_get():
     if specified_tenant_uuid:
         specified_tenant = _find_tenant(specified_tenant_uuid)
         if not specified_tenant:
-            return 'Tenant not found: {}'.format(specified_tenant_uuid), 500
+            return 'Tenant not found: {}'.format(specified_tenant_uuid), 401
 
         specified_tenant_children = _find_tenant_children(specified_tenant)
 
