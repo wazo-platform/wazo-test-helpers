@@ -290,6 +290,15 @@ def add_valid_credentials():
 
 @app.route(url_prefix + "/0.1/token/<token>", methods=['HEAD'])
 def token_head_ok(token):
+    required_tenant_uuid = request.args.get('tenant')
+    if required_tenant_uuid:
+        token_tenant_uuid = valid_tokens[token]['metadata']['tenant_uuid']
+        token_tenant = _find_tenant(token_tenant_uuid)
+        visible_tenant_uuids = [tenant['uuid'] for tenant in _find_tenant_children(token_tenant)] + [token_tenant['uuid']]
+        logger.debug('Visible tenants: %s', visible_tenant_uuids)
+        if required_tenant_uuid not in visible_tenant_uuids:
+            return '', 403
+
     required_acl = request.args.get('scope')
     if token in wrong_acl_tokens:
         if not required_acl:
