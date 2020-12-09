@@ -23,6 +23,19 @@ if os.environ.get('TEST_LOGS') != 'verbose':
     logger.setLevel(logging.WARNING)
 
 
+class ClientCreateException(Exception):
+    def __init__(self, client_name):
+        super().__init__(f'Could not create client {client_name}')
+
+
+class WrongClient:
+    def __init__(self, client_name):
+        self.client_name = client_name
+
+    def __getattr__(self, member):
+        raise ClientCreateException(self.client_name)
+
+
 class NoSuchService(Exception):
     def __init__(self, service_name):
         super(NoSuchService, self).__init__('No such service: {}'.format(service_name))
