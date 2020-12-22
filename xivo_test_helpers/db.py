@@ -23,18 +23,16 @@ class DBUserClient:
 
     def __init__(self, db_uri):
         self._db_uri = db_uri
+        self._engine = sqlalchemy.create_engine(self._db_uri)
 
     def is_up(self):
         try:
-            self._connect()
+            self._engine.connect()
             return True
         except Exception as e:
             logger.debug('Database is down: %s', e)
             return False
 
     def execute(self, query, **kwargs):
-        with self._connect() as connection:
+        with self._engine.connect() as connection:
             connection.execute(text(query), **kwargs)
-
-    def _connect(self):
-        return sqlalchemy.create_engine(self._db_uri) .connect()
