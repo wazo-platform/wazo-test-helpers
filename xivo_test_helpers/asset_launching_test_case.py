@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -262,7 +262,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
     @classmethod
     def _docker_compose_options(cls):
         options = [
-            '--no-ansi',
+            '--ansi', 'never',
             '--project-name', cls.service,
             '--file', os.path.join(cls.assets_root, 'docker-compose.yml'),
             '--file', os.path.join(
