@@ -219,12 +219,13 @@ class AssetLaunchingTestCase(unittest.TestCase):
         docker.start(cls._container_id(service_name))
 
     @classmethod
-    def docker_exec(cls, command, service_name=None):
+    def docker_exec(cls, command, service_name=None, return_attr='stdout'):
         if not service_name:
             service_name = cls.service
 
         docker_command = ['docker', 'exec', cls._container_id(service_name)] + command
-        return _run_cmd(docker_command).stdout
+        result = _run_cmd(docker_command)
+        return getattr(result, return_attr)
 
     @classmethod
     def docker_copy_to_container(cls, src, dst, service_name=None):
