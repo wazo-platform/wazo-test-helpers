@@ -1,4 +1,4 @@
-DIRS = wait wazo-amid-mock wazo-auth-mock wazo-confd-mock xivo-sysconfd-mock
+DIRS = wait wazo-amid-mock wazo-auth-mock wazo-confd-mock wazo-sysconfd-mock
 
 docker-images:
 	for d in $(DIRS); do cd contribs/docker/$$d && docker build -t wazoplatform/$$d . && cd ../../..; done

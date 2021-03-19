@@ -1,6 +1,6 @@
-# xivo-sysconfd mock
+# wazo-sysconfd mock
 
-This is the required files to build a docker image to be used as a xivo-sysconfd mock
+This is the required files to build a docker image to be used as a wazo-sysconfd mock
 for integration tests.
 
 Usage
