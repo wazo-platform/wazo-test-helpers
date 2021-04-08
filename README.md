@@ -6,7 +6,6 @@ Common test helpers used in Wazo.
 
 pip install xivo-test-helpers
 
-
 ## Releasing a new version
 
 Edit setup.py and increase version number.
