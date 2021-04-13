@@ -1,4 +1,4 @@
-# Copyright 2017-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -90,11 +90,11 @@ class MockUserToken:
         kwargs.setdefault('user_uuid', str(uuid.uuid4()))
         return cls(**kwargs)
 
-    def __init__(self, token, user_uuid, wazo_uuid=None, metadata=None, acls=None):
+    def __init__(self, token, user_uuid, wazo_uuid=None, metadata=None, acl=None):
         self.token_id = token
         self.auth_id = user_uuid
         self.wazo_uuid = wazo_uuid or str(uuid.uuid4())
-        self.acls = acls
+        self.acl = acl
         self.metadata = metadata or {}
         self.metadata.setdefault('uuid', user_uuid)
 
@@ -105,8 +105,8 @@ class MockUserToken:
             'xivo_uuid': self.wazo_uuid,
             'metadata': self.metadata,
         }
-        if self.acls is not None:
-            result['acls'] = self.acls
+        if self.acl is not None:
+            result['acl'] = self.acl
         return result
 
 
