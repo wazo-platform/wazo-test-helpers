@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -330,8 +330,8 @@ def token_get(token):
 
 def _valid_acl(token_id):
     required_acl = request.args.get('scope')
-    if required_acl and 'acls' in valid_tokens[token_id]:
-        if required_acl in valid_tokens[token_id]['acls']:
+    if required_acl and 'acl' in valid_tokens[token_id]:
+        if required_acl in valid_tokens[token_id]['acl']:
             return True
         else:
             return False
