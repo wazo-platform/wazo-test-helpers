@@ -219,6 +219,22 @@ class AssetLaunchingTestCase(unittest.TestCase):
         docker.start(cls._container_id(service_name))
 
     @classmethod
+    def pause_service(cls, service_name=None):
+        if not service_name:
+            service_name = cls.service
+
+        docker = docker_client.from_env().api
+        docker.pause(cls._container_id(service_name))
+
+    @classmethod
+    def unpause_service(cls, service_name=None):
+        if not service_name:
+            service_name = cls.service
+
+        docker = docker_client.from_env().api
+        docker.unpause(cls._container_id(service_name))
+
+    @classmethod
     def docker_exec(cls, command, service_name=None, return_attr='stdout'):
         if not service_name:
             service_name = cls.service
