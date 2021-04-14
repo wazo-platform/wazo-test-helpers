@@ -90,11 +90,12 @@ class MockUserToken:
         kwargs.setdefault('user_uuid', str(uuid.uuid4()))
         return cls(**kwargs)
 
-    def __init__(self, token, user_uuid, wazo_uuid=None, metadata=None, acl=None):
+    def __init__(self, token, user_uuid, wazo_uuid=None, metadata=None, acl=None, session_uuid=None):
         self.token_id = token
         self.auth_id = user_uuid
         self.wazo_uuid = wazo_uuid or str(uuid.uuid4())
         self.acl = acl
+        self.session_uuid = session_uuid
         self.metadata = metadata or {}
         self.metadata.setdefault('uuid', user_uuid)
 
@@ -103,6 +104,7 @@ class MockUserToken:
             'token': self.token_id,
             'auth_id': self.auth_id,
             'xivo_uuid': self.wazo_uuid,
+            'session_uuid': self.session_uuid,
             'metadata': self.metadata,
         }
         if self.acl is not None:
