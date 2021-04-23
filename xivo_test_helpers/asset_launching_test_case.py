@@ -182,8 +182,9 @@ class AssetLaunchingTestCase(unittest.TestCase):
         if not result:
             raise NoSuchPort(service_name, internal_port)
 
-        # NOTE(fblackburn): You must work with 127.0.0.1 when using this value instead of localhost
-        # to avoid IPv6 resolving, because this method only return port bound to IPv4 address
+        # NOTE: This returns the port bound to IPv4 address. You must combine
+        # this port with host 127.0.0.1, not localhost, because localhost can
+        # resolve to an IPv6 address that would not match with this port.
         return int(result[0]['HostPort'])
 
     @classmethod
