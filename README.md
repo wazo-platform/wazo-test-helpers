@@ -6,21 +6,6 @@ Common test helpers used in Wazo.
 
 pip install xivo-test-helpers
 
-
-## Releasing a new version
-
-Edit setup.py and increase version number.
-
-    git commit
-
-    git tag <version>
-
-    make upload
-
-    git push
-    git push --tags
-
-
 ## Environment variables
 
 ### Logging
@@ -52,3 +37,16 @@ To choose the directory used for docker logs dumping:
 To disable the `docker-compose pull` command and let `docker-compose run` do the job, do (used by zuul):
 
     WAZO_TEST_NO_DOCKER_COMPOSE_PULL=1
+
+## Releasing a new version
+
+Edit setup.py and increase version number.
+
+    git commit
+
+    git tag <version>
+
+    make upload
+
+    git push
+    git push --tags
