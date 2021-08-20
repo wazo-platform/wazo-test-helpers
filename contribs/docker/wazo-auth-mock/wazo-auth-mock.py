@@ -359,6 +359,8 @@ def token_post():
             if token in valid_tokens:
                 return jsonify({'data': valid_tokens[token]})
         return '', 401
+    elif username.endswith('-service'):
+        return '', 401
     else:
         return jsonify({'data': valid_tokens['valid-token-multitenant']})
 
