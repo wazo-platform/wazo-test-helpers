@@ -340,15 +340,20 @@ def _valid_acl(token_id):
 
 @app.route(url_prefix + "/0.1/token", methods=['POST'])
 def token_post():
-    auth = request.authorization['username'], request.authorization['password']
-    if auth in invalid_username_passwords:
+    username = request.authorization['username']
+    password = request.authorization['password']
+    if (username, password) in invalid_username_passwords:
         return '', 401
-    elif auth in token_that_will_be_invalid_when_used:
-        return jsonify({'data': {'auth_id': valid_tokens['valid-token']['auth_id'],
-                                 'token': 'expired'}})
-    elif request.authorization['username'] in valid_credentials:
-        username = request.authorization['username']
-        password = request.authorization['password']
+    elif (username, password) in token_that_will_be_invalid_when_used:
+        return jsonify(
+            {
+                'data': {
+                    'auth_id': valid_tokens['valid-token']['auth_id'],
+                    'token': 'expired',
+                }
+            }
+        )
+    elif username in valid_credentials:
         if password == valid_credentials[username]['password']:
             token = valid_credentials[username]['token']
             if token in valid_tokens:
