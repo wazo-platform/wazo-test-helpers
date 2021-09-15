@@ -265,6 +265,17 @@ class AssetLaunchingTestCase(unittest.TestCase):
         return _run_cmd(docker_command)
 
     @classmethod
+    def docker_copy_across_containers(cls, src_service_name, src, dst_service_name, dst):
+        container_src = '{}:{}'.format(cls._container_id(src_service_name), src)
+        container_dst = '{}:{}'.format(cls._container_id(dst_service_name), dst)
+        with tempfile.TemporaryDirectory() as tmp_dirname:
+            tmp_filename = os.path.join(tmp_dirname, 'docker_cp_across_containers')
+            docker_command = ['docker', 'cp', container_src, tmp_filename]
+            _run_cmd(docker_command)
+            docker_command = ['docker', 'cp', tmp_filename, container_dst]
+            _run_cmd(docker_command)
+
+    @classmethod
     def _run_cmd(cls, cmd):
         _run_cmd(cmd.split(' '))
 
