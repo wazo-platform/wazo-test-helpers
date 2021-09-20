@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -20,6 +20,7 @@ _EMPTY_RESPONSES = {
     'contexts': {},
     'infos': {},
     'lines': {},
+    'meetings': {},
     'moh': {
         '60f123e6-147b-487c-b08a-36395d43346e': {
             'uuid': '60f123e6-147b-487c-b08a-36395d43346e',
@@ -173,6 +174,21 @@ def context(context_id):
     if context_id not in _responses['contexts']:
         return '', 404
     return jsonify(_responses['contexts'][context_id])
+
+
+@app.route('/1.1/meetings')
+def meetings():
+    meetings = _responses['meetings'].values()
+    if 'name' in request.args:
+        meetings = [meeting for meeting in meetings if meeting['name'] == request.args['name']]
+    return jsonify({'items': meetings})
+
+
+@app.route('/1.1/meetings/<meeting_uuid>')
+def meeting(meeting_uuid):
+    if meeting_uuid not in _responses['meetings']:
+        return '', 404
+    return jsonify(_responses['meetings'][meeting_uuid])
 
 
 @app.route('/1.1/switchboards')
