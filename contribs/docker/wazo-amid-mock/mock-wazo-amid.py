@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright 2019-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2019-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -18,14 +18,14 @@ app = Flask(__name__)
 logger = logging.getLogger('amid-mock')
 
 _requests = []
-_responses = {'action': {'DeviceStateList': [], 'CoreShowChannels': []}}
+_responses = {'action': {'DeviceStateList': [], 'CoreShowChannels': [], 'Command': {'response': ['Success']}}}
 
 
 def _reset():
     global _requests
     global _responses
     _requests = []
-    _responses = {'action': {'DeviceStateList': [], 'CoreShowChannels': []}}
+    _responses = {'action': {'DeviceStateList': [], 'CoreShowChannels': [], 'Command': {'response': ['Success']}}}
 
 
 @app.before_request
