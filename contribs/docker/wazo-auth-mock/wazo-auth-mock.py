@@ -7,6 +7,7 @@ import logging
 import sys
 import uuid
 
+from collections import deque
 from flask import Flask, jsonify, request
 
 logging.basicConfig(level=logging.DEBUG)
@@ -120,7 +121,7 @@ token_that_will_be_invalid_when_used = [('test', 'iddqd')]
 users = {}
 wrong_acl_tokens = {'invalid-acl-token'}
 
-_requests = []
+_requests = deque(maxlen=1024)
 
 
 def _reset():
