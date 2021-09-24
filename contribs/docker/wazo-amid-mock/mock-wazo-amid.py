@@ -7,6 +7,7 @@ import json
 import logging
 import sys
 
+from collections import deque
 from flask import Flask
 from flask import jsonify
 from flask import request
@@ -17,7 +18,7 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 logger = logging.getLogger('amid-mock')
 
-_requests = []
+_requests = deque(maxlen=1024)
 _responses = {'action': {'DeviceStateList': [], 'CoreShowChannels': [], 'Command': {'response': ['Success']}}}
 
 

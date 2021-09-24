@@ -1,15 +1,16 @@
 #!/usr/bin/python2
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import sys
 
+from collections import deque
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 port = sys.argv[1]
 
-REQUESTS = []
+REQUESTS = deque(maxlen=1024)
 
 
 @app.before_request
