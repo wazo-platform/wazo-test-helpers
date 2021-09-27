@@ -28,7 +28,7 @@ def log_request():
 
 @app.route('/_requests', methods=['GET'])
 def list_requests():
-    return jsonify(requests=REQUESTS)
+    return jsonify(requests=list(REQUESTS))
 
 
 @app.route('/_requests', methods=['DELETE'])
