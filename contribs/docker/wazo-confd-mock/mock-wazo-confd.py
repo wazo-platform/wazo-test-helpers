@@ -42,13 +42,13 @@ app = Flask(__name__)
 logger = logging.getLogger('confd-mock')
 
 _requests = deque(maxlen=1024)
-_responses = {}
+_responses = dict(_EMPTY_RESPONSES)
 
 
 def _reset():
-    global _requests
+    _requests.clear()
+
     global _responses
-    _requests = []
     _responses = dict(_EMPTY_RESPONSES)
 
 
@@ -82,7 +82,7 @@ def print_request_response(response):
 
 @app.route('/_requests', methods=['GET'])
 def list_requests():
-    return jsonify(requests=_requests)
+    return jsonify(requests=list(_requests))
 
 
 @app.route('/_reset', methods=['POST'])

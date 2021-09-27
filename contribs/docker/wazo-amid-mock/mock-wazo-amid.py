@@ -18,15 +18,17 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 logger = logging.getLogger('amid-mock')
 
+EMPTY_RESPONSES = {'action': {'DeviceStateList': [], 'CoreShowChannels': [], 'Command': {'response': ['Success']}}}
+
 _requests = deque(maxlen=1024)
-_responses = {'action': {'DeviceStateList': [], 'CoreShowChannels': [], 'Command': {'response': ['Success']}}}
+_responses = dict(EMPTY_RESPONSES)
 
 
 def _reset():
-    global _requests
+    _requests.clear()
+
     global _responses
-    _requests = []
-    _responses = {'action': {'DeviceStateList': [], 'CoreShowChannels': [], 'Command': {'response': ['Success']}}}
+    _responses = dict(EMPTY_RESPONSES)
 
 
 @app.before_request
@@ -59,7 +61,7 @@ def print_request_response(response):
 
 @app.route('/_requests', methods=['GET'])
 def list_requests():
-    return jsonify(requests=_requests)
+    return jsonify(requests=list(_requests))
 
 
 @app.route('/_reset', methods=['POST'])
