@@ -10,7 +10,7 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 port = sys.argv[1]
 
-REQUESTS = deque(maxlen=1024)
+_requests = deque(maxlen=1024)
 
 
 @app.before_request
@@ -23,18 +23,17 @@ def log_request():
                'body': request.data,
                'json': request.json,
                'headers': dict(request.headers)}
-        REQUESTS.append(log)
+        _requests.append(log)
 
 
 @app.route('/_requests', methods=['GET'])
 def list_requests():
-    return jsonify(requests=list(REQUESTS))
+    return jsonify(requests=list(_requests))
 
 
 @app.route('/_requests', methods=['DELETE'])
 def delete_requests():
-    global REQUESTS
-    REQUESTS = []
+    _requests.clear()
     return ''
 
 
