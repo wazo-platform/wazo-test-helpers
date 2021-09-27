@@ -122,13 +122,12 @@ users = {}
 wrong_acl_tokens = {'invalid-acl-token'}
 
 _requests = deque(maxlen=1024)
+_tenants = {}
 
 
 def _reset():
-    global _requests
-    global _tenants
-    _requests = []
-    _tenants = {}
+    _requests.clear()
+    _tenants.clear()
 
 
 @app.route(url_prefix + "/0.1/external/<external_service>/config", methods=['GET'])
@@ -205,7 +204,7 @@ def print_request_response(response):
 
 @app.route('/0.1/_requests', methods=['GET'])
 def list_requests():
-    return jsonify(requests=_requests)
+    return jsonify(requests=list(_requests))
 
 
 @app.route('/0.1/_reset', methods=['POST'])
