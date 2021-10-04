@@ -282,7 +282,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
     @classmethod
     def _container_id(cls, service_name):
         result = _run_cmd(['docker-compose'] + cls._docker_compose_options() +
-                          ['ps', '-q', service_name], stderr=False).stdout.strip()
+                          ['ps', '-q', service_name], stderr=False, timeout=5).stdout.strip()
         result = result.decode('utf-8')
         if '\n' in result:
             raise AssertionError('There is more than one container running with name {}'.format(service_name))
@@ -328,10 +328,17 @@ class AssetLaunchingTestCase(unittest.TestCase):
         return AssetLaunchingTestCase.log_dir
 
 
-def _run_cmd(cmd, stderr=True):
+def _run_cmd(cmd, stderr=True, timeout=None):
     logger.debug('%s', cmd)
     stderr = subprocess.STDOUT if stderr else None
-    completed_process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=stderr)
+    try:
+        completed_process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=stderr, timeout=timeout)
+    except subprocess.TimeoutExpired as e:
+        logger.error('Command "%s" timed out', e.cmd)
+        logger.error('stdout: %s', e.stdout)
+        logger.error('stderr: %s', e.stderr)
+        raise
+
     if completed_process.stdout:
         for line in str(completed_process.stdout).replace('\\r', '').split('\\n'):
             logger.info('stdout: %s', line)
