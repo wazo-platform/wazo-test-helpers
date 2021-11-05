@@ -143,6 +143,13 @@ class AssetLaunchingTestCase(unittest.TestCase):
                         ['logs', '--no-color']).stdout
 
     @classmethod
+    def log_containers_to_file(cls, log_file):
+        return subprocess.run(
+            ['docker-compose'] + cls._docker_compose_options() +
+            ['logs', '--no-color'], stdout=log_file
+        )
+
+    @classmethod
     def service_status(cls, service_name=None):
         if not service_name:
             service_name = cls.service
@@ -312,7 +319,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
             with tempfile.NamedTemporaryFile(dir=cls.get_log_directory(),
                                              prefix=filename_prefix,
                                              delete=False) as logfile:
-                logfile.write(cls.log_containers())
+                cls.log_containers_to_file(logfile)
             logger.debug('Container logs dumped to %s', logfile.name)
 
     @staticmethod
