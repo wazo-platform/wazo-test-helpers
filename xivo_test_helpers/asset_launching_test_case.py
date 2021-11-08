@@ -143,6 +143,13 @@ class AssetLaunchingTestCase(unittest.TestCase):
                         ['logs', '--no-color']).stdout
 
     @classmethod
+    def log_containers_to_file(cls, log_file):
+        return subprocess.run(
+            ['docker-compose'] + cls._docker_compose_options() +
+            ['logs', '--no-color'], stdout=log_file
+        )
+
+    @classmethod
     def service_status(cls, service_name=None):
         if not service_name:
             service_name = cls.service
@@ -282,7 +289,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
     @classmethod
     def _container_id(cls, service_name):
         result = _run_cmd(['docker-compose'] + cls._docker_compose_options() +
-                          ['ps', '-q', service_name], stderr=False, timeout=4).stdout.strip()
+                          ['ps', '-q', service_name], stderr=False).stdout.strip()
         result = result.decode('utf-8')
         if '\n' in result:
             raise AssertionError('There is more than one container running with name {}'.format(service_name))
@@ -312,7 +319,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
             with tempfile.NamedTemporaryFile(dir=cls.get_log_directory(),
                                              prefix=filename_prefix,
                                              delete=False) as logfile:
-                logfile.write(cls.log_containers())
+                cls.log_containers_to_file(logfile)
             logger.debug('Container logs dumped to %s', logfile.name)
 
     @staticmethod
@@ -328,16 +335,11 @@ class AssetLaunchingTestCase(unittest.TestCase):
         return AssetLaunchingTestCase.log_dir
 
 
-def _run_cmd(cmd, stderr=True, timeout=None):
+def _run_cmd(cmd, stderr=True):
     logger.debug('%s', cmd)
     stderr = subprocess.STDOUT if stderr else None
-    try:
-        completed_process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=stderr, timeout=timeout)
-    except subprocess.TimeoutExpired as e:
-        logger.error('Command "%s" timed out', e.cmd)
-        logger.error('stdout: %s', e.stdout)
-        logger.error('stderr: %s', e.stderr)
-        raise
+
+    completed_process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=stderr)
 
     if completed_process.stdout:
         for line in str(completed_process.stdout).replace('\\r', '').split('\\n'):
