@@ -1,10 +1,10 @@
-# xivo-test-helpers
+# wazo-test-helpers
 
 Common test helpers used in Wazo.
 
 ## To install
 
-pip install xivo-test-helpers
+pip install wazo-test-helpers
 
 ## Environment variables
 
