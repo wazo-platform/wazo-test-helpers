@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from setuptools import setup
 from setuptools import find_packages
 
-VERSION = '0.1.7'
+VERSION = '1.0.0'
 
 setup(
-    name='xivo-test-helpers',
+    name='wazo-test-helpers',
     version=VERSION,
 
     description='Wazo test helpers',
@@ -20,5 +20,5 @@ setup(
 
     packages=find_packages(),
     install_requires=['docker'],
-    download_url='https://github.com/wazo-platform/xivo-test-helpers/tarball/{}'.format(VERSION),
+    download_url='https://github.com/wazo-platform/wazo-test-helpers/tarball/{}'.format(VERSION),
 )
