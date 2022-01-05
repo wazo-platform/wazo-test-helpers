@@ -1,4 +1,4 @@
-# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import uuid
@@ -10,7 +10,7 @@ from kombu import (
     Producer,
     Queue,
 )
-from kombu.exceptions import TimeoutError
+from kombu.exceptions import OperationalError, TimeoutError
 
 
 class BusClient:
@@ -30,7 +30,7 @@ class BusClient:
             with Connection(self._url) as connection:
                 producer = Producer(connection, exchange=self._default_exchange, auto_declare=True)
                 producer.publish('', routing_key='test')
-        except IOError:
+        except (IOError, OperationalError):
             return False
         else:
             return True
