@@ -12,7 +12,7 @@ import unittest
 import docker as docker_client
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
+logger.setLevel(logging.DEBUG)
 
 
 if os.environ.get('TEST_LOGS') != 'verbose':
