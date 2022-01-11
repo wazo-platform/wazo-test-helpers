@@ -1,4 +1,4 @@
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -117,7 +117,11 @@ class AssetLaunchingTestCase(unittest.TestCase):
 
     @classmethod
     def pull_containers(cls):
-        _run_cmd(['docker-compose'] + cls._docker_compose_options() + ['pull'])
+        _run_cmd(
+            ['docker-compose'] +
+            cls._docker_compose_options() +
+            ['pull', '--ignore-pull-failures']
+        )
 
     @classmethod
     def start_containers(cls, bootstrap_container):
