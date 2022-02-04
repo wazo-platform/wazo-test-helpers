@@ -59,6 +59,7 @@ class BusMessageAccumulator:
         self._queue = queue
         self._events = []
 
+    # FIXME: Clean with_headers after routing_key -> headers migration
     def accumulate(self, with_headers=False):
         self._pull_events()
         if with_headers:
@@ -68,6 +69,7 @@ class BusMessageAccumulator:
             ]
         return [message for message, _ in self._events]
 
+    # FIXME: Clean with_headers after routing_key -> headers migration
     def pop(self, with_headers=False):
         self._pull_events()
         message, headers = self._events.pop(0)
