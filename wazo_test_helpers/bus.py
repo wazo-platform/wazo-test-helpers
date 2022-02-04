@@ -3,13 +3,7 @@
 
 import uuid
 
-from kombu import (
-    Connection,
-    Consumer,
-    Exchange,
-    Producer,
-    Queue,
-)
+from kombu import Connection, Consumer, Exchange, Producer, Queue
 from kombu.exceptions import OperationalError, TimeoutError
 
 
@@ -65,16 +59,26 @@ class BusMessageAccumulator:
         self._queue = queue
         self._events = []
 
-    def accumulate(self):
+    # FIXME: Clean with_headers after routing_key -> headers migration
+    def accumulate(self, with_headers=False):
         self._pull_events()
-        return self._events
+        if with_headers:
+            return [
+                {'message': message, 'headers': headers}
+                for message, headers in self._events
+            ]
+        return [message for message, _ in self._events]
 
-    def pop(self):
+    # FIXME: Clean with_headers after routing_key -> headers migration
+    def pop(self, with_headers=False):
         self._pull_events()
-        return self._events.pop(0)
+        message, headers = self._events.pop(0)
+        if with_headers:
+            return {'message': message, 'headers': headers}
+        return message
 
-    def push_back(self, event):
-        self._events.insert(0, event)
+    def push_back(self, event, headers=None):
+        self._events.insert(0, (event, headers))
 
     def reset(self):
         self._pull_events()
@@ -91,5 +95,5 @@ class BusMessageAccumulator:
 
     def _on_event(self, body, message):
         # events are already decoded, thanks to the content-type
-        self._events.append(body)
+        self._events.append((body, message.headers))
         message.ack()
