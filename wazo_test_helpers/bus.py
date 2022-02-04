@@ -51,6 +51,7 @@ class BusClient:
             channel = connection.default_channel
             queue.bind(channel).declare()
 
+    # FIXME: Remove after routing_key -> headers migration
     def downstream_exchange_declare(self, name, type_, upstream=None):
         if not upstream:
             upstream = self._default_exchange
