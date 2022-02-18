@@ -20,6 +20,8 @@ _EMPTY_RESPONSES = {
     'conferences': {},
     'contexts': {},
     'infos': {},
+    'ingresses': {
+    },
     'lines': {},
     'meetings': {},
     'moh': {
@@ -141,6 +143,11 @@ def conference(conference_id):
 @app.route('/1.1/infos')
 def infos():
     return jsonify(_responses['infos'])
+
+
+@app.route('/1.1/ingresses/http')
+def ingresses():
+    return jsonify({'items': _responses['ingresses'].values()})
 
 
 @app.route('/1.1/lines')
