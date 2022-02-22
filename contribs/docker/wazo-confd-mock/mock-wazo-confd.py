@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import json
@@ -20,6 +20,7 @@ _EMPTY_RESPONSES = {
     'conferences': {},
     'contexts': {},
     'infos': {},
+    'ingresses': {},
     'lines': {},
     'meetings': {},
     'moh': {
@@ -141,6 +142,11 @@ def conference(conference_id):
 @app.route('/1.1/infos')
 def infos():
     return jsonify(_responses['infos'])
+
+
+@app.route('/1.1/ingresses/http')
+def ingresses():
+    return jsonify({'items': _responses['ingresses'].values()})
 
 
 @app.route('/1.1/lines')
