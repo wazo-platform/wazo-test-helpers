@@ -5,6 +5,7 @@ import uuid
 
 from kombu import Connection, Consumer, Exchange, Producer, Queue
 from kombu.exceptions import OperationalError, TimeoutError
+from wazo_test_helpers import until
 
 
 class BusClient:
@@ -79,6 +80,15 @@ class BusMessageAccumulator:
                 for message, headers in self._events
             ]
         return [message for message, _ in self._events]
+
+    def until_assert_that_accumulate(self, matcher, message=None, timeout=None):
+        # Optional dependency
+        from hamcrest import assert_that
+
+        def assert_function():
+            assert_that(self.accumulate(), matcher, message)
+
+        until.assert_(assert_function, timeout=timeout, message=message)
 
     # FIXME: Clean with_headers after routing_key -> headers migration
     def pop(self, with_headers=False):
