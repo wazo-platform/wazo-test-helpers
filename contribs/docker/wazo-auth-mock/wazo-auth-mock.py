@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -371,6 +371,17 @@ def tokens_get():
         'items': refresh_tokens,
         'total': len(refresh_tokens),
         'filtered': len(refresh_tokens),
+    }
+    return jsonify(result), 200
+
+
+@app.route(url_prefix + "/0.1/users/<user_uuid>/tokens", methods=["GET"])
+def get_user_refresh_tokens(user_uuid):
+    tokens = [token for token in refresh_tokens if token['user_uuid'] == user_uuid]
+    result = {
+        'items': tokens,
+        'total': len(tokens),
+        'filtered': len(tokens),
     }
     return jsonify(result), 200
 
