@@ -3,7 +3,7 @@
 
 import uuid
 
-from kombu import Connection, Consumer, Exchange, Producer, Queue
+from kombu import binding, Connection, Consumer, Exchange, Producer, Queue
 from kombu.exceptions import OperationalError, TimeoutError
 from wazo_test_helpers import until
 
@@ -30,11 +30,26 @@ class BusClient:
         else:
             return True
 
-    def accumulator(self, routing_key, exchange=None):
+    def accumulator(self, routing_key=None, exchange=None, headers=None):
         exchange = exchange or self._default_exchange
         queue_name = 'test-{}'.format(str(uuid.uuid4()))
         with Connection(self._url) as conn:
-            queue = Queue(name=queue_name, exchange=exchange, routing_key=routing_key, channel=conn.channel())
+            if routing_key:
+                queue = Queue(
+                    name=queue_name,
+                    exchange=exchange,
+                    routing_key=routing_key,
+                    channel=conn.channel(),
+                )
+            elif headers:
+                queue = Queue(
+                    name=queue_name,
+                    exchange=exchange,
+                    bindings=[binding(exchange=exchange, arguments=headers)],
+                    channel=conn.channel(),
+                )
+            else:
+                raise Exception('Need a routing key or a header')
             queue.declare()
             queue.purge()
             accumulator = BusMessageAccumulator(self._url, queue)
