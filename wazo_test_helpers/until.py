@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -63,8 +63,8 @@ def assert_(assert_function, *args, **kwargs):
             errors.append(str(e))
     else:
         if message:
-            raise NoMoreTries(message)
-        raise NoMoreTries('\n'.join(errors))
+            raise AssertionError(message)
+        raise AssertionError('\n'.join(errors))
 
 
 def true(function, *args, **kwargs):
