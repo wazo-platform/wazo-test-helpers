@@ -62,9 +62,10 @@ def assert_(assert_function, *args, **kwargs):
         except AssertionError as e:
             errors.append(str(e))
     else:
+        error_message = '\n'.join(errors)
         if message:
-            raise AssertionError(message)
-        raise AssertionError('\n'.join(errors))
+            error_message = message + '\n' + error_message
+        raise AssertionError(error_message)
 
 
 def true(function, *args, **kwargs):
