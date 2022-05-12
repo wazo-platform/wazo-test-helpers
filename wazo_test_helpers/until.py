@@ -157,11 +157,15 @@ def return_(function, *args, **kwargs):
     timeout = kwargs.pop('timeout')
     interval = kwargs.pop('interval', 1)
     message = kwargs.pop('message', None)
+    errors = []
 
     for _ in timeout_executions(timeout, interval):
         try:
             return function(*args, **kwargs)
-        except Exception:
-            logger.debug('Exception caught while waiting for %s to return', function, exc_info=True)
+        except Exception as e:
+            errors.append(str(e))
     else:
-        raise NoMoreTries(message)
+        error_message = '\n'.join(errors)
+        if message:
+            error_message = message + '\n' + error_message
+        raise NoMoreTries(error_message)
