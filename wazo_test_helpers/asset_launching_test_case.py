@@ -305,7 +305,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
     def _docker_compose_options(cls):
         options = [
             '--ansi', 'never',
-            '--project-name', cls.service,
+            '--project-name', cls.service + '_' + cls.asset,
             '--file', os.path.join(cls.assets_root, 'docker-compose.yml'),
             '--file', os.path.join(
                 cls.assets_root, 'docker-compose.{}.override.yml'.format(cls.asset)
