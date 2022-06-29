@@ -23,6 +23,10 @@ except IndexError:
     url_prefix = ''
 
 DEFAULT_POLICIES = {
+    'wazo_default_master_user_policy': {
+        'uuid': '5650b7e8-6de8-4f5f-994c-000000000001',
+        'name': 'wazo_default_master_user_policy',
+    },
     'wazo_default_admin_policy': {
         'uuid': '5650b7e8-6de8-4f5f-994c-000000000002',
         'name': 'wazo_default_admin_policy',
