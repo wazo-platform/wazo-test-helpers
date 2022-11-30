@@ -523,7 +523,10 @@ def tenant_get(tenant_uuid):
 
 @app.route(url_prefix + "/0.1/users/<user_uuid>", methods=['DELETE'])
 def users_delete(user_uuid):
-    del users[user_uuid]
+    try:
+        del users[user_uuid]
+    except KeyError:
+        return '', 404
     return '', 204
 
 
