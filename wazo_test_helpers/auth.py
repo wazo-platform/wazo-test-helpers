@@ -1,4 +1,4 @@
-# Copyright 2017-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -46,6 +46,14 @@ class AuthClient:
     def set_external_auth(self, auth_info):
         url = self.url('_set_external_auth')
         requests.post(url, json=auth_info)
+
+    def reset_external_users(self):
+        url = self.url('_reset_external_users')
+        requests.post(url)
+
+    def set_external_users(self, users_info):
+        url =self.url('_set_external_users')
+        requests.post(url, json=users_info)
 
     def set_tenants(self, *tenants):
         url = self.url('_set_tenants')
