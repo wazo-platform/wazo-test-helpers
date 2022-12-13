@@ -84,6 +84,7 @@ valid_tokens = {
 valid_credentials = {}
 external = {}
 external_config = {}
+external_users = {}
 invalid_username_passwords = [('test', 'foobar')]
 sessions = {}
 refresh_tokens = {}
@@ -162,6 +163,26 @@ def external_auth_external_service_get(user_uuid, external_service):
         return jsonify(external)
     else:
         return '', 404
+
+
+@app.route(url_prefix + "/_reset_external_users", methods=['POST'])
+def external_users_reset():
+    global external_users
+    external_users = {}
+    return '', 204
+
+
+@app.route(url_prefix + "/_set_external_users", methods=['POST'])
+def external_users_set():
+    global external_users
+    external_users = request.get_json()
+    return '', 201
+
+
+@app.route(url_prefix + "/0.1/external/<external_service>/users", methods=['GET'])
+def external_auth_external_service_users(external_service):
+    users = external_users.get(external_service, [])
+    return jsonify({'total': len(users), 'filtered': len(users), 'items': users})
 
 
 @app.route(url_prefix + "/_reset_external_auth", methods=['POST'])
