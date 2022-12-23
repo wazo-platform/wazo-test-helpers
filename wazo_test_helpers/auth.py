@@ -16,11 +16,7 @@ class AuthClient:
         self.port = port
 
     def url(self, *parts):
-        return 'http://{host}:{port}/{path}'.format(
-            host=self.host,
-            port=self.port,
-            path='/'.join(parts)
-        )
+        return f'http://{self.host}:{self.port}/{"/".join(parts)}'
 
     def is_up(self):
         url = self.url()

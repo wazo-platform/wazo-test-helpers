@@ -38,18 +38,18 @@ class WrongClient:
 
 class NoSuchService(Exception):
     def __init__(self, service_name):
-        super(NoSuchService, self).__init__('No such service: {}'.format(service_name))
+        super().__init__(f'No such service: {service_name}')
 
 
 class NoSuchPort(Exception):
     def __init__(self, service_name, port):
-        super(NoSuchPort, self).__init__('For service {}: No such port: {}'.format(service_name, port))
+        super().__init__(f'For service {service_name}: No such port: {port}')
 
 
 class ContainerStartFailed(Exception):
     def __init__(self, stdout, stderr, return_code):
-        message = 'Container start failed (code {}): output follows.\nstdout:\n{}\nstderr:\n{}'.format(return_code, stdout, stderr)
-        super(ContainerStartFailed, self).__init__(message)
+        message = f'Container start failed (code {return_code}): output follows.\nstdout:\n{stdout}\nstderr:\n{stderr}'
+        super().__init__(message)
 
         self.stdout = stdout
         self.stderr = stderr
@@ -262,7 +262,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
         if not service_name:
             service_name = cls.service
 
-        container_dst = '{}:{}'.format(cls._container_id(service_name), dst)
+        container_dst = f'{cls._container_id(service_name)}:{dst}'
         docker_command = ['docker', 'cp', src, container_dst]
         return _run_cmd(docker_command)
 
@@ -271,14 +271,14 @@ class AssetLaunchingTestCase(unittest.TestCase):
         if not service_name:
             service_name = cls.service
 
-        container_src = '{}:{}'.format(cls._container_id(service_name), src)
+        container_src = f'{cls._container_id(service_name)}:{src}'
         docker_command = ['docker', 'cp', container_src, dst]
         return _run_cmd(docker_command)
 
     @classmethod
     def docker_copy_across_containers(cls, src_service_name, src, dst_service_name, dst):
-        container_src = '{}:{}'.format(cls._container_id(src_service_name), src)
-        container_dst = '{}:{}'.format(cls._container_id(dst_service_name), dst)
+        container_src = f'{cls._container_id(src_service_name)}:{src}'
+        container_dst = f'{cls._container_id(dst_service_name)}:{dst}'
         with tempfile.TemporaryDirectory() as tmp_dirname:
             tmp_filename = os.path.join(tmp_dirname, 'docker_cp_across_containers')
             docker_command = ['docker', 'cp', container_src, tmp_filename]
@@ -296,7 +296,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
                           ['ps', '-q', service_name], stderr=False).stdout.strip()
         result = result.decode('utf-8')
         if '\n' in result:
-            raise AssertionError('There is more than one container running with name {}'.format(service_name))
+            raise AssertionError(f'There is more than one container running with name {service_name}')
         if not result:
             raise NoSuchService(service_name)
         return result
@@ -308,7 +308,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
             '--project-name', cls.service + '_' + cls.asset,
             '--file', os.path.join(cls.assets_root, 'docker-compose.yml'),
             '--file', os.path.join(
-                cls.assets_root, 'docker-compose.{}.override.yml'.format(cls.asset)
+                cls.assets_root, f'docker-compose.{cls.asset}.override.yml'
             ),
         ]
         extra = os.getenv("WAZO_TEST_DOCKER_OVERRIDE_EXTRA")
@@ -319,7 +319,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
     @classmethod
     def _maybe_dump_docker_logs(cls):
         if os.getenv('WAZO_TEST_DOCKER_LOGS_ENABLED', '0') == '1':
-            filename_prefix = '{}.{}-'.format(cls.__module__, cls.__name__)
+            filename_prefix = f'{cls.__module__}.{cls.__name__}-'
             with tempfile.NamedTemporaryFile(dir=cls.get_log_directory(),
                                              prefix=filename_prefix,
                                              delete=False) as logfile:

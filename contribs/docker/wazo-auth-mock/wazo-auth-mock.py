@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -476,7 +475,7 @@ def tenants_get():
 
     token_tenant = _find_tenant(token_tenant_uuid)
     if not token_tenant:
-        return 'Tenant not found: {}'.format(token_tenant_uuid), 500
+        return f'Tenant not found: {token_tenant_uuid}', 500
 
     token_tenant_children = _find_tenant_children(token_tenant)
 
@@ -484,7 +483,7 @@ def tenants_get():
     if specified_tenant_uuid:
         specified_tenant = _find_tenant(specified_tenant_uuid)
         if not specified_tenant:
-            return 'Tenant not found: {}'.format(specified_tenant_uuid), 401
+            return f'Tenant not found: {specified_tenant_uuid}', 401
 
         specified_tenant_children = _find_tenant_children(specified_tenant)
 
