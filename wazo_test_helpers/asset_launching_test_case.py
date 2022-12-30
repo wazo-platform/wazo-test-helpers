@@ -293,7 +293,7 @@ class AssetLaunchingTestCase(unittest.TestCase):
     @classmethod
     def _container_id(cls, service_name):
         result = _run_cmd(['docker-compose'] + cls._docker_compose_options() +
-                          ['ps', '-q', service_name], stderr=False).stdout.strip()
+                          ['ps', '-aq', service_name], stderr=False).stdout.strip()
         result = result.decode('utf-8')
         if '\n' in result:
             raise AssertionError('There is more than one container running with name {}'.format(service_name))
