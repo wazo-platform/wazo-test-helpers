@@ -1,4 +1,4 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import uuid
@@ -66,17 +66,6 @@ class BusClient:
         with Connection(self._url) as connection:
             channel = connection.default_channel
             queue.bind(channel).declare()
-
-    # FIXME: Remove after routing_key -> headers migration
-    def downstream_exchange_declare(self, name, type_, upstream=None):
-        if not upstream:
-            upstream = self._default_exchange
-        with Connection(self._url) as connection:
-            channel = connection.default_channel
-            exchange = Exchange(name, type_).bind(channel)
-            exchange.declare()
-            upstream.bind(channel).declare()
-            exchange.bind_to(upstream, routing_key='#')
 
 
 class BusMessageAccumulator:
