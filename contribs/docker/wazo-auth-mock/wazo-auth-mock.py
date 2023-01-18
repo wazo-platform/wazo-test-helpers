@@ -1,14 +1,16 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+#!/usr/bin/env python3
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+from __future__ import annotations
 
 import logging
 import sys
 import uuid
 
 from collections import deque
-from flask import Flask, jsonify, request
+from typing import Any
+
+from flask import Flask, jsonify, request, Response
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -130,116 +132,120 @@ _requests = deque(maxlen=1024)
 _tenants = {}
 
 
-def _reset():
+def _reset() -> None:
     _requests.clear()
     _tenants.clear()
 
 
-@app.route(url_prefix + "/0.1/external/<external_service>/config", methods=['GET'])
-def external_config_get(external_service):
+@app.route(f"{url_prefix}/0.1/external/<external_service>/config", methods=['GET'])
+def external_config_get(external_service: str) -> Response | tuple[str, int]:
     if external_service in external_config:
         return jsonify(external_config[external_service])
-    else:
-        return '', 404
+    return '', 404
 
 
-@app.route(url_prefix + "/_reset_external_config", methods=['POST'])
-def external_config_reset():
+@app.route(f"{url_prefix}/_reset_external_config", methods=['POST'])
+def external_config_reset() -> tuple[str, int]:
     global external_config
     external_config = {}
     return '', 204
 
 
-@app.route(url_prefix + "/_set_external_config", methods=['POST'])
-def external_config_set():
+@app.route(f"{url_prefix}/_set_external_config", methods=['POST'])
+def external_config_set() -> tuple[str, int]:
     global external_config
     external_config = request.get_json()
     return '', 201
 
 
-@app.route(url_prefix + "/0.1/users/<user_uuid>/external/<external_service>", methods=['GET'])
-def external_auth_external_service_get(user_uuid, external_service):
+@app.route(f"{url_prefix}/0.1/users/<user_uuid>/external/<external_service>", methods=['GET'])
+def external_auth_external_service_get(user_uuid, external_service) -> Response | tuple[str, int]:
     if external:
         return jsonify(external)
-    else:
-        return '', 404
+    return '', 404
 
 
-@app.route(url_prefix + "/_reset_external_users", methods=['POST'])
-def external_users_reset():
+@app.route(f"{url_prefix}/_reset_external_users", methods=['POST'])
+def external_users_reset() -> tuple[str, int]:
     global external_users
     external_users = {}
     return '', 204
 
 
-@app.route(url_prefix + "/_set_external_users", methods=['POST'])
-def external_users_set():
+@app.route(f"{url_prefix}/_set_external_users", methods=['POST'])
+def external_users_set() -> tuple[str, int]:
     global external_users
     external_users = request.get_json()
     return '', 201
 
 
-@app.route(url_prefix + "/0.1/external/<external_service>/users", methods=['GET'])
-def external_auth_external_service_users(external_service):
+@app.route(f"{url_prefix}/0.1/external/<external_service>/users", methods=['GET'])
+def external_auth_external_service_users(external_service) -> Response:
     users = external_users.get(external_service, [])
     return jsonify({'total': len(users), 'filtered': len(users), 'items': users})
 
 
-@app.route(url_prefix + "/_reset_external_auth", methods=['POST'])
-def external_auth_reset():
+@app.route(f"{url_prefix}/_reset_external_auth", methods=['POST'])
+def external_auth_reset() -> tuple[str, int]:
     global external
     external = {}
     return '', 204
 
 
-@app.route(url_prefix + "/_set_external_auth", methods=['POST'])
-def external_auth_set():
+@app.route(f"{url_prefix}/_set_external_auth", methods=['POST'])
+def external_auth_set() -> tuple[str, int]:
     global external
     external = request.get_json()
     return '', 201
 
 
+@app.errorhandler(500)
+def handle_generic(e: Exception) -> Response:
+    logger.error(f'Exception: {e}')
+    return jsonify({'error': str(e)})
+
+
 @app.before_request
-def log_request():
+def log_request() -> None:
     if not request.path.startswith('/_'):
         path = request.path
         log = {'method': request.method,
                'path': path,
-               'query': request.args.items(multi=True),
-               'body': request.data,
-               'json': request.json,
+               'query': dict(request.args.items(multi=True)),
+               'body': request.data.decode('utf-8'),
+               'json': request.json if request.is_json else None,
                'headers': dict(request.headers)}
         _requests.append(log)
 
 
 @app.after_request
-def print_request_response(response):
+def print_request_response(response: Response) -> Response:
     logger.debug('request: %s', {
         'method': request.method,
         'path': request.path,
-        'query': request.args.items(multi=True),
-        'body': request.data,
+        'query': dict(request.args.items(multi=True)),
+        'body': request.data.decode('utf-8'),
         'headers': dict(request.headers)
     })
     logger.debug('response: %s', {
-        'body': response.data,
+        'body': response.data.decode('utf-8'),
     })
     return response
 
 
 @app.route('/0.1/_requests', methods=['GET'])
-def list_requests():
+def list_requests() -> Response:
     return jsonify(requests=list(_requests))
 
 
 @app.route('/0.1/_reset', methods=['POST'])
-def reset():
+def reset() -> tuple[str, int]:
     _reset()
     return '', 204
 
 
-@app.route(url_prefix + "/_set_tenants", methods=['POST'])
-def set_tenants():
+@app.route(f"{url_prefix}/_set_tenants", methods=['POST'])
+def set_tenants() -> tuple[str, int]:
     global tenants
     new_tenants = request.get_json()
     for tenant in new_tenants:
@@ -249,8 +255,8 @@ def set_tenants():
     return '', 204
 
 
-@app.route(url_prefix + "/_set_token", methods=['POST'])
-def set_token():
+@app.route(f"{url_prefix}/_set_token", methods=['POST'])
+def set_token() -> tuple[str, int]:
     request_body = request.get_json()
     token = request_body['token']
 
@@ -259,32 +265,31 @@ def set_token():
     return '', 204
 
 
-@app.route(url_prefix + "/_set_sessions", methods=['POST'])
-def set_sessions():
+@app.route(f"{url_prefix}/_set_sessions", methods=['POST'])
+def set_sessions() -> tuple[str, int]:
     global sessions
     sessions = request.get_json()
     return '', 204
 
 
-@app.route(url_prefix + "/_set_refresh_tokens", methods=['POST'])
-def set_refresh_tokens():
+@app.route(f"{url_prefix}/_set_refresh_tokens", methods=['POST'])
+def set_refresh_tokens() -> tuple[str, int]:
     global refresh_tokens
     refresh_tokens = request.get_json()
     return '', 204
 
 
-@app.route(url_prefix + "/_remove_token/<token_id>", methods=['DELETE'])
-def remove_token(token_id):
+@app.route(f"{url_prefix}/_remove_token/<token_id>", methods=['DELETE'])
+def remove_token(token_id: str) -> tuple[str, int]:
     try:
         del valid_tokens[token_id]
     except KeyError:
         return '', 404
-    else:
-        return '', 204
+    return '', 204
 
 
-@app.route(url_prefix + "/_add_invalid_credentials", methods=['POST'])
-def add_invalid_credentials():
+@app.route(f"{url_prefix}/_add_invalid_credentials", methods=['POST'])
+def add_invalid_credentials() -> tuple[str, int]:
     request_body = request.get_json()
     invalid_username_passwords.append((request_body['username'],
                                        request_body['password']))
@@ -292,8 +297,8 @@ def add_invalid_credentials():
     return '', 204
 
 
-@app.route(url_prefix + "/_add_credentials_for_invalid_token", methods=['POST'])
-def add_credentials_for_invalid_token():
+@app.route(f"{url_prefix}/_add_credentials_for_invalid_token", methods=['POST'])
+def add_credentials_for_invalid_token() -> tuple[str, int]:
     request_body = request.get_json()
     token_that_will_be_invalid_when_used.append((request_body['username'],
                                                  request_body['password']))
@@ -301,8 +306,8 @@ def add_credentials_for_invalid_token():
     return '', 204
 
 
-@app.route(url_prefix + "/_add_valid_credentials", methods=['POST'])
-def add_valid_credentials():
+@app.route(f"{url_prefix}/_add_valid_credentials", methods=['POST'])
+def add_valid_credentials() -> tuple[str, int]:
     request_body = request.get_json()
     valid_credentials[request_body['username']] = {
         'username': request_body['username'],
@@ -313,8 +318,8 @@ def add_valid_credentials():
     return '', 204
 
 
-@app.route(url_prefix + "/0.1/token/<token>", methods=['HEAD'])
-def token_head_ok(token):
+@app.route(f"{url_prefix}/0.1/token/<token>", methods=['HEAD'])
+def token_head_ok(token: str) -> tuple[str, int]:
     required_tenant_uuid = request.args.get('tenant')
     if required_tenant_uuid:
         token_tenant_uuid = valid_tokens[token]['metadata']['tenant_uuid']
@@ -337,8 +342,8 @@ def token_head_ok(token):
         return '', 404
 
 
-@app.route(url_prefix + "/0.1/token/<token>", methods=['GET'])
-def token_get(token):
+@app.route(f"{url_prefix}/0.1/token/<token>", methods=['GET'])
+def token_get(token: str) -> Response | tuple[str, int]:
     if token not in valid_tokens:
         return '', 404
 
@@ -353,18 +358,17 @@ def token_get(token):
     })
 
 
-def _valid_acl(token_id):
+def _valid_acl(token_id: str) -> bool:
     required_acl = request.args.get('scope')
     if required_acl and 'acl' in valid_tokens[token_id]:
         if required_acl in valid_tokens[token_id]['acl']:
             return True
-        else:
-            return False
+        return False
     return True
 
 
-@app.route(url_prefix + "/0.1/token", methods=['POST'])
-def token_post():
+@app.route(f"{url_prefix}/0.1/token", methods=['POST'])
+def token_post() -> Response | tuple[str, int]:
     username = request.authorization['username']
     password = request.authorization['password']
     if (username, password) in invalid_username_passwords:
@@ -390,8 +394,8 @@ def token_post():
         return jsonify({'data': valid_tokens['valid-token-multitenant']})
 
 
-@app.route(url_prefix + "/0.1/tokens", methods=['GET'])
-def tokens_get():
+@app.route(f"{url_prefix}/0.1/tokens", methods=['GET'])
+def tokens_get() -> tuple[Response, int]:
     result = {
         'items': refresh_tokens,
         'total': len(refresh_tokens),
@@ -400,8 +404,8 @@ def tokens_get():
     return jsonify(result), 200
 
 
-@app.route(url_prefix + "/0.1/users/<user_uuid>/tokens", methods=["GET"])
-def get_user_refresh_tokens(user_uuid):
+@app.route(f"{url_prefix}/0.1/users/<user_uuid>/tokens", methods=["GET"])
+def get_user_refresh_tokens(user_uuid: str) -> tuple[Response, int]:
     tokens = [token for token in refresh_tokens if token['user_uuid'] == user_uuid]
     result = {
         'items': tokens,
@@ -411,18 +415,18 @@ def get_user_refresh_tokens(user_uuid):
     return jsonify(result), 200
 
 
-@app.route(url_prefix + "/0.1/users", methods=['GET'])
-def users_list():
+@app.route(f"{url_prefix}/0.1/users", methods=['GET'])
+def users_list() -> Response:
     return jsonify({'items': [user for user in users.values()]})
 
 
-@app.route(url_prefix + "/0.1/tenants", methods=['POST'])
-def tenants_post():
+@app.route(f"{url_prefix}/0.1/tenants", methods=['POST'])
+def tenants_post() -> Response:
     return jsonify(request.get_json())
 
 
-@app.route(url_prefix + "/0.1/users", methods=['POST'])
-def users_post():
+@app.route(f"{url_prefix}/0.1/users", methods=['POST'])
+def users_post() -> Response:
     args = request.get_json()
     email = {'address': args['email_address']} if args.get('email_address') else None
     user = {
@@ -438,16 +442,16 @@ def users_post():
     return jsonify(user)
 
 
-@app.route(url_prefix + "/0.1/users/<user_uuid>", methods=['GET'])
-def users_get(user_uuid):
+@app.route(f"{url_prefix}/0.1/users/<user_uuid>", methods=['GET'])
+def users_get(user_uuid: str) -> Response:
     user = users.get(user_uuid)
     if not user:
         return '', 404
     return jsonify(user)
 
 
-@app.route(url_prefix + "/0.1/users/<user_uuid>", methods=['PUT'])
-def users_put(user_uuid):
+@app.route(f"{url_prefix}/0.1/users/<user_uuid>", methods=['PUT'])
+def users_put(user_uuid: str) -> Response | tuple[str, int]:
     user = users.get(user_uuid)
     if not user:
         return '', 404
@@ -459,8 +463,8 @@ def users_put(user_uuid):
     return jsonify(args)
 
 
-@app.route(url_prefix + "/0.1/sessions", methods=['GET'])
-def sessions_get():
+@app.route(f"{url_prefix}/0.1/sessions", methods=['GET'])
+def sessions_get() -> tuple[Response, int]:
     result = {
         'items': sessions,
         'total': len(sessions),
@@ -469,14 +473,14 @@ def sessions_get():
     return jsonify(result), 200
 
 
-@app.route(url_prefix + "/0.1/tenants", methods=['GET'])
-def tenants_get():
+@app.route(f"{url_prefix}/0.1/tenants", methods=['GET'])
+def tenants_get() -> tuple[Response | str, int]:
     token_uuid = request.headers['X-Auth-Token']
     token_tenant_uuid = valid_tokens[token_uuid]['metadata']['tenant_uuid']
 
     token_tenant = _find_tenant(token_tenant_uuid)
     if not token_tenant:
-        return 'Tenant not found: {}'.format(token_tenant_uuid), 500
+        return f'Tenant not found: {token_tenant_uuid}', 500
 
     token_tenant_children = _find_tenant_children(token_tenant)
 
@@ -484,7 +488,7 @@ def tenants_get():
     if specified_tenant_uuid:
         specified_tenant = _find_tenant(specified_tenant_uuid)
         if not specified_tenant:
-            return 'Tenant not found: {}'.format(specified_tenant_uuid), 401
+            return f'Tenant not found: {specified_tenant_uuid}', 401
 
         specified_tenant_children = _find_tenant_children(specified_tenant)
 
@@ -506,13 +510,13 @@ def tenants_get():
     return jsonify(result), 200
 
 
-def _find_tenant(tenant_uuid):
+def _find_tenant(tenant_uuid: str) -> dict[str, Any] | None:
     for tenant in tenants:
         if tenant_uuid == tenant['uuid']:
             return tenant
 
 
-def _find_tenant_children(search_tenant):
+def _find_tenant_children(search_tenant: dict[str, Any]) -> list[dict[str, Any]]:
     result = []
     for tenant in tenants:
         if tenant['uuid'] == search_tenant['uuid']:
@@ -531,8 +535,8 @@ def _filter_tenants(tenants, name=None, **kwargs):
     return result
 
 
-@app.route(url_prefix + "/0.1/tenants/<tenant_uuid>", methods=['GET'])
-def tenant_get(tenant_uuid):
+@app.route(f"{url_prefix}/0.1/tenants/<tenant_uuid>", methods=['GET'])
+def tenant_get(tenant_uuid: str) -> tuple[Response, int]:
     # Simulate master tenant by default
     parent_uuid = tenant_uuid
     for tenant in tenants:
@@ -542,8 +546,8 @@ def tenant_get(tenant_uuid):
     return jsonify({'uuid': tenant_uuid, 'parent_uuid': parent_uuid}), 200
 
 
-@app.route(url_prefix + "/0.1/users/<user_uuid>", methods=['DELETE'])
-def users_delete(user_uuid):
+@app.route(f"{url_prefix}/0.1/users/<user_uuid>", methods=['DELETE'])
+def users_delete(user_uuid: str) -> tuple[str, int]:
     try:
         del users[user_uuid]
     except KeyError:
@@ -551,8 +555,8 @@ def users_delete(user_uuid):
     return '', 204
 
 
-@app.route(url_prefix + "/0.1/users/password/reset", methods=['POST'])
-def users_password_reset():
+@app.route(f"{url_prefix}/0.1/users/password/reset", methods=['POST'])
+def users_password_reset() -> tuple[str, int]:
     user_uuid = request.args.get('user_uuid')
     user = users.get(user_uuid)
     if not user:
@@ -560,8 +564,8 @@ def users_password_reset():
     return '', 204
 
 
-@app.route(url_prefix + "/0.1/admin/users/<user_uuid>/emails", methods=['PUT'])
-def admin_users_emails_put(user_uuid):
+@app.route(f"{url_prefix}/0.1/admin/users/<user_uuid>/emails", methods=['PUT'])
+def admin_users_emails_put(user_uuid: str) -> Response | tuple[str, int]:
     user = users.get(user_uuid)
     if not user:
         return '', 404
@@ -570,8 +574,8 @@ def admin_users_emails_put(user_uuid):
     return jsonify(emails)
 
 
-@app.route(url_prefix + "/0.1/policies", methods=['GET'])
-def policies_get():
+@app.route(f"{url_prefix}/0.1/policies", methods=['GET'])
+def policies_get() -> tuple[Response, int]:
     policies_dict = dict(DEFAULT_POLICIES)
     name = request.args.get('name')
     policies = [policies_dict.get(name)] if name else policies_dict.items()
@@ -583,8 +587,8 @@ def policies_get():
     }), 200
 
 
-@app.route(url_prefix + "/0.1/users/<user_uuid>/policies/<policy_uuid>", methods=['PUT'])
-def users_policies_put(user_uuid, policy_uuid):
+@app.route(f"{url_prefix}/0.1/users/<user_uuid>/policies/<policy_uuid>", methods=['PUT'])
+def users_policies_put(user_uuid: str, policy_uuid: str) -> tuple[str, int]:
     return '', 204
 
 

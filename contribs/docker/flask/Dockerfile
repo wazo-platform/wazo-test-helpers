@@ -1,3 +1,3 @@
-FROM python:slim-buster
+FROM python:3.9-slim-bullseye
 
-RUN python3 -m pip install flask
+RUN python3 -m pip install --no-cache-dir flask
