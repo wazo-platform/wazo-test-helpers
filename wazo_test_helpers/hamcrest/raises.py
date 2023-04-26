@@ -1,4 +1,4 @@
-# Copyright 2011 hamcrest.org
+# Copyright 2011-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: BSD-3-Clause
 
 # Copyright 2017-2021 The Wazo Authors  (see AUTHORS file)
@@ -71,7 +71,7 @@ class Raises(BaseMatcher):
                        .append_text(' because ')
             self.matcher.describe_mismatch(self.actual, description)
         else:
-            description.append_text('%s was raised instead: %s\n' % (type(self.actual), str(self.actual)))
+            description.append_text(f'{type(self.actual)} was raised instead: {str(self.actual)}\n')
             traceback_lines = traceback.format_exception(type(self.actual), self.actual, self.actual.__traceback__)
             for traceback_line in traceback_lines:
                 description.append_text(traceback_line)

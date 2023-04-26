@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2015-2021 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from setuptools import setup
@@ -20,5 +20,5 @@ setup(
 
     packages=find_packages(),
     install_requires=['docker'],
-    download_url='https://github.com/wazo-platform/wazo-test-helpers/tarball/{}'.format(VERSION),
+    download_url=f'https://github.com/wazo-platform/wazo-test-helpers/tarball/{VERSION}',
 )
