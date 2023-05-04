@@ -1,4 +1,4 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import uuid
@@ -16,7 +16,7 @@ class BusClient:
 
     @classmethod
     def from_connection_fields(cls, user='guest', password='guest', host='localhost', port=5672, exchange_name='xivo', exchange_type='topic'):
-        url = 'amqp://{user}:{password}@{host}:{port}//'.format(user=user, password=password, host=host, port=port)
+        url = f'amqp://{user}:{password}@{host}:{port}//'
         exchange = Exchange(exchange_name, type=exchange_type)
         return cls(url, exchange)
 
@@ -25,14 +25,14 @@ class BusClient:
             with Connection(self._url) as connection:
                 producer = Producer(connection, exchange=self._default_exchange, auto_declare=True)
                 producer.publish('', routing_key='test')
-        except (IOError, OperationalError):
+        except (OSError, OperationalError):
             return False
         else:
             return True
 
     def accumulator(self, routing_key=None, exchange=None, headers=None):
         exchange = exchange or self._default_exchange
-        queue_name = 'test-{}'.format(str(uuid.uuid4()))
+        queue_name = f'test-{str(uuid.uuid4())}'
         with Connection(self._url) as conn:
             if routing_key:
                 queue = Queue(
