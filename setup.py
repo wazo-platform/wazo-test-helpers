@@ -19,6 +19,9 @@ setup(
     url='http://wazo.community',
 
     packages=find_packages(),
-    install_requires=['docker'],
+    install_requires=[
+        'docker',
+        'requests<2.30',  # Avoid to break docker library
+    ],
     download_url=f'https://github.com/wazo-platform/wazo-test-helpers/tarball/{VERSION}',
 )
