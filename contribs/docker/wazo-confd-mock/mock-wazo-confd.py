@@ -118,7 +118,7 @@ def asterisk_rtp_general_put() -> tuple[str, int]:
 
 @app.route('/1.1/applications')
 def applications() -> Response:
-    return jsonify({'items': _responses['applications'].values()})
+    return jsonify({'items': list(_responses['applications'].values())})
 
 
 @app.route('/1.1/applications/<application_uuid>')
@@ -130,7 +130,7 @@ def application(application_uuid: str) -> Response | tuple[str, int]:
 
 @app.route('/1.1/conferences')
 def conferences() -> Response:
-    conferences = _responses['conferences'].values()
+    conferences = list(_responses['conferences'].values())
     if 'name' in request.args:
         conferences = [conference for conference in conferences if conference['name'] == request.args['name']]
     return jsonify({'items': conferences})
@@ -150,12 +150,12 @@ def infos() -> Response:
 
 @app.route('/1.1/ingresses/http')
 def ingresses() -> Response:
-    return jsonify({'items': _responses['ingresses'].values()})
+    return jsonify({'items': list(_responses['ingresses'].values())})
 
 
 @app.route('/1.1/lines')
 def lines() -> Response:
-    lines = _responses['lines'].values()
+    lines = list(_responses['lines'].values())
     if 'name' in request.args:
         lines = [line for line in lines if line['name'] == request.args['name']]
     return jsonify({'items': lines})
@@ -171,13 +171,13 @@ def line(line_id: str) -> Response | tuple[str, int]:
 @app.route('/1.1/moh')
 def moh() -> Response:
     recurse = request.args.get('recurse')
-    items = _responses['moh'].values() if recurse else []
+    items = list(_responses['moh'].values()) if recurse else []
     return jsonify({'items': items})
 
 
 @app.route('/1.1/contexts')
 def contexts() -> Response:
-    return jsonify({'items': _responses['contexts'].values()})
+    return jsonify({'items': list(_responses['contexts'].values())})
 
 
 @app.route('/1.1/contexts/<context_id>')
@@ -189,7 +189,7 @@ def context(context_id: str) -> Response | tuple[str, int]:
 
 @app.route('/1.1/meetings')
 def meetings() -> Response:
-    meetings = _responses['meetings'].values()
+    meetings = list(_responses['meetings'].values())
     if 'name' in request.args:
         meetings = [meeting for meeting in meetings if meeting['name'] == request.args['name']]
     return jsonify({'items': meetings})
@@ -204,7 +204,7 @@ def meeting(meeting_uuid: str) -> Response | tuple[str, int]:
 
 @app.route('/1.1/switchboards')
 def switchboards() -> Response:
-    return jsonify({'items': _responses['switchboards'].values()})
+    return jsonify({'items': list(_responses['switchboards'].values())})
 
 
 @app.route('/1.1/switchboards/<switchboard_uuid>')
@@ -216,7 +216,7 @@ def switchboard(switchboard_uuid: str) -> Response | tuple[str, int]:
 
 @app.route('/1.1/users')
 def users() -> Response:
-    return jsonify({'items': _responses['users'].values()})
+    return jsonify({'items': list(_responses['users'].values())})
 
 
 @app.route('/1.1/users/<user_uuid>')
@@ -245,7 +245,7 @@ def voicemails_of_user(user_uuid: str) -> Response:
 
 @app.route('/1.1/trunks')
 def trunks() -> Response:
-    items = _responses['trunks'].values()
+    items = list(_responses['trunks'].values())
     total = len(items)
     return jsonify({'items': items, 'total': total})
 
@@ -257,7 +257,7 @@ def trunk(trunk_id: str) -> Response:
 
 @app.route('/1.1/voicemails')
 def voicemails() -> Response:
-    return jsonify({'items': _responses['voicemails'].values()})
+    return jsonify({'items': list(_responses['voicemails'].values())})
 
 
 @app.route('/1.1/voicemails/<voicemail_id>')
