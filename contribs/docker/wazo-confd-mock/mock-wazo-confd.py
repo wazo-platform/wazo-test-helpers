@@ -61,27 +61,35 @@ def handle_generic(e: Exception) -> Response:
 def log_request() -> None:
     if not request.path.startswith('/_'):
         path = request.path
-        log = {'method': request.method,
-               'path': path,
-               'query': dict(request.args.items(multi=True)),
-               'body': request.data.decode('utf-8'),
-               'json': request.json if request.is_json else None,
-               'headers': dict(request.headers)}
+        log = {
+            'method': request.method,
+            'path': path,
+            'query': dict(request.args.items(multi=True)),
+            'body': request.data.decode('utf-8'),
+            'json': request.json if request.is_json else None,
+            'headers': dict(request.headers),
+        }
         _requests.append(log)
 
 
 @app.after_request
 def print_request_response(response: Response) -> Response:
-    logger.debug('request: %s', {
-        'method': request.method,
-        'path': request.path,
-        'query': dict(request.args.items(multi=True)),
-        'body': request.data.decode('utf-8'),
-        'headers': dict(request.headers)
-    })
-    logger.debug('response: %s', {
-        'body': response.data.decode('utf-8'),
-    })
+    logger.debug(
+        'request: %s',
+        {
+            'method': request.method,
+            'path': request.path,
+            'query': dict(request.args.items(multi=True)),
+            'body': request.data.decode('utf-8'),
+            'headers': dict(request.headers),
+        },
+    )
+    logger.debug(
+        'response: %s',
+        {
+            'body': response.data.decode('utf-8'),
+        },
+    )
     return response
 
 
@@ -132,7 +140,11 @@ def application(application_uuid: str) -> Response | tuple[str, int]:
 def conferences() -> Response:
     conferences = list(_responses['conferences'].values())
     if 'name' in request.args:
-        conferences = [conference for conference in conferences if conference['name'] == request.args['name']]
+        conferences = [
+            conference
+            for conference in conferences
+            if conference['name'] == request.args['name']
+        ]
     return jsonify({'items': conferences})
 
 
@@ -191,7 +203,9 @@ def context(context_id: str) -> Response | tuple[str, int]:
 def meetings() -> Response:
     meetings = list(_responses['meetings'].values())
     if 'name' in request.args:
-        meetings = [meeting for meeting in meetings if meeting['name'] == request.args['name']]
+        meetings = [
+            meeting for meeting in meetings if meeting['name'] == request.args['name']
+        ]
     return jsonify({'items': meetings})
 
 
@@ -231,16 +245,12 @@ def lines_of_user(user_uuid: str) -> Response | tuple[str, int]:
     if user_uuid not in _responses['users']:
         return '', 404
 
-    return jsonify({
-        'items': _responses['user_lines'].get(user_uuid, [])
-    })
+    return jsonify({'items': _responses['user_lines'].get(user_uuid, [])})
 
 
 @app.route('/1.1/users/<user_uuid>/voicemails')
 def voicemails_of_user(user_uuid: str) -> Response:
-    return jsonify({
-        'items': _responses['user_voicemails'].get(user_uuid, [])
-    })
+    return jsonify({'items': _responses['user_voicemails'].get(user_uuid, [])})
 
 
 @app.route('/1.1/trunks')

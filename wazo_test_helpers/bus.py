@@ -9,13 +9,20 @@ from wazo_test_helpers import until
 
 
 class BusClient:
-
     def __init__(self, url, exchange):
         self._url = url
         self._default_exchange = exchange
 
     @classmethod
-    def from_connection_fields(cls, user='guest', password='guest', host='localhost', port=5672, exchange_name='xivo', exchange_type='topic'):
+    def from_connection_fields(
+        cls,
+        user='guest',
+        password='guest',
+        host='localhost',
+        port=5672,
+        exchange_name='xivo',
+        exchange_type='topic',
+    ):
         url = f'amqp://{user}:{password}@{host}:{port}//'
         exchange = Exchange(exchange_name, type=exchange_type)
         return cls(url, exchange)
@@ -23,7 +30,9 @@ class BusClient:
     def is_up(self):
         try:
             with Connection(self._url) as connection:
-                producer = Producer(connection, exchange=self._default_exchange, auto_declare=True)
+                producer = Producer(
+                    connection, exchange=self._default_exchange, auto_declare=True
+                )
                 producer.publish('', routing_key='test')
         except (OSError, OperationalError):
             return False
@@ -80,7 +89,6 @@ class BusClient:
 
 
 class BusMessageAccumulator:
-
     def __init__(self, url, queue):
         self._url = url
         self._queue = queue

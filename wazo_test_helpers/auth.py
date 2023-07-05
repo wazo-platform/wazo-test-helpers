@@ -10,16 +10,13 @@ logger = logging.getLogger(__name__)
 
 
 class AuthClient:
-
     def __init__(self, host, port):
         self.host = host
         self.port = port
 
     def url(self, *parts):
         return 'http://{host}:{port}/{path}'.format(
-            host=self.host,
-            port=self.port,
-            path='/'.join(parts)
+            host=self.host, port=self.port, path='/'.join(parts)
         )
 
     def is_up(self):
@@ -52,7 +49,7 @@ class AuthClient:
         requests.post(url)
 
     def set_external_users(self, users_info):
-        url =self.url('_set_external_users')
+        url = self.url('_set_external_users')
         requests.post(url, json=users_info)
 
     def set_tenants(self, *tenants):
@@ -91,7 +88,6 @@ class AuthClient:
 
 
 class MockUserToken:
-
     @classmethod
     def some_token(cls, **kwargs):
         kwargs.setdefault('token', str(uuid.uuid4()))
@@ -132,7 +128,6 @@ class MockUserToken:
 
 
 class MockCredentials:
-
     def __init__(self, username, password):
         self.username = username
         self.password = password

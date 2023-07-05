@@ -17,7 +17,6 @@ __license__ = "BSD, see License.txt"
 
 
 class IsObjectWithCallable(BaseMatcher):
-
     def __init__(self, callable_name, value_matcher):
         self.callable_name = callable_name
         self.value_matcher = value_matcher
@@ -33,10 +32,9 @@ class IsObjectWithCallable(BaseMatcher):
         return self.value_matcher.matches(value)
 
     def describe_to(self, description):
-        description.append_text("an object with a callable '") \
-                                        .append_text(self.callable_name) \
-                                        .append_text("' matching ") \
-                                        .append_description_of(self.value_matcher)
+        description.append_text("an object with a callable '").append_text(
+            self.callable_name
+        ).append_text("' matching ").append_description_of(self.value_matcher)
 
     def describe_mismatch(self, item, mismatch_description):
         if item is None:
@@ -44,15 +42,14 @@ class IsObjectWithCallable(BaseMatcher):
             return
 
         if not hasattr(item, self.callable_name):
-            mismatch_description.append_description_of(item) \
-                                .append_text(' did not have the ') \
-                                .append_description_of(self.callable_name) \
-                                .append_text(' callable')
+            mismatch_description.append_description_of(item).append_text(
+                ' did not have the '
+            ).append_description_of(self.callable_name).append_text(' callable')
             return
 
-        mismatch_description.append_text('callable ') \
-                            .append_description_of(self.callable_name) \
-                            .append_text(' ')
+        mismatch_description.append_text('callable ').append_description_of(
+            self.callable_name
+        ).append_text(' ')
         value = getattr(item, self.callable_name)()
         self.value_matcher.describe_mismatch(value, mismatch_description)
 

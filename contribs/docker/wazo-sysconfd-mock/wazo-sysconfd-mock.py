@@ -26,12 +26,14 @@ def handle_generic(e: Exception) -> Response:
 def log_request() -> None:
     if not request.path.startswith('/_requests'):
         path = request.path
-        log = {'method': request.method,
-               'path': path,
-               'query': dict(request.args.items(multi=True)),
-               'body': request.data.decode('utf-8'),
-               'json': request.json if request.is_json else None,
-               'headers': dict(request.headers)}
+        log = {
+            'method': request.method,
+            'path': path,
+            'query': dict(request.args.items(multi=True)),
+            'body': request.data.decode('utf-8'),
+            'json': request.json if request.is_json else None,
+            'headers': dict(request.headers),
+        }
         _requests.append(log)
 
 
