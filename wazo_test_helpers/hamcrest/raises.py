@@ -90,7 +90,10 @@ def raises(exception, matcher=None):
     the actual exception object must match the matcher.
     Examples::
         assert_that(calling(int).with_args('q'), raises(TypeError))
-        assert_that(calling(parse, broken_input), raises(ValueError, has_property('input', 'brokn')))
+        assert_that(
+            calling(parse, broken_input),
+            raises(ValueError, has_property('input', 'brokn')),
+        )
     """
 
     return Raises(exception, matcher)

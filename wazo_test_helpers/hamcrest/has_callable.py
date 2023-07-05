@@ -4,7 +4,7 @@
 # Copyright 2018 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Derived from https://github.com/hamcrest/PyHamcrest/blob/master/src/hamcrest/library/object/hasproperty.py
+# Derived from https://github.com/hamcrest/PyHamcrest/blob/master/src/hamcrest/library/object/hasproperty.py  # noqa
 
 from hamcrest.core.base_matcher import BaseMatcher
 from hamcrest.core import anything

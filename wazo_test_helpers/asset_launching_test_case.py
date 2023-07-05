@@ -48,7 +48,10 @@ class NoSuchPort(Exception):
 
 class ContainerStartFailed(Exception):
     def __init__(self, stdout, stderr, return_code):
-        message = f'Container start failed (code {return_code}): output follows.\nstdout:\n{stdout}\nstderr:\n{stderr}'
+        message = (
+            f'Container start failed (code {return_code}): '
+            f'output follows.\nstdout:\n{stdout}\nstderr:\n{stderr}'
+        )
         super().__init__(message)
 
         self.stdout = stdout
