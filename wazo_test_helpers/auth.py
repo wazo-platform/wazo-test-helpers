@@ -1,4 +1,4 @@
-# Copyright 2017-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -10,16 +10,13 @@ logger = logging.getLogger(__name__)
 
 
 class AuthClient:
-
     def __init__(self, host, port):
         self.host = host
         self.port = port
 
     def url(self, *parts):
         return 'http://{host}:{port}/{path}'.format(
-            host=self.host,
-            port=self.port,
-            path='/'.join(parts)
+            host=self.host, port=self.port, path='/'.join(parts)
         )
 
     def is_up(self):
@@ -52,7 +49,7 @@ class AuthClient:
         requests.post(url)
 
     def set_external_users(self, users_info):
-        url =self.url('_set_external_users')
+        url = self.url('_set_external_users')
         requests.post(url, json=users_info)
 
     def set_tenants(self, *tenants):
@@ -91,14 +88,22 @@ class AuthClient:
 
 
 class MockUserToken:
-
     @classmethod
     def some_token(cls, **kwargs):
         kwargs.setdefault('token', str(uuid.uuid4()))
         kwargs.setdefault('user_uuid', str(uuid.uuid4()))
         return cls(**kwargs)
 
-    def __init__(self, token, user_uuid, wazo_uuid=None, metadata=None, acl=None, session_uuid=None):
+    def __init__(
+        self,
+        token,
+        user_uuid,
+        wazo_uuid=None,
+        metadata=None,
+        acl=None,
+        session_uuid=None,
+        utc_expires_at=None,
+    ):
         self.token_id = token
         self.auth_id = user_uuid
         self.wazo_uuid = wazo_uuid or str(uuid.uuid4())
@@ -106,6 +111,7 @@ class MockUserToken:
         self.session_uuid = session_uuid
         self.metadata = metadata or {}
         self.metadata.setdefault('uuid', user_uuid)
+        self.utc_expires_at = utc_expires_at
 
     def to_dict(self):
         result = {
@@ -114,6 +120,7 @@ class MockUserToken:
             'xivo_uuid': self.wazo_uuid,
             'session_uuid': self.session_uuid,
             'metadata': self.metadata,
+            'utc_expires_at': self.utc_expires_at,
         }
         if self.acl is not None:
             result['acl'] = self.acl
@@ -121,7 +128,6 @@ class MockUserToken:
 
 
 class MockCredentials:
-
     def __init__(self, username, password):
         self.username = username
         self.password = password

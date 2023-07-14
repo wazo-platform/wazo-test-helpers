@@ -1,4 +1,4 @@
-# Copyright 2018 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import logging
@@ -10,15 +10,10 @@ logger = logging.getLogger(__name__)
 
 
 class DBUserClient:
-
     @classmethod
     def build(cls, user, password, host, port, db=None):
         tpl = "postgresql://{user}:{password}@{host}:{port}/{db}"
-        uri = tpl.format(user=user,
-                         password=password,
-                         host=host,
-                         port=port,
-                         db=db)
+        uri = tpl.format(user=user, password=password, host=host, port=port, db=db)
         return cls(uri)
 
     def __init__(self, db_uri):

@@ -10,14 +10,10 @@ VERSION = '1.0.0'
 setup(
     name='wazo-test-helpers',
     version=VERSION,
-
     description='Wazo test helpers',
-
     author='Wazo Authors',
     author_email='dev@wazo.community',
-
     url='http://wazo.community',
-
     packages=find_packages(),
     install_requires=[
         'docker',

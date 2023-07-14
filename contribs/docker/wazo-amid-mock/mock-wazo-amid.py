@@ -16,7 +16,13 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 logger = logging.getLogger('amid-mock')
 
-EMPTY_RESPONSES = {'action': {'DeviceStateList': [], 'CoreShowChannels': [], 'Command': {'response': ['Success']}}}
+EMPTY_RESPONSES = {
+    'action': {
+        'DeviceStateList': [],
+        'CoreShowChannels': [],
+        'Command': {'response': ['Success']},
+    }
+}
 
 _requests = deque(maxlen=1024)
 _responses: dict[str, dict] = dict(EMPTY_RESPONSES)
@@ -39,27 +45,35 @@ def handle_generic(e: Exception) -> Response:
 def log_request() -> None:
     if not request.path.startswith('/_'):
         path = request.path
-        log = {'method': request.method,
-               'path': path,
-               'query': dict(request.args.items(multi=True)),
-               'body': request.data.decode('utf-8'),
-               'json': request.json if request.is_json else None,
-               'headers': dict(request.headers)}
+        log = {
+            'method': request.method,
+            'path': path,
+            'query': dict(request.args.items(multi=True)),
+            'body': request.data.decode('utf-8'),
+            'json': request.json if request.is_json else None,
+            'headers': dict(request.headers),
+        }
         _requests.append(log)
 
 
 @app.after_request
 def print_request_response(response: Response) -> Response:
-    logger.debug('request: %s', {
-        'method': request.method,
-        'path': request.path,
-        'query': dict(request.args.items(multi=True)),
-        'body': request.data.decode('utf-8'),
-        'headers': dict(request.headers)
-    })
-    logger.debug('response: %s', {
-        'body': response.data.decode('utf-8'),
-    })
+    logger.debug(
+        'request: %s',
+        {
+            'method': request.method,
+            'path': request.path,
+            'query': dict(request.args.items(multi=True)),
+            'body': request.data.decode('utf-8'),
+            'headers': dict(request.headers),
+        },
+    )
+    logger.debug(
+        'response: %s',
+        {
+            'body': response.data.decode('utf-8'),
+        },
+    )
     return response
 
 

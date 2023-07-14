@@ -48,7 +48,10 @@ class NoSuchPort(Exception):
 
 class ContainerStartFailed(Exception):
     def __init__(self, stdout, stderr, return_code):
-        message = f'Container start failed (code {return_code}): output follows.\nstdout:\n{stdout}\nstderr:\n{stderr}'
+        message = (
+            f'Container start failed (code {return_code}): '
+            f'output follows.\nstdout:\n{stdout}\nstderr:\n{stderr}'
+        )
         super().__init__(message)
 
         self.stdout = stdout
@@ -112,21 +115,27 @@ class AssetLaunchingTestCase(unittest.TestCase):
 
     @classmethod
     def rm_containers(cls):
-        _run_cmd(['docker-compose'] + cls._docker_compose_options() +
-                 ['down', '--timeout', '0', '--volumes'])
+        _run_cmd(
+            ['docker-compose']
+            + cls._docker_compose_options()
+            + ['down', '--timeout', '0', '--volumes']
+        )
 
     @classmethod
     def pull_containers(cls):
         _run_cmd(
-            ['docker-compose'] +
-            cls._docker_compose_options() +
-            ['pull', '--ignore-pull-failures']
+            ['docker-compose']
+            + cls._docker_compose_options()
+            + ['pull', '--ignore-pull-failures']
         )
 
     @classmethod
     def start_containers(cls, bootstrap_container):
-        completed_process = _run_cmd(['docker-compose'] + cls._docker_compose_options() +
-                                     ['run', '--rm', bootstrap_container])
+        completed_process = _run_cmd(
+            ['docker-compose']
+            + cls._docker_compose_options()
+            + ['run', '--rm', bootstrap_container]
+        )
         if completed_process.returncode != 0:
             stdout = completed_process.stdout
             stderr = completed_process.stderr
@@ -138,19 +147,19 @@ class AssetLaunchingTestCase(unittest.TestCase):
 
     @classmethod
     def kill_containers(cls):
-        _run_cmd(['docker-compose'] + cls._docker_compose_options() +
-                 ['kill'])
+        _run_cmd(['docker-compose'] + cls._docker_compose_options() + ['kill'])
 
     @classmethod
     def log_containers(cls):
-        return _run_cmd(['docker-compose'] + cls._docker_compose_options() +
-                        ['logs', '--no-color']).stdout
+        return _run_cmd(
+            ['docker-compose'] + cls._docker_compose_options() + ['logs', '--no-color']
+        ).stdout
 
     @classmethod
     def log_containers_to_file(cls, log_file):
         return subprocess.run(
-            ['docker-compose'] + cls._docker_compose_options() +
-            ['logs', '--no-color'], stdout=log_file
+            ['docker-compose'] + cls._docker_compose_options() + ['logs', '--no-color'],
+            stdout=log_file,
         )
 
     @classmethod
@@ -276,7 +285,9 @@ class AssetLaunchingTestCase(unittest.TestCase):
         return _run_cmd(docker_command)
 
     @classmethod
-    def docker_copy_across_containers(cls, src_service_name, src, dst_service_name, dst):
+    def docker_copy_across_containers(
+        cls, src_service_name, src, dst_service_name, dst
+    ):
         container_src = f'{cls._container_id(src_service_name)}:{src}'
         container_dst = f'{cls._container_id(dst_service_name)}:{dst}'
         with tempfile.TemporaryDirectory() as tmp_dirname:
@@ -292,11 +303,17 @@ class AssetLaunchingTestCase(unittest.TestCase):
 
     @classmethod
     def _container_id(cls, service_name):
-        result = _run_cmd(['docker-compose'] + cls._docker_compose_options() +
-                          ['ps', '-aq', service_name], stderr=False).stdout.strip()
+        result = _run_cmd(
+            ['docker-compose']
+            + cls._docker_compose_options()
+            + ['ps', '-aq', service_name],
+            stderr=False,
+        ).stdout.strip()
         result = result.decode('utf-8')
         if '\n' in result:
-            raise AssertionError(f'There is more than one container running with name {service_name}')
+            raise AssertionError(
+                f'There is more than one container running with name {service_name}'
+            )
         if not result:
             raise NoSuchService(service_name)
         return result
@@ -304,12 +321,14 @@ class AssetLaunchingTestCase(unittest.TestCase):
     @classmethod
     def _docker_compose_options(cls):
         options = [
-            '--ansi', 'never',
-            '--project-name', cls.service + '_' + cls.asset,
-            '--file', os.path.join(cls.assets_root, 'docker-compose.yml'),
-            '--file', os.path.join(
-                cls.assets_root, f'docker-compose.{cls.asset}.override.yml'
-            ),
+            '--ansi',
+            'never',
+            '--project-name',
+            cls.service + '_' + cls.asset,
+            '--file',
+            os.path.join(cls.assets_root, 'docker-compose.yml'),
+            '--file',
+            os.path.join(cls.assets_root, f'docker-compose.{cls.asset}.override.yml'),
         ]
         extra = os.getenv("WAZO_TEST_DOCKER_OVERRIDE_EXTRA")
         if extra:
@@ -320,9 +339,9 @@ class AssetLaunchingTestCase(unittest.TestCase):
     def _maybe_dump_docker_logs(cls):
         if os.getenv('WAZO_TEST_DOCKER_LOGS_ENABLED', '0') == '1':
             filename_prefix = f'{cls.__module__}.{cls.__name__}-'
-            with tempfile.NamedTemporaryFile(dir=cls.get_log_directory(),
-                                             prefix=filename_prefix,
-                                             delete=False) as logfile:
+            with tempfile.NamedTemporaryFile(
+                dir=cls.get_log_directory(), prefix=filename_prefix, delete=False
+            ) as logfile:
                 cls.log_containers_to_file(logfile)
             logger.debug('Container logs dumped to %s', logfile.name)
 
@@ -333,7 +352,9 @@ class AssetLaunchingTestCase(unittest.TestCase):
             default_logging_dir = '/tmp/wazo-integration-{}'.format(
                 ''.join(random.choice(char_set) for _ in range(8))
             )
-            AssetLaunchingTestCase.log_dir = os.getenv('WAZO_TEST_DOCKER_LOGS_DIR', default_logging_dir)
+            AssetLaunchingTestCase.log_dir = os.getenv(
+                'WAZO_TEST_DOCKER_LOGS_DIR', default_logging_dir
+            )
             if not os.path.exists(AssetLaunchingTestCase.log_dir):
                 os.makedirs(AssetLaunchingTestCase.log_dir, mode=0o755)
         return AssetLaunchingTestCase.log_dir

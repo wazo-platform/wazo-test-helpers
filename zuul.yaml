@@ -1,3 +1,4 @@
 - project:
     templates:
+      - wazo-tox-linters-310
       - docker-build-template

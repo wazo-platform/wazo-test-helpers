@@ -67,12 +67,15 @@ class Raises(BaseMatcher):
             description.append_text('No exception raised.')
         elif isinstance(self.actual, self.expected) and self.matcher is not None:
             description.append_text('Exception did not match ')
-            description.append_description_of(self.matcher) \
-                       .append_text(' because ')
+            description.append_description_of(self.matcher).append_text(' because ')
             self.matcher.describe_mismatch(self.actual, description)
         else:
-            description.append_text(f'{type(self.actual)} was raised instead: {str(self.actual)}\n')
-            traceback_lines = traceback.format_exception(type(self.actual), self.actual, self.actual.__traceback__)
+            description.append_text(
+                f'{type(self.actual)} was raised instead: {str(self.actual)}\n'
+            )
+            traceback_lines = traceback.format_exception(
+                type(self.actual), self.actual, self.actual.__traceback__
+            )
             for traceback_line in traceback_lines:
                 description.append_text(traceback_line)
 
@@ -87,7 +90,10 @@ def raises(exception, matcher=None):
     the actual exception object must match the matcher.
     Examples::
         assert_that(calling(int).with_args('q'), raises(TypeError))
-        assert_that(calling(parse, broken_input), raises(ValueError, has_property('input', 'brokn')))
+        assert_that(
+            calling(parse, broken_input),
+            raises(ValueError, has_property('input', 'brokn')),
+        )
     """
 
     return Raises(exception, matcher)

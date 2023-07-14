@@ -32,7 +32,7 @@ DEFAULT_POLICIES = {
     'wazo_default_admin_policy': {
         'uuid': '5650b7e8-6de8-4f5f-994c-000000000002',
         'name': 'wazo_default_admin_policy',
-    }
+    },
 }
 
 valid_tokens = {
@@ -43,7 +43,7 @@ valid_tokens = {
             'uuid': 'uuid',
             'pbx_user_uuid': 'uuid',
             'tenant_uuid': 'ffffffff-ffff-ffff-ffff-ffffffffffff',
-        }
+        },
     },
     'valid-token-multitenant': {
         'auth_id': 'uuid-multitenant',
@@ -52,7 +52,7 @@ valid_tokens = {
             'uuid': 'uuid-multitenant',
             'pbx_user_uuid': 'uuid-multitenant',
             'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
-        }
+        },
     },
     'valid-token-master-tenant': {
         'auth_id': 'uuid-tenant-master',
@@ -61,7 +61,7 @@ valid_tokens = {
             'uuid': 'uuid-tenant-master',
             'pbx_user_uuid': 'uuid-tenant-master',
             'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
-        }
+        },
     },
     'valid-token-sub-tenant': {
         'auth_id': 'uuid-subtenant',
@@ -70,7 +70,7 @@ valid_tokens = {
             'uuid': 'uuid-subtenant',
             'pbx_user_uuid': 'uuid-subtenant',
             'tenant_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee11',
-        }
+        },
     },
     'non-user-token': {
         'auth_id': 'uuid-non-user',
@@ -79,8 +79,8 @@ valid_tokens = {
             'uuid': None,
             'pbx_user_uuid': None,
             'tenant_uuid': 'dddddddd-dddd-dddd-dddd-dddddddddd11',
-        }
-    }
+        },
+    },
 }
 
 valid_credentials = {}
@@ -96,7 +96,6 @@ tenants = [
         'name': 'valid-tenant',
         'parent_uuid': 'ffffffff-ffff-ffff-ffff-ffffffffffff',
     },
-
     {
         'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
         'name': 'valid-tenant1',
@@ -112,7 +111,6 @@ tenants = [
         'name': 'valid-tenant3',
         'parent_uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeee1',
     },
-
     {
         'uuid': 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeee10',
         'name': 'master-tenant',
@@ -158,8 +156,12 @@ def external_config_set() -> tuple[str, int]:
     return '', 201
 
 
-@app.route(f"{url_prefix}/0.1/users/<user_uuid>/external/<external_service>", methods=['GET'])
-def external_auth_external_service_get(user_uuid, external_service) -> Response | tuple[str, int]:
+@app.route(
+    f"{url_prefix}/0.1/users/<user_uuid>/external/<external_service>", methods=['GET']
+)
+def external_auth_external_service_get(
+    user_uuid, external_service
+) -> Response | tuple[str, int]:
     if external:
         return jsonify(external)
     return '', 404
@@ -209,27 +211,35 @@ def handle_generic(e: Exception) -> Response:
 def log_request() -> None:
     if not request.path.startswith('/_'):
         path = request.path
-        log = {'method': request.method,
-               'path': path,
-               'query': dict(request.args.items(multi=True)),
-               'body': request.data.decode('utf-8'),
-               'json': request.json if request.is_json else None,
-               'headers': dict(request.headers)}
+        log = {
+            'method': request.method,
+            'path': path,
+            'query': dict(request.args.items(multi=True)),
+            'body': request.data.decode('utf-8'),
+            'json': request.json if request.is_json else None,
+            'headers': dict(request.headers),
+        }
         _requests.append(log)
 
 
 @app.after_request
 def print_request_response(response: Response) -> Response:
-    logger.debug('request: %s', {
-        'method': request.method,
-        'path': request.path,
-        'query': dict(request.args.items(multi=True)),
-        'body': request.data.decode('utf-8'),
-        'headers': dict(request.headers)
-    })
-    logger.debug('response: %s', {
-        'body': response.data.decode('utf-8'),
-    })
+    logger.debug(
+        'request: %s',
+        {
+            'method': request.method,
+            'path': request.path,
+            'query': dict(request.args.items(multi=True)),
+            'body': request.data.decode('utf-8'),
+            'headers': dict(request.headers),
+        },
+    )
+    logger.debug(
+        'response: %s',
+        {
+            'body': response.data.decode('utf-8'),
+        },
+    )
     return response
 
 
@@ -291,8 +301,9 @@ def remove_token(token_id: str) -> tuple[str, int]:
 @app.route(f"{url_prefix}/_add_invalid_credentials", methods=['POST'])
 def add_invalid_credentials() -> tuple[str, int]:
     request_body = request.get_json()
-    invalid_username_passwords.append((request_body['username'],
-                                       request_body['password']))
+    invalid_username_passwords.append(
+        (request_body['username'], request_body['password'])
+    )
 
     return '', 204
 
@@ -300,8 +311,9 @@ def add_invalid_credentials() -> tuple[str, int]:
 @app.route(f"{url_prefix}/_add_credentials_for_invalid_token", methods=['POST'])
 def add_credentials_for_invalid_token() -> tuple[str, int]:
     request_body = request.get_json()
-    token_that_will_be_invalid_when_used.append((request_body['username'],
-                                                 request_body['password']))
+    token_that_will_be_invalid_when_used.append(
+        (request_body['username'], request_body['password'])
+    )
 
     return '', 204
 
@@ -324,7 +336,9 @@ def token_head_ok(token: str) -> tuple[str, int]:
     if required_tenant_uuid:
         token_tenant_uuid = valid_tokens[token]['metadata']['tenant_uuid']
         token_tenant = _find_tenant(token_tenant_uuid)
-        visible_tenant_uuids = [tenant['uuid'] for tenant in _find_tenant_children(token_tenant)] + [token_tenant['uuid']]
+        visible_tenant_uuids = [
+            tenant['uuid'] for tenant in _find_tenant_children(token_tenant)
+        ] + [token_tenant['uuid']]
         logger.debug('Visible tenants: %s', visible_tenant_uuids)
         if required_tenant_uuid not in visible_tenant_uuids:
             return '', 403
@@ -353,9 +367,7 @@ def token_get(token: str) -> Response | tuple[str, int]:
     result = dict(valid_tokens[token])
     result['metadata'].setdefault('pbx_user_uuid', result['metadata']['uuid'])
     result.setdefault('auth_id', result['metadata']['uuid'])
-    return jsonify({
-        'data': result
-    })
+    return jsonify({'data': result})
 
 
 def _valid_acl(token_id: str) -> bool:
@@ -436,7 +448,7 @@ def users_post() -> Response:
         'username': args.get('username', None),
         'emails': [email] if email else [],
         'enabled': args.get('enabled', True),
-        'tenant_uuid': request.headers.get('Wazo-Tenant', None)
+        'tenant_uuid': request.headers.get('Wazo-Tenant', None),
     }
     users[user['uuid']] = user
     return jsonify(user)
@@ -580,14 +592,21 @@ def policies_get() -> tuple[Response, int]:
     name = request.args.get('name')
     policies = [policies_dict.get(name)] if name else policies_dict.items()
 
-    return jsonify({
-        'items': policies,
-        'total': len(policies),
-        'filtered': len(policies),
-    }), 200
+    return (
+        jsonify(
+            {
+                'items': policies,
+                'total': len(policies),
+                'filtered': len(policies),
+            }
+        ),
+        200,
+    )
 
 
-@app.route(f"{url_prefix}/0.1/users/<user_uuid>/policies/<policy_uuid>", methods=['PUT'])
+@app.route(
+    f"{url_prefix}/0.1/users/<user_uuid>/policies/<policy_uuid>", methods=['PUT']
+)
 def users_policies_put(user_uuid: str, policy_uuid: str) -> tuple[str, int]:
     return '', 204
 
