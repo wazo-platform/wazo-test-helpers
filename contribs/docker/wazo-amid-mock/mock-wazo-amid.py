@@ -24,7 +24,7 @@ EMPTY_RESPONSES = {
     }
 }
 
-_requests = deque(maxlen=1024)
+_requests: deque[dict] = deque(maxlen=1024)
 _responses: dict[str, dict] = dict(EMPTY_RESPONSES)
 
 
