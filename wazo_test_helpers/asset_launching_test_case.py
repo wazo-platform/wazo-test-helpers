@@ -425,15 +425,6 @@ class AssetLaunchingTestCase(AbstractAssetLaunchingHelper, unittest.TestCase):
     def tearDownClass(cls) -> None:
         cls.stop_service_with_asset()
 
-    @classmethod
-    def is_managing_containers(cls) -> bool:
-        warnings.warn(
-            "Method `is_managing_containers` was removed, please use "
-            "`get_container_management_enabled` or migrate to fixtures.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return get_container_management_enabled()
 
 
 def make_asset_fixture(
