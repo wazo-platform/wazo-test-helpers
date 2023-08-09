@@ -465,8 +465,10 @@ def make_asset_fixture(
                 'You must subclass `AbstractAssetLaunchingHelper` and pass that class instead.'
             )
         asset_class.launch_service_with_asset()
-        yield asset_class
-        asset_class.stop_service_with_asset()
+        try:
+            yield asset_class
+        finally:
+            asset_class.stop_service_with_asset()
 
     return fixture
 
