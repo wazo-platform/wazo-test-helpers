@@ -9,7 +9,6 @@ import string
 import subprocess
 import tempfile
 import unittest
-import warnings
 from collections.abc import Callable, Generator
 from pathlib import Path
 
@@ -66,37 +65,30 @@ class ContainerStartFailed(Exception):
         self.return_code = return_code
 
 
-R = TypeVar("R", covariant=True)
+C = TypeVar("C", bound=type[Any])
+R = TypeVar("R")
 
 
 class CachedClassProperty(Generic[R]):
-    cls: type
+    __slots__ = ('_func', '_value')
 
-    def __init__(self, func: Callable[..., R]) -> None:
-        self.func = func
+    def __init__(self, func: Callable[[C], R]) -> None:
+        self._func = func
 
-    def __set_name__(self, owner: type, name: str) -> None:
-        self.cls = owner
-        self.private_name = f'_{name}'
+    def __get__(self, instance: object | None, owner: C | None = None) -> R:
+        if owner is None:
+            owner = cast(C, type(instance))
+        if not hasattr(self, '_value'):
+            self._value = self._func(owner)
+            return self._value
+        return cast(R, getattr(self, '_value'))
 
-    def __get__(self, obj: Any | None = None, obj_type: type | None = None) -> R:
-        if obj is not None:
-            raise RuntimeError('Must not be called on instance')
-        if not hasattr(self.cls, self.private_name):
-            value = self.func(self.cls)
-            setattr(self.cls, self.private_name, value)
-            return value
-        return getattr(self.cls, self.private_name)
-
-    def __del__(self, obj: Any | None = None) -> None:
-        if obj is not None:
-            raise RuntimeError('Must not be called on instance')
-        if hasattr(self.cls, self.private_name):
-            delattr(self.cls, self.private_name)
+    def __del__(self, obj: object | None = None) -> None:
+        if hasattr(self, '_value'):
+            delattr(self, '_value')
 
 
-def cached_class_property(func: Callable[..., R]) -> CachedClassProperty[R]:
-    return cast(CachedClassProperty[R], CachedClassProperty(func))
+cached_class_property = CachedClassProperty
 
 
 def get_container_management_enabled() -> bool:
@@ -424,7 +416,6 @@ class AssetLaunchingTestCase(AbstractAssetLaunchingHelper, unittest.TestCase):
     @classmethod
     def tearDownClass(cls) -> None:
         cls.stop_service_with_asset()
-
 
 
 def make_asset_fixture(
