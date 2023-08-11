@@ -46,7 +46,7 @@ _requests: deque[dict] = deque(maxlen=1024)
 _responses: dict[str, Any] = dict(_EMPTY_RESPONSES)
 
 
-def _reset():
+def _reset() -> None:
     _requests.clear()
 
     global _responses

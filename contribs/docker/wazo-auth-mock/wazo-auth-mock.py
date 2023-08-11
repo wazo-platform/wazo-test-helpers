@@ -8,7 +8,7 @@ import sys
 import uuid
 
 from collections import deque
-from typing import TypedDict, cast
+from typing import TypedDict, cast, Any
 
 from flask import Flask, jsonify, request, Response
 
@@ -193,7 +193,7 @@ def external_config_set() -> tuple[str, int]:
     f"{url_prefix}/0.1/users/<user_uuid>/external/<external_service>", methods=['GET']
 )
 def external_auth_external_service_get(
-    user_uuid, external_service
+    user_uuid: str, external_service: str
 ) -> Response | tuple[str, int]:
     if external:
         return jsonify(external)
@@ -215,7 +215,7 @@ def external_users_set() -> tuple[str, int]:
 
 
 @app.route(f"{url_prefix}/0.1/external/<external_service>/users", methods=['GET'])
-def external_auth_external_service_users(external_service) -> Response:
+def external_auth_external_service_users(external_service: str) -> Response:
     users = external_users.get(external_service, [])
     return jsonify({'total': len(users), 'filtered': len(users), 'items': users})
 
@@ -253,6 +253,7 @@ def log_request() -> None:
             'headers': dict(request.headers),
         }
         _requests.append(log)
+    return None
 
 
 @app.after_request
@@ -416,6 +417,8 @@ def _valid_acl(token_id: str) -> bool:
 
 @app.route(f"{url_prefix}/0.1/token", methods=['POST'])
 def token_post() -> Response | tuple[str, int]:
+    if not request.authorization:
+        return 'Unauthorized', 401
     username = request.authorization['username']
     password = request.authorization['password']
     if (username, password) in invalid_username_passwords:
@@ -490,7 +493,7 @@ def users_post() -> Response:
 
 
 @app.route(f"{url_prefix}/0.1/users/<user_uuid>", methods=['GET'])
-def users_get(user_uuid: str) -> Response:
+def users_get(user_uuid: str) -> Response | tuple[str, int]:
     user = users.get(user_uuid)
     if not user:
         return '', 404
@@ -577,7 +580,9 @@ def _find_tenant_children(search_tenant: TenantDict | None) -> list[TenantDict]:
     return result
 
 
-def _filter_tenants(tenants, name=None, **kwargs):
+def _filter_tenants(
+    tenants: list[TenantDict], name: str | None = None, **kwargs: Any
+) -> list[TenantDict]:
     if not name:
         return tenants
 

@@ -12,14 +12,22 @@ import unittest
 from collections.abc import Callable, Generator
 from pathlib import Path
 
-from typing import TypeVar, Generic, Any, cast, NoReturn
+from typing import TypeVar, Generic, Any, cast, NoReturn, TYPE_CHECKING, TextIO
 
 import docker as docker_client
 import pytest
 
+if TYPE_CHECKING:
+    from typing import ParamSpec
+    from tempfile import _TemporaryFileWrapper
+
+    P = ParamSpec('P')
+    C = TypeVar("C", bound=type[Any])
+    R = TypeVar('R')
+
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-
 
 if os.environ.get('TEST_LOGS') != 'verbose':
     logging.getLogger('amqp').setLevel(logging.INFO)
@@ -65,10 +73,6 @@ class ContainerStartFailed(Exception):
         self.return_code = return_code
 
 
-C = TypeVar("C", bound=type[Any])
-R = TypeVar("R")
-
-
 class CachedClassProperty(Generic[R]):
     __slots__ = ('_func', '_value')
 
@@ -95,8 +99,8 @@ def get_container_management_enabled() -> bool:
     return os.environ.get('TEST_DOCKER', 'manage') != 'ignore'
 
 
-def require_container_management(func: Callable[..., R]) -> Callable[..., R | None]:
-    def wrapper(*args, **kwargs) -> R | None:
+def require_container_management(func: Callable[P, R]) -> Callable[P, R | None]:
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R | None:
         if get_container_management_enabled():
             return func(*args, **kwargs)
         logger.debug('Container management disabled.')
@@ -187,7 +191,9 @@ class AbstractAssetLaunchingHelper:
         ).stdout
 
     @classmethod
-    def log_containers_to_file(cls, log_file) -> subprocess.CompletedProcess:
+    def log_containers_to_file(
+        cls, log_file: TextIO | _TemporaryFileWrapper
+    ) -> subprocess.CompletedProcess:
         return subprocess.run(
             ['docker-compose'] + cls._docker_compose_options() + ['logs', '--no-color'],
             stdout=log_file,
@@ -202,7 +208,7 @@ class AbstractAssetLaunchingHelper:
 
     @classmethod
     def service_logs(
-        cls, service_name: str | None = None, since: str | int | None = None
+        cls, service_name: str | None = None, since: str | None = None
     ) -> str:
         if not service_name:
             service_name = cls.service
@@ -214,12 +220,16 @@ class AbstractAssetLaunchingHelper:
         return status.decode('utf-8')
 
     @classmethod
-    def database_logs(cls, service_name='postgres', since=None) -> str:
+    def database_logs(
+        cls, service_name: str = 'postgres', since: str | None = None
+    ) -> str:
         logs = cls.service_logs(service_name=service_name, since=since)
         return logs.replace('\n\t', ' ')
 
     @classmethod
-    def count_database_logs(cls, service_name='postgres', since=None) -> int:
+    def count_database_logs(
+        cls, service_name: str = 'postgres', since: str | None = None
+    ) -> int:
         logs = cls.database_logs(service_name=service_name, since=since)
         return len(logs.split('\n'))
 
@@ -284,7 +294,7 @@ class AbstractAssetLaunchingHelper:
         service_name: str | None = None,
         return_attr: str = 'stdout',
         privileged: bool = False,
-    ):
+    ) -> str | int | list[str]:
         if not service_name:
             service_name = cls.service
 

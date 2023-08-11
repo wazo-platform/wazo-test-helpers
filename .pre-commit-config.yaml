@@ -15,4 +15,10 @@ repos:
     hooks:
       - id: mypy
         language_version: "3.10"
-        additional_dependencies: ["types-requests"]
+        additional_dependencies:
+          - "types-requests"
+          - "types-flask"
+          - "sqlalchemy-stubs"
+          - "pyhamcrest"
+          - "kombu==5.0.2"
+          - "sqlalchemy==1.3.22"
