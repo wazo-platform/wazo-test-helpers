@@ -22,9 +22,10 @@ if TYPE_CHECKING:
     from tempfile import _TemporaryFileWrapper
 
     P = ParamSpec('P')
-    C = TypeVar("C", bound=type[Any])
-    R = TypeVar('R')
 
+
+ClassType = TypeVar("ClassType", bound=type[Any])
+R = TypeVar('R')
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -76,12 +77,12 @@ class ContainerStartFailed(Exception):
 class CachedClassProperty(Generic[R]):
     __slots__ = ('_func', '_value')
 
-    def __init__(self, func: Callable[[C], R]) -> None:
+    def __init__(self, func: Callable[[ClassType], R]) -> None:
         self._func = func
 
-    def __get__(self, instance: object | None, owner: C | None = None) -> R:
+    def __get__(self, instance: object | None, owner: ClassType | None = None) -> R:
         if owner is None:
-            owner = cast(C, type(instance))
+            owner = cast(ClassType, type(instance))
         if not hasattr(self, '_value'):
             self._value = self._func(owner)
             return self._value
