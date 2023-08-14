@@ -258,11 +258,19 @@ class AssetLaunchingTestCase(unittest.TestCase):
         docker.unpause(cls._container_id(service_name))
 
     @classmethod
-    def docker_exec(cls, command, service_name=None, return_attr='stdout'):
+    def docker_exec(
+        cls, command, service_name=None, return_attr='stdout', privileged=False
+    ):
         if not service_name:
             service_name = cls.service
 
-        docker_command = ['docker', 'exec', cls._container_id(service_name)] + command
+        options = []
+        if privileged:
+            options.append('--privileged')
+
+        docker_command = (
+            ['docker', 'exec'] + options + [cls._container_id(service_name)] + command
+        )
         result = _run_cmd(docker_command)
         return getattr(result, return_attr)
 
@@ -344,6 +352,26 @@ class AssetLaunchingTestCase(unittest.TestCase):
             ) as logfile:
                 cls.log_containers_to_file(logfile)
             logger.debug('Container logs dumped to %s', logfile.name)
+
+    @classmethod
+    def mark_logs_test_start(cls, test_name):
+        cls._mark_logs(f'TEST START: {test_name}')
+
+    @classmethod
+    def mark_logs_test_end(cls, test_name):
+        cls._mark_logs(f'TEST END: {test_name}')
+
+    @classmethod
+    def _mark_logs(cls, marker):
+        cls.docker_exec(
+            [
+                '/bin/bash',
+                '-c',
+                '(date +"%F %T.%N " | tr -d "\n" &&'
+                f'echo ============= {marker} ================= ) &> /proc/1/fd/1',
+            ],
+            privileged=True,
+        )
 
     @staticmethod
     def get_log_directory():
