@@ -15,7 +15,6 @@ from pathlib import Path
 from typing import TypeVar, Generic, Any, cast, NoReturn, TYPE_CHECKING, TextIO
 
 import docker as docker_client
-import pytest
 
 if TYPE_CHECKING:
     from typing import ParamSpec
@@ -431,7 +430,7 @@ class AssetLaunchingTestCase(AbstractAssetLaunchingHelper, unittest.TestCase):
 
 def make_asset_fixture(
     asset_class: type[AbstractAssetLaunchingHelper],
-) -> Callable[[], Generator[type[AbstractAssetLaunchingHelper], None, None]]:
+) -> Generator[type[AbstractAssetLaunchingHelper], None, None]:
     """
     Helper to create asset loading fixtures for Pytest in conftest.py or test files.
 
@@ -442,37 +441,32 @@ def make_asset_fixture(
         asset = 'asset-name'
         service = 'my-service'
 
-    # Note: assignment is important to be detected by pytest.
-    asset_name_asset = make_asset_fixture(MyAssetClass)
+    @pytest.fixture(scope='session')  # session avoids recreating between different files
+    def my_asset_name_asset():
+        yield from make_asset_fixture(MyAssetClass)
 
     # For test methods
-    def test_my_test(asset_name_asset: MyAssetClass) -> None:
+    def test_my_test(my_asset_name_asset: MyAssetClass) -> None:
         asset_name_asset.service_status()  # Containers are up, and you can call methods on
 
     # For whole classes:
-    @pytest.mark.usefixtures('asset_name_asset')
+    @pytest.mark.usefixtures('my_asset_name_asset')
     class TestExample(TestCase):
         def test_my_test(self) -> None:
             self.asset_name_asset.service_status()  # Containers are up, and you can call methods
     """
-    asset_name = asset_class.asset.replace('-', '_')
-
-    @pytest.fixture(name=f'{asset_name}_asset', scope='session')
-    def fixture() -> Generator[type[AbstractAssetLaunchingHelper], None, None]:
-        if (
-            not issubclass(asset_class, AbstractAssetLaunchingHelper)
-            or asset_class is AbstractAssetLaunchingHelper
-        ):
-            raise TypeError(
-                'You must subclass `AbstractAssetLaunchingHelper` and pass that class instead.'
-            )
-        asset_class.launch_service_with_asset()
-        try:
-            yield asset_class
-        finally:
-            asset_class.stop_service_with_asset()
-
-    return fixture
+    if (
+        not issubclass(asset_class, AbstractAssetLaunchingHelper)
+        or asset_class is AbstractAssetLaunchingHelper
+    ):
+        raise TypeError(
+            'You must subclass `AbstractAssetLaunchingHelper` and pass that class instead.'
+        )
+    asset_class.launch_service_with_asset()
+    try:
+        yield asset_class
+    finally:
+        asset_class.stop_service_with_asset()
 
 
 def _run_cmd(cmd: list[str], stderr: bool = True) -> subprocess.CompletedProcess:
