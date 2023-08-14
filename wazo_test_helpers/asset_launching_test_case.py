@@ -386,15 +386,15 @@ class AbstractAssetLaunchingHelper:
             logger.debug('Container logs dumped to %s', logfile.name)
 
     @classmethod
-    def mark_logs_test_start(cls, test_name):
+    def mark_logs_test_start(cls, test_name: str) -> None:
         cls._mark_logs(f'TEST START: {test_name}')
 
     @classmethod
-    def mark_logs_test_end(cls, test_name):
+    def mark_logs_test_end(cls, test_name: str) -> None:
         cls._mark_logs(f'TEST END: {test_name}')
 
     @classmethod
-    def _mark_logs(cls, marker):
+    def _mark_logs(cls, marker: str) -> None:
         cls.docker_exec(
             [
                 '/bin/bash',
