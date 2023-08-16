@@ -1,25 +1,30 @@
-# Copyright 2015-2022 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
+from __future__ import annotations
 
 import logging
 import time
+from collections.abc import Generator, Callable
 
 from functools import partial
+from typing import Any, TypeVar
 
 logger = logging.getLogger(__name__)
+
+R = TypeVar('R')
 
 
 class NoMoreTries(Exception):
     pass
 
 
-def tries_executions(tries, interval):
+def tries_executions(tries: int, interval: int) -> Generator[None, None, None]:
     for _ in range(tries):
         yield
         time.sleep(interval)
 
 
-def timeout_executions(timeout, interval):
+def timeout_executions(timeout: int, interval: int) -> Generator[None, None, None]:
     end_time = time.time() + timeout
     while time.time() < end_time:
         yield
@@ -28,7 +33,7 @@ def timeout_executions(timeout, interval):
         time.sleep(delay)
 
 
-def assert_(assert_function, *args, **kwargs):
+def assert_(assert_function: Callable[..., Any], *args: Any, **kwargs: Any) -> None:
     """Run <assert_function> <tries> times, spaced with <interval> seconds. Stops
     when <function> does not throw AssertionError.
 
@@ -48,7 +53,7 @@ def assert_(assert_function, *args, **kwargs):
     tries = kwargs.pop('tries', 1)
     timeout = kwargs.pop('timeout', None)
     interval = kwargs.pop('interval', 1)
-    errors = []
+    errors: list[str] = []
 
     if timeout:
         executions = partial(timeout_executions, timeout, interval)
@@ -68,7 +73,7 @@ def assert_(assert_function, *args, **kwargs):
         raise AssertionError(error_message)
 
 
-def true(function, *args, **kwargs):
+def true(function: Callable[..., R], *args: Any, **kwargs: Any) -> R:
     """Run <function> <tries> times, spaced with 1 second. Stops when <function>
     returns an object evaluating to True, and returns it.
 
@@ -88,7 +93,6 @@ def true(function, *args, **kwargs):
     timeout = kwargs.pop('timeout', None)
     tries = kwargs.pop('tries', 1)
     interval = kwargs.pop('interval', 1)
-    return_value = False
 
     if timeout:
         executions = partial(timeout_executions, timeout, interval)
@@ -103,7 +107,7 @@ def true(function, *args, **kwargs):
         raise NoMoreTries(message)
 
 
-def false(function, *args, **kwargs):
+def false(function: Callable[..., R], *args: Any, **kwargs: Any) -> R:
     """Run <function> <tries> times, spaced with <interval> seconds. Stops when
     <function> returns an object evaluating to False, and returns it.
 
@@ -124,7 +128,6 @@ def false(function, *args, **kwargs):
     timeout = kwargs.pop('timeout', None)
     tries = kwargs.pop('tries', 1)
     interval = kwargs.pop('interval', 1)
-    return_value = False
 
     if timeout:
         executions = partial(timeout_executions, timeout, interval)
@@ -139,7 +142,7 @@ def false(function, *args, **kwargs):
         raise NoMoreTries(message)
 
 
-def return_(function, *args, **kwargs):
+def return_(function: Callable[..., R], *args: Any, **kwargs: Any) -> R:
     """Periodically run <function> for <timeout> seconds, spaced with <interval>
     seconds. Stops when <function> returns something, then return this value.
 
@@ -158,7 +161,7 @@ def return_(function, *args, **kwargs):
     timeout = kwargs.pop('timeout')
     interval = kwargs.pop('interval', 1)
     message = kwargs.pop('message', None)
-    errors = []
+    errors: list[str] = []
 
     for _ in timeout_executions(timeout, interval):
         try:

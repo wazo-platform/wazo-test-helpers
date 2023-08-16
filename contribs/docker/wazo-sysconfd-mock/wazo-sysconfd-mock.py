@@ -13,7 +13,7 @@ app = Flask(__name__)
 port = sys.argv[1]
 logger = logging.getLogger('wazo-sysconfd-mock')
 
-_requests = deque(maxlen=1024)
+_requests: deque[dict] = deque(maxlen=1024)
 
 
 @app.errorhandler(500)

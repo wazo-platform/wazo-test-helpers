@@ -5,38 +5,42 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Derived from https://github.com/hamcrest/PyHamcrest/blob/master/src/hamcrest/core/core/raises.py
+from __future__ import annotations
 
+from typing import Any, TypeVar, Callable
 from weakref import ref
 
 import sys
 import traceback
 
-from hamcrest.core.base_matcher import BaseMatcher
+from hamcrest.core.base_matcher import BaseMatcher, Description
 
 __author__ = "Per Fagrell"
 __copyright__ = "Copyright 2013 hamcrest.org"
 __license__ = "SPDX-License-Identifier: BSD-3-Clause"
 
+Self = TypeVar("Self", bound="Raises")
+
 
 class Raises(BaseMatcher):
-    def __init__(self, expected, matcher=None):
+    def __init__(self, expected: Any, matcher: BaseMatcher | None = None) -> None:
         self.matcher = matcher
-        self.expected = expected
-        self.actual = None
-        self.function = None
+        self.expected: Any = expected
+        self.actual: Any = None
+        self.function: Callable[..., Any] | None = None
 
-    def matching(self, matcher):
+    def matching(self: Self, matcher: BaseMatcher) -> Self:
         self.matcher = matcher
         return self
 
-    def _matches(self, function):
+    def _matches(self, function: Callable[..., Any] | None) -> bool:
         if not callable(function):
             return False
 
         self.function = ref(function)
         return self._call_function(function)
 
-    def _call_function(self, function):
+    def _call_function(self, function: Callable[..., Any]) -> bool:
         self.actual = None
         try:
             function()
@@ -49,12 +53,12 @@ class Raises(BaseMatcher):
                 return True
         return False
 
-    def describe_to(self, description):
-        description.append_text('Expected a callable raising %s' % self.expected)
+    def describe_to(self, description: Description) -> None:
+        description.append_text(f'Expected a callable raising {self.expected}')
 
-    def describe_mismatch(self, item, description):
+    def describe_mismatch(self, item: Any, description: Description) -> None:
         if not callable(item):
-            description.append_text('%s is not callable' % item)
+            description.append_text(f'{item} is not callable')
             return
 
         function = None if self.function is None else self.function()
@@ -80,7 +84,7 @@ class Raises(BaseMatcher):
                 description.append_text(traceback_line)
 
 
-def raises(exception, matcher=None):
+def raises(exception: BaseException, matcher: BaseMatcher | None = None) -> Raises:
     """Matches if the called function raised the expected exception.
     :param exception:  The class of the expected exception
     :param matcher:    Optional regular expression to match exception message.
@@ -92,7 +96,7 @@ def raises(exception, matcher=None):
         assert_that(calling(int).with_args('q'), raises(TypeError))
         assert_that(
             calling(parse, broken_input),
-            raises(ValueError, has_property('input', 'brokn')),
+            raises(ValueError, has_property('input', 'broken')),
         )
     """
 

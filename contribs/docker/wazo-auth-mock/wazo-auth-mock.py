@@ -8,7 +8,7 @@ import sys
 import uuid
 
 from collections import deque
-from typing import Any
+from typing import TypedDict, cast, Any
 
 from flask import Flask, jsonify, request, Response
 
@@ -24,6 +24,32 @@ try:
 except IndexError:
     url_prefix = ''
 
+
+class CredentialsDict(TypedDict):
+    username: str
+    password: str
+    token: str
+
+
+class TenantDict(TypedDict):
+    uuid: str
+    name: str
+    parent_uuid: str
+
+
+class TokenMetadataDict(TypedDict):
+    uuid: str | None
+    pbx_user_uuid: str | None
+    tenant_uuid: str
+
+
+class TokenDict(TypedDict):
+    auth_id: str | None
+    token: str
+    metadata: TokenMetadataDict
+    acl: list[str]
+
+
 DEFAULT_POLICIES = {
     'wazo_default_master_user_policy': {
         'uuid': '5650b7e8-6de8-4f5f-994c-000000000001',
@@ -35,10 +61,11 @@ DEFAULT_POLICIES = {
     },
 }
 
-valid_tokens = {
+valid_tokens: dict[str, TokenDict] = {
     'valid-token': {
         'auth_id': 'uuid',
         'token': 'valid-token',
+        'acl': [],
         'metadata': {
             'uuid': 'uuid',
             'pbx_user_uuid': 'uuid',
@@ -48,6 +75,7 @@ valid_tokens = {
     'valid-token-multitenant': {
         'auth_id': 'uuid-multitenant',
         'token': 'valid-token-multitenant',
+        'acl': [],
         'metadata': {
             'uuid': 'uuid-multitenant',
             'pbx_user_uuid': 'uuid-multitenant',
@@ -57,6 +85,7 @@ valid_tokens = {
     'valid-token-master-tenant': {
         'auth_id': 'uuid-tenant-master',
         'token': 'valid-token-master-tenant',
+        'acl': [],
         'metadata': {
             'uuid': 'uuid-tenant-master',
             'pbx_user_uuid': 'uuid-tenant-master',
@@ -66,6 +95,7 @@ valid_tokens = {
     'valid-token-sub-tenant': {
         'auth_id': 'uuid-subtenant',
         'token': 'valid-token-sub-tenant',
+        'acl': [],
         'metadata': {
             'uuid': 'uuid-subtenant',
             'pbx_user_uuid': 'uuid-subtenant',
@@ -75,6 +105,7 @@ valid_tokens = {
     'non-user-token': {
         'auth_id': 'uuid-non-user',
         'token': 'non-user-token',
+        'acl': [],
         'metadata': {
             'uuid': None,
             'pbx_user_uuid': None,
@@ -83,14 +114,16 @@ valid_tokens = {
     },
 }
 
-valid_credentials = {}
-external = {}
-external_config = {}
-external_users = {}
+valid_credentials: dict[str, CredentialsDict] = {}
+external: dict = {}
+external_config: dict = {}
+external_users: dict = {}
 invalid_username_passwords = [('test', 'foobar')]
-sessions = {}
-refresh_tokens = {}
-tenants = [
+sessions: dict = {}
+refresh_tokens: dict = {}
+
+
+tenants: list[TenantDict] = [
     {
         'uuid': 'ffffffff-ffff-ffff-ffff-ffffffffffff',
         'name': 'valid-tenant',
@@ -123,11 +156,11 @@ tenants = [
     },
 ]
 token_that_will_be_invalid_when_used = [('test', 'iddqd')]
-users = {}
+users: dict = {}
 wrong_acl_tokens = {'invalid-acl-token'}
 
-_requests = deque(maxlen=1024)
-_tenants = {}
+_requests: deque[dict] = deque(maxlen=1024)
+_tenants: dict = {}
 
 
 def _reset() -> None:
@@ -160,7 +193,7 @@ def external_config_set() -> tuple[str, int]:
     f"{url_prefix}/0.1/users/<user_uuid>/external/<external_service>", methods=['GET']
 )
 def external_auth_external_service_get(
-    user_uuid, external_service
+    user_uuid: str, external_service: str
 ) -> Response | tuple[str, int]:
     if external:
         return jsonify(external)
@@ -182,7 +215,7 @@ def external_users_set() -> tuple[str, int]:
 
 
 @app.route(f"{url_prefix}/0.1/external/<external_service>/users", methods=['GET'])
-def external_auth_external_service_users(external_service) -> Response:
+def external_auth_external_service_users(external_service: str) -> Response:
     users = external_users.get(external_service, [])
     return jsonify({'total': len(users), 'filtered': len(users), 'items': users})
 
@@ -220,6 +253,7 @@ def log_request() -> None:
             'headers': dict(request.headers),
         }
         _requests.append(log)
+    return None
 
 
 @app.after_request
@@ -336,6 +370,8 @@ def token_head_ok(token: str) -> tuple[str, int]:
     if required_tenant_uuid:
         token_tenant_uuid = valid_tokens[token]['metadata']['tenant_uuid']
         token_tenant = _find_tenant(token_tenant_uuid)
+        if not token_tenant:
+            return '', 403
         visible_tenant_uuids = [
             tenant['uuid'] for tenant in _find_tenant_children(token_tenant)
         ] + [token_tenant['uuid']]
@@ -364,7 +400,7 @@ def token_get(token: str) -> Response | tuple[str, int]:
     if not _valid_acl(token):
         return '', 403
 
-    result = dict(valid_tokens[token])
+    result: TokenDict = cast(TokenDict, dict(valid_tokens[token]))
     result['metadata'].setdefault('pbx_user_uuid', result['metadata']['uuid'])
     result.setdefault('auth_id', result['metadata']['uuid'])
     return jsonify({'data': result})
@@ -381,6 +417,8 @@ def _valid_acl(token_id: str) -> bool:
 
 @app.route(f"{url_prefix}/0.1/token", methods=['POST'])
 def token_post() -> Response | tuple[str, int]:
+    if not request.authorization:
+        return 'Unauthorized', 401
     username = request.authorization['username']
     password = request.authorization['password']
     if (username, password) in invalid_username_passwords:
@@ -455,7 +493,7 @@ def users_post() -> Response:
 
 
 @app.route(f"{url_prefix}/0.1/users/<user_uuid>", methods=['GET'])
-def users_get(user_uuid: str) -> Response:
+def users_get(user_uuid: str) -> Response | tuple[str, int]:
     user = users.get(user_uuid)
     if not user:
         return '', 404
@@ -522,16 +560,19 @@ def tenants_get() -> tuple[Response | str, int]:
     return jsonify(result), 200
 
 
-def _find_tenant(tenant_uuid: str) -> dict[str, Any] | None:
+def _find_tenant(tenant_uuid: str) -> TenantDict | None:
     for tenant in tenants:
         if tenant_uuid == tenant['uuid']:
             return tenant
+    return None
 
 
-def _find_tenant_children(search_tenant: dict[str, Any]) -> list[dict[str, Any]]:
-    result = []
+def _find_tenant_children(search_tenant: TenantDict | None) -> list[TenantDict]:
+    result: list[TenantDict] = []
+    if not search_tenant:
+        return []
     for tenant in tenants:
-        if tenant['uuid'] == search_tenant['uuid']:
+        if not tenant['uuid'] or tenant['uuid'] == search_tenant['uuid']:
             continue
         if tenant['parent_uuid'] == search_tenant['uuid']:
             result.append(tenant)
@@ -539,7 +580,9 @@ def _find_tenant_children(search_tenant: dict[str, Any]) -> list[dict[str, Any]]
     return result
 
 
-def _filter_tenants(tenants, name=None, **kwargs):
+def _filter_tenants(
+    tenants: list[TenantDict], name: str | None = None, **kwargs: Any
+) -> list[TenantDict]:
     if not name:
         return tenants
 

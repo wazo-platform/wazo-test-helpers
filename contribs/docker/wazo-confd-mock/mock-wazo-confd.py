@@ -8,6 +8,8 @@ import logging
 import sys
 
 from collections import deque
+from typing import Any
+
 from flask import Flask, jsonify, request, Response
 
 logging.basicConfig(level=logging.DEBUG)
@@ -40,11 +42,11 @@ _EMPTY_RESPONSES = {
 app = Flask(__name__)
 logger = logging.getLogger('confd-mock')
 
-_requests = deque(maxlen=1024)
-_responses = dict(_EMPTY_RESPONSES)
+_requests: deque[dict] = deque(maxlen=1024)
+_responses: dict[str, Any] = dict(_EMPTY_RESPONSES)
 
 
-def _reset():
+def _reset() -> None:
     _requests.clear()
 
     global _responses
