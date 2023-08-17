@@ -16,6 +16,8 @@ logging.basicConfig(level=logging.DEBUG)
 
 logger = logging.getLogger()
 
+ACCEPT_ALL = '__accept_all__'
+
 app = Flask(__name__)
 
 port = int(sys.argv[1])
@@ -65,7 +67,7 @@ valid_tokens: dict[str, TokenDict] = {
     'valid-token': {
         'auth_id': 'uuid',
         'token': 'valid-token',
-        'acl': [],
+        'acl': [ACCEPT_ALL],
         'metadata': {
             'uuid': 'uuid',
             'pbx_user_uuid': 'uuid',
@@ -75,7 +77,7 @@ valid_tokens: dict[str, TokenDict] = {
     'valid-token-multitenant': {
         'auth_id': 'uuid-multitenant',
         'token': 'valid-token-multitenant',
-        'acl': [],
+        'acl': [ACCEPT_ALL],
         'metadata': {
             'uuid': 'uuid-multitenant',
             'pbx_user_uuid': 'uuid-multitenant',
@@ -85,7 +87,7 @@ valid_tokens: dict[str, TokenDict] = {
     'valid-token-master-tenant': {
         'auth_id': 'uuid-tenant-master',
         'token': 'valid-token-master-tenant',
-        'acl': [],
+        'acl': [ACCEPT_ALL],
         'metadata': {
             'uuid': 'uuid-tenant-master',
             'pbx_user_uuid': 'uuid-tenant-master',
@@ -95,7 +97,7 @@ valid_tokens: dict[str, TokenDict] = {
     'valid-token-sub-tenant': {
         'auth_id': 'uuid-subtenant',
         'token': 'valid-token-sub-tenant',
-        'acl': [],
+        'acl': [ACCEPT_ALL],
         'metadata': {
             'uuid': 'uuid-subtenant',
             'pbx_user_uuid': 'uuid-subtenant',
@@ -105,7 +107,7 @@ valid_tokens: dict[str, TokenDict] = {
     'non-user-token': {
         'auth_id': 'uuid-non-user',
         'token': 'non-user-token',
-        'acl': [],
+        'acl': [ACCEPT_ALL],
         'metadata': {
             'uuid': None,
             'pbx_user_uuid': None,
@@ -408,11 +410,19 @@ def token_get(token: str) -> Response | tuple[str, int]:
 
 def _valid_acl(token_id: str) -> bool:
     required_acl = request.args.get('scope')
-    if required_acl and 'acl' in valid_tokens[token_id]:
-        if required_acl in valid_tokens[token_id]['acl']:
-            return True
-        return False
-    return True
+    if not required_acl:
+        logger.debug('Valid ACL: no required access')
+        return True
+    if 'acl' not in valid_tokens[token_id]:
+        logger.debug('Valid ACL: token has no ACL')
+        return True
+    if ACCEPT_ALL in valid_tokens[token_id]['acl']:
+        logger.debug('Valid ACL: token accepts all access')
+        return True
+    if required_acl in valid_tokens[token_id]['acl']:
+        logger.debug('Valid ACL: token has matching access')
+        return True
+    return False
 
 
 @app.route(f"{url_prefix}/0.1/token", methods=['POST'])
