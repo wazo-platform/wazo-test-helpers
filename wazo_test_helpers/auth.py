@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import logging
 import uuid
-from typing import TypedDict, Any
+from typing import TypedDict, Any, TYPE_CHECKING
 
 import requests
-from wazo_auth_client.types import TokenDict, TokenMetadataDict
+
+if TYPE_CHECKING:
+    from wazo_auth_client.types import TokenDict, TokenMetadataDict
+
 
 logger = logging.getLogger(__name__)
 
