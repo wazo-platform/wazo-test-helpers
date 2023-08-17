@@ -22,3 +22,4 @@ repos:
           - "pyhamcrest"
           - "kombu==5.0.2"
           - "sqlalchemy==1.3.22"
+          - "https://github.com/wazo-platform/wazo-auth-client/archive/master.zip"
