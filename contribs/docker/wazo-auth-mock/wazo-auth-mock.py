@@ -305,6 +305,7 @@ def set_tenants() -> tuple[str, int]:
 def set_token() -> tuple[str, int]:
     request_body = request.get_json()
     token = request_body['token']
+    request_body.setdefault('acl', [ACCEPT_ALL])
 
     valid_tokens[token] = request_body
 
@@ -412,9 +413,6 @@ def _valid_acl(token_id: str) -> bool:
     required_acl = request.args.get('scope')
     if not required_acl:
         logger.debug('Valid ACL: no required access')
-        return True
-    if 'acl' not in valid_tokens[token_id]:
-        logger.debug('Valid ACL: token has no ACL')
         return True
     if ACCEPT_ALL in valid_tokens[token_id]['acl']:
         logger.debug('Valid ACL: token accepts all access')
