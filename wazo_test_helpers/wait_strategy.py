@@ -30,7 +30,7 @@ class ComponentsWaitStrategy(WaitStrategy, metaclass=ABCMeta):
         self._components = components
 
     def wait(self, integration_test: Callable[..., None]) -> None:
-        def components_are_ok(components) -> None:
+        def components_are_ok(components: list[str]) -> None:
             try:
                 status = self.get_status(integration_test)
             except requests.RequestException:
