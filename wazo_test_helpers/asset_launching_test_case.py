@@ -9,10 +9,21 @@ import string
 import subprocess
 import tempfile
 import unittest
-from collections.abc import Callable, Generator
+from asyncio import Future
+from collections.abc import Callable, Generator, Iterator
+from contextlib import contextmanager
+from datetime import datetime
 from pathlib import Path
 
-from typing import TypeVar, Generic, Any, cast, NoReturn, TYPE_CHECKING, TextIO
+from typing import (
+    Any,
+    Generic,
+    NoReturn,
+    TYPE_CHECKING,
+    TextIO,
+    TypeVar,
+    cast,
+)
 
 import docker as docker_client
 
@@ -218,6 +229,22 @@ class AbstractAssetLaunchingHelper:
             cmd.append(f'--since={since}')
         status = _run_cmd(cmd).stdout
         return status.decode('utf-8')
+
+    @classmethod
+    @contextmanager
+    def capture_logs(cls, service_name: str | None = None) -> Iterator[Future]:
+        '''
+        Usage:
+        with self.capture_logs(service_name='auth') as logs:
+            client.token.new(expiration=1)
+        assert 'login' in logs.result()
+        '''
+        time_start = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        result: Future = Future()
+        try:
+            yield result
+        finally:
+            result.set_result(cls.service_logs(service_name, since=time_start))
 
     @classmethod
     def database_logs(
