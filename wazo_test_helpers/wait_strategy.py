@@ -3,10 +3,10 @@
 
 from __future__ import annotations
 
-import requests
-
 from abc import ABCMeta, abstractmethod
 from collections.abc import Callable
+
+import requests
 
 from . import until
 

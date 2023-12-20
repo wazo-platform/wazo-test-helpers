@@ -6,9 +6,9 @@ from __future__ import annotations
 import json
 import logging
 import sys
-
 from collections import deque
-from flask import Flask, jsonify, request, Response
+
+from flask import Flask, Response, jsonify, request
 
 logging.basicConfig(level=logging.DEBUG)
 

@@ -7,11 +7,10 @@
 # Derived from https://github.com/hamcrest/PyHamcrest/blob/master/src/hamcrest/core/core/raises.py
 from __future__ import annotations
 
-from typing import Any, TypeVar, Callable
-from weakref import ref
-
 import sys
 import traceback
+from typing import Any, Callable, TypeVar
+from weakref import ref
 
 from hamcrest.core.base_matcher import BaseMatcher, Description
 

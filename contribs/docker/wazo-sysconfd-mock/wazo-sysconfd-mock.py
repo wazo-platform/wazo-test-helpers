@@ -5,9 +5,9 @@ from __future__ import annotations
 
 import logging
 import sys
-
 from collections import deque
-from flask import Flask, request, jsonify, Response
+
+from flask import Flask, Response, jsonify, request
 
 app = Flask(__name__)
 port = sys.argv[1]

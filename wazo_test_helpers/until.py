@@ -4,8 +4,7 @@ from __future__ import annotations
 
 import logging
 import time
-from collections.abc import Generator, Callable
-
+from collections.abc import Callable, Generator
 from functools import partial
 from typing import Any, TypeVar
 

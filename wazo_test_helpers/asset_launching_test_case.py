@@ -14,22 +14,13 @@ from collections.abc import Callable, Generator, Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-
-from typing import (
-    Any,
-    Generic,
-    NoReturn,
-    TYPE_CHECKING,
-    TextIO,
-    TypeVar,
-    cast,
-)
+from typing import TYPE_CHECKING, Any, Generic, NoReturn, TextIO, TypeVar, cast
 
 import docker as docker_client
 
 if TYPE_CHECKING:
-    from typing import ParamSpec
     from tempfile import _TemporaryFileWrapper
+    from typing import ParamSpec
 
     P = ParamSpec('P')
 
