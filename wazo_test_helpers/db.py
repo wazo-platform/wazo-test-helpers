@@ -6,7 +6,6 @@ import logging
 from typing import Any
 
 import sqlalchemy
-
 from sqlalchemy.sql import text
 
 logger = logging.getLogger(__name__)

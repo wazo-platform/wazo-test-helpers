@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import uuid
-from typing import TYPE_CHECKING, TypedDict, Any
+from typing import TYPE_CHECKING, Any, TypedDict
 
-from kombu import binding, Connection, Consumer, Exchange, Producer, Queue, Message
+from kombu import Connection, Consumer, Exchange, Message, Producer, Queue, binding
 from kombu.exceptions import OperationalError, TimeoutError
+
 from wazo_test_helpers import until
 
 if TYPE_CHECKING:

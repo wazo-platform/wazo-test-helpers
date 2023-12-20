@@ -6,11 +6,10 @@ from __future__ import annotations
 import logging
 import sys
 import uuid
-
 from collections import deque
-from typing import TypedDict, cast, Any
+from typing import Any, TypedDict, cast
 
-from flask import Flask, jsonify, request, Response
+from flask import Flask, Response, jsonify, request
 
 logging.basicConfig(level=logging.DEBUG)
 

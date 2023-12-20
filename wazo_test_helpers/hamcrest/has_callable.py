@@ -1,4 +1,4 @@
-# Copyright 2011 hamcrest.org
+# Copyright 2011-2023 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: BSD-3-Clause
 
 # Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
@@ -10,12 +10,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from hamcrest.core.base_matcher import BaseMatcher
 from hamcrest.core import anything
+from hamcrest.core.base_matcher import BaseMatcher
 from hamcrest.core.description import Description
+from hamcrest.core.helpers.wrap_matcher import wrap_matcher as wrap_shortcut
 from hamcrest.core.matcher import Matcher
 from hamcrest.core.string_description import StringDescription
-from hamcrest.core.helpers.wrap_matcher import wrap_matcher as wrap_shortcut
 
 __author__ = "Chris Rose"
 __copyright__ = "Copyright 2011 hamcrest.org"
