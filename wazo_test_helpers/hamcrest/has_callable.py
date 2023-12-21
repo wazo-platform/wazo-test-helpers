@@ -1,4 +1,4 @@
-# Copyright 2011-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2011 hamcrest.org
 # SPDX-License-Identifier: BSD-3-Clause
 
 # Copyright 2018-2023 The Wazo Authors  (see the AUTHORS file)
