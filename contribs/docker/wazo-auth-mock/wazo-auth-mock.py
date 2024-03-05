@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
+import datetime
 import logging
 import sys
 import uuid
@@ -403,6 +404,13 @@ def token_get(token: str) -> Response | tuple[str, int]:
         return '', 403
 
     result: TokenDict = cast(TokenDict, dict(valid_tokens[token]))
+    expiration = result.get('utc_expires_at')
+    if expiration:
+        now = datetime.datetime.utcnow()
+        if datetime.datetime.fromisoformat(str(expiration)) < now:
+            logger.debug('Token is expired')
+            return '', 404
+
     result['metadata'].setdefault('pbx_user_uuid', result['metadata']['uuid'])
     result.setdefault('auth_id', result['metadata']['uuid'])
     return jsonify({'data': result})
