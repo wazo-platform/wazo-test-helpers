@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2015-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
@@ -28,6 +28,7 @@ _EMPTY_RESPONSES = {
             'name': 'default',
         },
     },
+    'parkinglots': {},
     'switchboards': {},
     'trunks': {},
     'user_lines': {},
@@ -215,6 +216,18 @@ def meeting(meeting_uuid: str) -> Response | tuple[str, int]:
     if meeting_uuid not in _responses['meetings']:
         return '', 404
     return jsonify(_responses['meetings'][meeting_uuid])
+
+
+@app.route('/1.1/parkinglots')
+def parkinglots() -> Response:
+    return jsonify({'items': list(_responses['parkinglots'].values())})
+
+
+@app.route('/1.1/parkinglots/<parking_id>')
+def parkinglot(parking_id: int) -> Response | tuple[str, int]:
+    if parking_id not in _responses['parkinglots']:
+        return '', 404
+    return jsonify(_responses['parkinglots'][parking_id])
 
 
 @app.route('/1.1/switchboards')
