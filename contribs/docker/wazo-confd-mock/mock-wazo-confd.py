@@ -244,7 +244,8 @@ def switchboard(switchboard_uuid: str) -> Response | tuple[str, int]:
 
 @app.route('/1.1/users')
 def users() -> Response:
-    return jsonify({'items': list(_responses['users'].values())})
+    users = list(_responses['users'].values())
+    return jsonify({'items': users, 'total': len(users)})
 
 
 @app.route('/1.1/users/<user_uuid>')
