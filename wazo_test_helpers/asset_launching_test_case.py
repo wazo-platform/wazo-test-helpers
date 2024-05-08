@@ -151,7 +151,7 @@ class AbstractAssetLaunchingHelper:
     @classmethod
     def rm_containers(cls) -> None:
         _run_cmd(
-            ['docker compose']
+            ['docker', 'compose']
             + cls._docker_compose_options()
             + ['down', '--timeout', '0', '--volumes']
         )
@@ -159,7 +159,7 @@ class AbstractAssetLaunchingHelper:
     @classmethod
     def pull_containers(cls) -> None:
         _run_cmd(
-            ['docker compose']
+            ['docker', 'compose']
             + cls._docker_compose_options()
             + ['pull', '--ignore-pull-failures']
         )
@@ -168,7 +168,7 @@ class AbstractAssetLaunchingHelper:
     @require_container_management
     def start_containers(cls, bootstrap_container: str) -> None:
         completed_process = _run_cmd(
-            ['docker compose']
+            ['docker', 'compose']
             + cls._docker_compose_options()
             + ['run', '--rm', bootstrap_container]
         )
@@ -184,12 +184,14 @@ class AbstractAssetLaunchingHelper:
     @classmethod
     @require_container_management
     def kill_containers(cls) -> None:
-        _run_cmd(['docker compose'] + cls._docker_compose_options() + ['kill'])
+        _run_cmd(['docker', 'compose'] + cls._docker_compose_options() + ['kill'])
 
     @classmethod
     def log_containers(cls) -> str:
         return _run_cmd(
-            ['docker compose'] + cls._docker_compose_options() + ['logs', '--no-color']
+            ['docker', 'compose']
+            + cls._docker_compose_options()
+            + ['logs', '--no-color']
         ).stdout
 
     @classmethod
@@ -197,7 +199,9 @@ class AbstractAssetLaunchingHelper:
         cls, log_file: TextIO | _TemporaryFileWrapper
     ) -> subprocess.CompletedProcess:
         return subprocess.run(
-            ['docker compose'] + cls._docker_compose_options() + ['logs', '--no-color'],
+            ['docker', 'compose']
+            + cls._docker_compose_options()
+            + ['logs', '--no-color'],
             stdout=log_file,
         )
 
@@ -360,7 +364,7 @@ class AbstractAssetLaunchingHelper:
     @classmethod
     def _container_id(cls, service_name: str) -> str:
         result = _run_cmd(
-            ['docker compose']
+            ['docker', 'compose']
             + cls._docker_compose_options()
             + ['ps', '-aq', service_name],
             stderr=False,
