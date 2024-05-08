@@ -374,9 +374,7 @@ class AbstractAssetLaunchingHelper:
             raise AssertionError(
                 f'There is more than one container running with name {service_name}'
             )
-        print('CONTAINER ID RESULT')
         if not result:
-            print('WWWWWWWWWWWTTTTTTTTTTTTTFFFFFFFFFFFFFFF')
             raise NoSuchService(service_name)
         return result
 
