@@ -1,8 +1,9 @@
-# Copyright 2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2023-2024 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 from __future__ import annotations
 
-from collections.abc import Callable
+from collections.abc import Callable, Generator
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
@@ -39,3 +40,17 @@ class FileSystemClient:
     def remove_file(self, path: str | Path) -> None:
         command = ['rm', '-f', f'{path}']
         self.execute(command, service_name=self.service_name)
+
+    @contextmanager
+    def file_(
+        self,
+        path: str | Path,
+        content: str = 'content',
+        mode: str = '666',
+        root: bool = False,
+    ) -> Generator[None, None, None]:
+        self.create_file(path, content, mode, root)
+        try:
+            yield
+        finally:
+            self.remove_file(path)
