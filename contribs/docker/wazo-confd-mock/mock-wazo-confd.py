@@ -245,6 +245,11 @@ def switchboard(switchboard_uuid: str) -> Response | tuple[str, int]:
 @app.route('/1.1/users')
 def users() -> Response:
     users = list(_responses['users'].values())
+
+    tenant_uuid = request.headers.get('Wazo-Tenant')
+    if tenant_uuid:
+        users = [user for user in users if user['tenant_uuid'] == tenant_uuid]
+
     return jsonify({'items': users, 'total': len(users)})
 
 
@@ -252,12 +257,24 @@ def users() -> Response:
 def user(user_uuid: str) -> Response | tuple[str, int]:
     if user_uuid not in _responses['users']:
         return '', 404
-    return jsonify(_responses['users'][user_uuid])
+
+    user = _responses['users'][user_uuid]
+
+    tenant_uuid = request.headers.get('Wazo-Tenant')
+    if tenant_uuid and tenant_uuid != user['tenant_uuid']:
+        return '', 404
+
+    return jsonify(user)
 
 
 @app.route('/1.1/users/<user_uuid>/lines')
 def lines_of_user(user_uuid: str) -> Response | tuple[str, int]:
     if user_uuid not in _responses['users']:
+        return '', 404
+
+    user = _responses['users'][user_uuid]
+    tenant_uuid = request.headers.get('Wazo-Tenant')
+    if tenant_uuid and tenant_uuid != user['tenant_uuid']:
         return '', 404
 
     return jsonify({'items': _responses['user_lines'].get(user_uuid, [])})
