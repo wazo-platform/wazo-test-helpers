@@ -179,6 +179,13 @@ def lines() -> Response:
 def line(line_id: str) -> Response | tuple[str, int]:
     if line_id not in _responses['lines']:
         return '', 404
+
+    line = _responses['lines'][line_id]
+
+    tenant_uuid = request.headers.get('Wazo-Tenant')
+    if tenant_uuid and tenant_uuid != line['tenant_uuid']:
+        return '', 404
+
     return jsonify(_responses['lines'][line_id])
 
 
