@@ -250,10 +250,17 @@ class AbstractAssetLaunchingHelper:
 
     @classmethod
     def count_database_logs(
-        cls, service_name: str = 'postgres', since: str | None = None
+        cls,
+        service_name: str = 'postgres',
+        since: str | None = None,
+        exclude: str | None = None,
     ) -> int:
         logs = cls.database_logs(service_name=service_name, since=since)
-        return len(logs.split('\n'))
+        return len(
+            list(
+                line for line in logs.split('\n') if not exclude or exclude not in line
+            )
+        )
 
     @classmethod
     def service_port(cls, internal_port: int, service_name: str | None = None) -> int:
