@@ -166,6 +166,25 @@ class AbstractAssetLaunchingHelper:
 
     @classmethod
     @require_container_management
+    def run_container(cls, service_name: str) -> str:
+        completed_process = _run_cmd(
+            ['docker', 'compose']
+            + cls._docker_compose_options()
+            + ['run', '--rm', service_name]
+        )
+        if completed_process.returncode != 0:
+            stdout = completed_process.stdout
+            stderr = completed_process.stderr
+            raise ContainerStartFailed(
+                stdout=stdout.decode('unicode-escape') if stdout else None,
+                stderr=stderr.decode('unicode-escape') if stderr else None,
+                return_code=completed_process.returncode,
+            )
+
+        return completed_process.stdout.decode('utf-8')
+
+    @classmethod
+    @require_container_management
     def start_containers(cls, bootstrap_container: str) -> None:
         completed_process = _run_cmd(
             ['docker', 'compose']
