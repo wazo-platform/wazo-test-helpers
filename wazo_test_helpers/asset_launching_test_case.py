@@ -144,8 +144,9 @@ class AbstractAssetLaunchingHelper:
         except ContainerStartFailed as e:
             logger.error(e)
 
-            cls.kill_containers()
+            cls.stop_services()
             cls._maybe_dump_docker_logs()
+            cls._maybe_collect_coverage()
             raise
         logger.debug('Done.')
 
@@ -203,8 +204,23 @@ class AbstractAssetLaunchingHelper:
 
     @classmethod
     @require_container_management
+    def stop_services(cls) -> None:
+        if cls._is_coverage_enabled():
+            cls.stop_containers()
+        else:
+            cls.kill_containers()
+
+    @classmethod
+    @require_container_management
     def kill_containers(cls) -> None:
+        logger.debug('Killing containers...')
         _run_cmd(['docker', 'compose'] + cls._docker_compose_options() + ['kill'])
+
+    @classmethod
+    @require_container_management
+    def stop_containers(cls) -> None:
+        logger.debug('Stopping containers...')
+        _run_cmd(['docker', 'compose'] + cls._docker_compose_options() + ['stop'])
 
     @classmethod
     def log_containers(cls) -> str:
@@ -301,9 +317,9 @@ class AbstractAssetLaunchingHelper:
     @classmethod
     @require_container_management
     def stop_service_with_asset(cls) -> None:
-        logger.debug('Killing containers...')
-        cls.kill_containers()
+        cls.stop_services()
         cls._maybe_dump_docker_logs()
+        cls._maybe_collect_coverage()
         logger.debug('Done.')
 
     @classmethod
@@ -434,6 +450,18 @@ class AbstractAssetLaunchingHelper:
             logger.debug('Container logs dumped to %s', logfile.name)
 
     @classmethod
+    def _maybe_collect_coverage(cls) -> None:
+        if cls._is_coverage_enabled():
+            file_name = f'{cls.__module__}.{cls.__name__}.coverage'
+            directory = cls.get_coverage_directory()
+            file_path = os.path.join(directory, file_name)
+            service_name = os.environ['WAZO_TEST_COVERAGE_SERVICE_NAME']
+            cls.docker_copy_from_container('/tmp/coverage', file_path, service_name)
+            logger.debug(
+                'Coverage file from service %s dumped to %s', service_name, file_path
+            )
+
+    @classmethod
     def mark_logs_test_start(cls, test_name: str) -> None:
         cls._mark_logs(f'TEST START: {test_name}')
 
@@ -465,6 +493,17 @@ class AbstractAssetLaunchingHelper:
             if not os.path.exists(AssetLaunchingTestCase.log_dir):
                 os.makedirs(AssetLaunchingTestCase.log_dir, mode=0o755)
         return str(AssetLaunchingTestCase.log_dir)
+
+    @staticmethod
+    def _is_coverage_enabled() -> bool:
+        return os.getenv('WAZO_TEST_COVERAGE_ENABLED', '0') == '1'
+
+    @staticmethod
+    def get_coverage_directory() -> str:
+        coverage_dir = os.environ['WAZO_TEST_COVERAGE_DIR']
+        if not os.path.exists(coverage_dir):
+            os.makedirs(coverage_dir, mode=0o755)
+        return str(coverage_dir)
 
 
 class AssetLaunchingTestCase(AbstractAssetLaunchingHelper, unittest.TestCase):
