@@ -311,7 +311,15 @@ def voicemails() -> Response:
 
 
 @app.route('/1.1/voicemails/<voicemail_id>')
-def voicemail(voicemail_id: str) -> Response:
+def voicemail(voicemail_id: str) -> Response | tuple[str, int]:
+    if voicemail_id not in _responses['voicemails']:
+        return '', 404
+
+    voicemail = _responses['voicemails'][voicemail_id]
+    tenant_uuid = request.headers.get('Wazo-Tenant')
+    if tenant_uuid and tenant_uuid != voicemail['tenant_uuid']:
+        return '', 404
+
     return jsonify(_responses['voicemails'][voicemail_id])
 
 
