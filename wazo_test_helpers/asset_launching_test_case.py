@@ -455,10 +455,9 @@ class AbstractAssetLaunchingHelper:
             file_name = f'{cls.__module__}.{cls.__name__}.coverage'
             directory = cls.get_coverage_directory()
             file_path = os.path.join(directory, file_name)
-            service_name = os.environ['WAZO_TEST_COVERAGE_SERVICE_NAME']
-            cls.docker_copy_from_container('/tmp/coverage', file_path, service_name)
+            cls.docker_copy_from_container('/tmp/coverage', file_path, cls.service)
             logger.debug(
-                'Coverage file from service %s dumped to %s', service_name, file_path
+                'Coverage file from service %s dumped to %s', cls.service, file_path
             )
 
     @classmethod
