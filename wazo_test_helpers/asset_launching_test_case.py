@@ -76,6 +76,18 @@ class ContainerStartFailed(Exception):
         self.return_code = return_code
 
 
+class ContainerCommandFailed(Exception):
+    def __init__(
+        self, command: list[str], service_name: str, return_code: int | str | list[str]
+    ):
+        command_str = ' '.join(command)
+        message = (
+            f'An error occured while trying to run command: `{command_str}` '
+            f'(service: {service_name}, return_code: {return_code})'
+        )
+        super().__init__(message)
+
+
 class CachedClassProperty(Generic[R]):
     __slots__ = ('_func', '_value')
 
@@ -297,6 +309,17 @@ class AbstractAssetLaunchingHelper:
                 line for line in logs.split('\n') if not exclude or exclude not in line
             )
         )
+
+    @classmethod
+    def database_grant_superuser(
+        cls, user: str, service_name: str = 'postgres'
+    ) -> None:
+        command = ['psql', '-c', f'ALTER ROLE "{user}" WITH SUPERUSER;']
+        return_code = cls.docker_exec(
+            command, return_attr='returncode', service_name=service_name
+        )
+        if return_code:
+            raise ContainerCommandFailed(command, service_name, return_code)
 
     @classmethod
     def service_port(cls, internal_port: int, service_name: str | None = None) -> int:
