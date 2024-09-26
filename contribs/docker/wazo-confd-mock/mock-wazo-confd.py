@@ -199,7 +199,10 @@ def moh() -> Response:
 
 @app.route('/1.1/contexts')
 def contexts() -> Response:
-    return jsonify({'items': list(_responses['contexts'].values())})
+    recurse_raw = request.args.get('recurse') or ''
+    recurse = recurse_raw.lower() == 'true'
+    items = list(_responses['contexts'].values()) if recurse else []
+    return jsonify({'items': items})
 
 
 @app.route('/1.1/contexts/<context_id>')
