@@ -192,14 +192,18 @@ def line(line_id: str) -> Response | tuple[str, int]:
 
 @app.route('/1.1/moh')
 def moh() -> Response:
-    recurse = request.args.get('recurse')
+    recurse_raw = request.args.get('recurse') or ''
+    recurse = recurse_raw.lower() == 'true'
     items = list(_responses['moh'].values()) if recurse else []
     return jsonify({'items': items})
 
 
 @app.route('/1.1/contexts')
 def contexts() -> Response:
-    return jsonify({'items': list(_responses['contexts'].values())})
+    recurse_raw = request.args.get('recurse') or ''
+    recurse = recurse_raw.lower() == 'true'
+    items = list(_responses['contexts'].values()) if recurse else []
+    return jsonify({'items': items})
 
 
 @app.route('/1.1/contexts/<context_id>')
