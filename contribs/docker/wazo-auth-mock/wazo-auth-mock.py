@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -121,6 +121,7 @@ valid_credentials: dict[str, CredentialsDict] = {}
 external: dict = {}
 external_config: dict = {}
 external_users: dict = {}
+idp: list[str] = ['default', 'native', 'ldap', 'saml']
 invalid_username_passwords = [('test', 'foobar')]
 sessions: dict = {}
 refresh_tokens: dict = {}
@@ -670,6 +671,29 @@ def policies_get() -> tuple[Response, int]:
 )
 def users_policies_put(user_uuid: str, policy_uuid: str) -> tuple[str, int]:
     return '', 204
+
+
+@app.route(f"{url_prefix}/_set_idp", methods=['POST'])
+def set_idp() -> tuple[str, int]:
+    global idp
+    idp = request.get_json()
+    return '', 201
+
+
+@app.route(f"{url_prefix}/0.1/idp", methods=['GET'])
+def get_idp() -> tuple[Response, int]:
+    global idp
+
+    return (
+        jsonify(
+            {
+                'items': idp,
+                'total': len(idp),
+                'filtered': len(idp),
+            }
+        ),
+        200,
+    )
 
 
 if __name__ == "__main__":
