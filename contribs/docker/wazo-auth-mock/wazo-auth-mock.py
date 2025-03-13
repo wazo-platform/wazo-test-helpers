@@ -9,6 +9,7 @@ import logging
 import sys
 import uuid
 from collections import deque
+from time import time
 from typing import Any, TypedDict, cast
 
 from flask import Flask, Response, jsonify, request
@@ -498,8 +499,8 @@ def tenants_post() -> Response:
 def users_post() -> Response:
     args = request.get_json()
 
-    if (auth := args.pop('authentication_method', 'default')) not in idp:
-        return '', 400
+    if (auth := args.get('authentication_method', 'default')) not in idp:
+        return _error(400, '', '', {'authentication_method': {}})
 
     email = {'address': args['email_address']} if args.get('email_address') else None
     user = {
@@ -698,6 +699,21 @@ def get_idp() -> tuple[Response, int]:
             }
         ),
         200,
+    )
+
+
+def _error(status_code, message=None, error_id=None, details=None, resource=None):
+    return (
+        jsonify(
+            {
+                'message': message or '',
+                'error_id': error_id or '',
+                'details': details or {},
+                'resource': resource or '',
+                'timestamp': time(),
+            }
+        ),
+        status_code,
     )
 
 
