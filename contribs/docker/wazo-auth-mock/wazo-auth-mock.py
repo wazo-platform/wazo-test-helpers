@@ -497,6 +497,10 @@ def tenants_post() -> Response:
 @app.route(f"{url_prefix}/0.1/users", methods=['POST'])
 def users_post() -> Response:
     args = request.get_json()
+
+    if (auth := args.pop('authentication_method', 'default')) not in idp:
+        return '', 400
+
     email = {'address': args['email_address']} if args.get('email_address') else None
     user = {
         'uuid': args.get('uuid', uuid.uuid4()),
@@ -506,6 +510,7 @@ def users_post() -> Response:
         'emails': [email] if email else [],
         'enabled': args.get('enabled', True),
         'tenant_uuid': request.headers.get('Wazo-Tenant', None),
+        'authentication_method': auth,
     }
     users[user['uuid']] = user
     return jsonify(user)
