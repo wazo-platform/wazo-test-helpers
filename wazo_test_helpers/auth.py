@@ -1,4 +1,4 @@
-# Copyright 2017-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2017-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -29,6 +29,12 @@ class TenantDict(TypedDict):
     uuid: str
     name: str
     parent_uuid: str
+
+
+class UserDict(TypedDict):
+    uuid: str
+    firstname: str
+    lastname: str
 
 
 class AuthClient:
@@ -75,6 +81,10 @@ class AuthClient:
     def set_tenants(self, *tenants: TenantDict) -> None:
         url = self.url('_set_tenants')
         requests.post(url, json=tenants)
+
+    def set_users(self, *users: UserDict) -> None:
+        url = self.url('_set_users')
+        requests.post(url, json=users)
 
     def set_sessions(self, *sessions: dict) -> None:
         url = self.url('_set_sessions')
