@@ -281,12 +281,18 @@ def print_request_response(response: Response) -> Response:
     return response
 
 
-@app.route('/0.1/_requests', methods=['GET'])
+@app.route(f"{url_prefix}/_requests", methods=['GET'])
 def list_requests() -> Response:
     return jsonify(requests=list(_requests))
 
 
-@app.route('/0.1/_reset', methods=['POST'])
+@app.route(f"{url_prefix}/_requests", methods=['DELETE'])
+def clear_requests() -> tuple[str, int]:
+    _requests.clear()
+    return '', 204
+
+
+@app.route(f"{url_prefix}/_reset", methods=['POST'])
 def reset() -> tuple[str, int]:
     _reset()
     return '', 204

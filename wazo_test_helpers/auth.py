@@ -3,8 +3,10 @@
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import uuid
+from collections.abc import Iterator
 from typing import TYPE_CHECKING, Any, TypedDict
 
 import requests
@@ -25,6 +27,10 @@ class CredentialsTokenDict(CredentialsDict, total=False):
     token: str
 
 
+class MockRequestList(TypedDict):
+    requests: list[dict[str, str]]
+
+
 class TenantDict(TypedDict):
     uuid: str
     name: str
@@ -35,6 +41,10 @@ class UserDict(TypedDict):
     uuid: str
     firstname: str
     lastname: str
+
+
+class MockRequestCapture:
+    requests: list[dict[str, str]] = []
 
 
 class AuthClient:
@@ -115,6 +125,22 @@ class AuthClient:
     def set_credentials_for_invalid_token(self, credentials: MockCredentials) -> None:
         url = self.url('_add_credentials_for_invalid_token')
         requests.post(url, json=credentials.to_dict())
+
+    def list_requests(self) -> MockRequestList:
+        url = self.url('_requests')
+        request_list: MockRequestList = requests.get(url).json()
+        return request_list
+
+    def clear_requests(self) -> None:
+        url = self.url('_requests')
+        requests.delete(url)
+
+    @contextlib.contextmanager
+    def capture_requests(self) -> Iterator[MockRequestCapture]:
+        self.clear_requests()
+        capture = MockRequestCapture()
+        yield capture
+        capture.requests = self.list_requests()['requests']
 
 
 class MockUserToken:
