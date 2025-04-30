@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -169,6 +169,7 @@ _tenants: dict = {}
 def _reset() -> None:
     _requests.clear()
     _tenants.clear()
+    users.clear()
 
 
 @app.route(f"{url_prefix}/0.1/external/<external_service>/config", methods=['GET'])
@@ -280,12 +281,18 @@ def print_request_response(response: Response) -> Response:
     return response
 
 
-@app.route('/0.1/_requests', methods=['GET'])
+@app.route(f"{url_prefix}/_requests", methods=['GET'])
 def list_requests() -> Response:
     return jsonify(requests=list(_requests))
 
 
-@app.route('/0.1/_reset', methods=['POST'])
+@app.route(f"{url_prefix}/_requests", methods=['DELETE'])
+def clear_requests() -> tuple[str, int]:
+    _requests.clear()
+    return '', 204
+
+
+@app.route(f"{url_prefix}/_reset", methods=['POST'])
 def reset() -> tuple[str, int]:
     _reset()
     return '', 204
@@ -299,6 +306,16 @@ def set_tenants() -> tuple[str, int]:
         tenant.setdefault('name', tenant['uuid'])
         tenant.setdefault('parent_uuid', tenant['uuid'])
     tenants = new_tenants
+    return '', 204
+
+
+@app.route(f"{url_prefix}/_set_users", methods=['POST'])
+def set_users() -> tuple[str, int]:
+    users.clear()
+    new_users = request.get_json()
+    for user in new_users:
+        user.setdefault('firstname', user['uuid'])
+        users[user['uuid']] = user
     return '', 204
 
 
