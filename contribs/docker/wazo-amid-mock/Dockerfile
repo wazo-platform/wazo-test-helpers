@@ -3,8 +3,8 @@ LABEL maintainer="Wazo Maintainers <dev@wazo.community>"
 ENV PIP_ROOT_USER_ACTION=ignore
 
 RUN python3 -m pip install --no-cache-dir flask
-COPY mock-wazo-amid.py /usr/local/bin/mock-wazo-amid.py
+COPY wazo-amid-mock.py /usr/local/bin/wazo-amid-mock.py
 
 EXPOSE 9491
 
-CMD ["/usr/local/bin/mock-wazo-amid.py", "9491"]
+CMD ["/usr/local/bin/wazo-amid-mock.py", "9491"]
