@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -8,6 +8,7 @@ import json
 import logging
 import sys
 from collections import deque
+from time import sleep
 from typing import Any
 
 from flask import Flask, Response, jsonify, request
@@ -45,6 +46,7 @@ logger = logging.getLogger('confd-mock')
 
 _requests: deque[dict] = deque(maxlen=1024)
 _responses: dict[str, Any] = dict(_EMPTY_RESPONSES)
+_delay_responses: dict[str, Any] = {}
 
 
 def _reset() -> None:
@@ -52,6 +54,8 @@ def _reset() -> None:
 
     global _responses
     _responses = dict(_EMPTY_RESPONSES)
+    global _delay_responses
+    _delay_responses = {}
 
 
 @app.errorhandler(500)
@@ -110,10 +114,13 @@ def reset() -> tuple[str, int]:
 @app.route('/_set_response', methods=['POST'])
 def set_response() -> tuple[str, int]:
     global _responses
+    global _delay_responses
     request_body = json.loads(request.data)
     set_response = request_body['response']
     set_response_body = request_body['content']
     _responses[set_response] = set_response_body
+    if delay := request_body.get('delay'):
+        _delay_responses[set_response] = delay
     return '', 204
 
 
@@ -261,6 +268,9 @@ def users() -> Response:
     tenant_uuid = request.headers.get('Wazo-Tenant')
     if tenant_uuid:
         users = [user for user in users if user['tenant_uuid'] == tenant_uuid]
+
+    if delay := _delay_responses.get('users'):
+        sleep(delay)
 
     return jsonify({'items': users, 'total': len(users)})
 

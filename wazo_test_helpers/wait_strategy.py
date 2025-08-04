@@ -1,4 +1,4 @@
-# Copyright 2016-2023 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2016-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -33,8 +33,8 @@ class ComponentsWaitStrategy(WaitStrategy, metaclass=ABCMeta):
         def components_are_ok(components: list[str]) -> None:
             try:
                 status = self.get_status(integration_test)
-            except requests.RequestException:
-                status = {}
+            except requests.RequestException as e:
+                assert False, e
 
             for component in components:
                 assert status[component]['status'] == 'ok'
