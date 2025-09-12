@@ -1,4 +1,4 @@
-# Copyright 2011-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2011-2025 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: BSD-3-Clause
 
 # Copyright 2017-2021 The Wazo Authors  (see AUTHORS file)
@@ -10,7 +10,8 @@ from __future__ import annotations
 
 import sys
 import traceback
-from typing import Any, Callable, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
 from weakref import ref
 
 from hamcrest.core.base_matcher import BaseMatcher, Description
