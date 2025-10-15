@@ -1,4 +1,4 @@
-FROM python:3.9-slim-bullseye
+FROM python:3.11-slim-bookworm
 LABEL maintainer="Wazo Maintainers <dev@wazo.community>"
 ENV PIP_ROOT_USER_ACTION=ignore
 
