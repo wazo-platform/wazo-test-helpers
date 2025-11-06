@@ -321,7 +321,13 @@ def trunk(trunk_id: str) -> Response:
 
 @app.route('/1.1/voicemails')
 def voicemails() -> Response:
-    return jsonify({'items': list(_responses['voicemails'].values())})
+    voicemails = list(_responses['voicemails'].values())
+
+    if 'shared' in request.args:
+        shared = request.args['shared'].lower() == 'true'
+        voicemails = list(filter(lambda vm: vm['shared'] is shared, voicemails))
+
+    return jsonify({'items': voicemails})
 
 
 @app.route('/1.1/voicemails/<voicemail_id>')
