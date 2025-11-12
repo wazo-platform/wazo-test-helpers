@@ -323,9 +323,13 @@ def trunk(trunk_id: str) -> Response:
 def voicemails() -> Response:
     voicemails = list(_responses['voicemails'].values())
 
-    if 'shared' in request.args:
-        shared = request.args['shared'].lower() == 'true'
-        voicemails = list(filter(lambda vm: vm['shared'] is shared, voicemails))
+    if 'accesstype' in request.args:
+        voicemails = list(
+            filter(
+                lambda vm: vm['accesstype'] == request.args['accesstype'].lower(),
+                voicemails,
+            )
+        )
 
     return jsonify({'items': voicemails})
 
