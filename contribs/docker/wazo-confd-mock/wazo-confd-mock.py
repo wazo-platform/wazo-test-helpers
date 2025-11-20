@@ -331,7 +331,11 @@ def voicemails() -> Response:
             )
         )
 
-    return jsonify({'items': voicemails})
+    tenant_uuid = request.headers.get('Wazo-Tenant')
+    if tenant_uuid:
+        voicemails = [vm for vm in voicemails if vm['tenant_uuid'] == tenant_uuid]
+
+    return jsonify({'items': voicemails, 'total': len(voicemails)})
 
 
 @app.route('/1.1/voicemails/<voicemail_id>')
