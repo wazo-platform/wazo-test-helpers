@@ -582,7 +582,7 @@ def make_asset_fixture(
 
 def _run_cmd(cmd: list[str], stderr: bool = True) -> subprocess.CompletedProcess:
     logger.debug('%s', cmd)
-    error_output = subprocess.STDOUT if stderr else None
+    error_output = subprocess.STDOUT if stderr else subprocess.PIPE
     completed_process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=error_output)
 
     if completed_process.stdout:
