@@ -1,4 +1,4 @@
-# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -180,11 +180,12 @@ class AbstractAssetLaunchingHelper:
 
     @classmethod
     @require_container_management
-    def run_container(cls, service_name: str) -> str:
+    def run_container(cls, service_name: str, stderr: bool = True) -> str:
         completed_process = _run_cmd(
             ['docker', 'compose']
             + cls._docker_compose_options()
-            + ['run', '--rm', service_name]
+            + ['run', '--rm', service_name],
+            stderr=stderr,
         )
         if completed_process.returncode != 0:
             stdout = completed_process.stdout
