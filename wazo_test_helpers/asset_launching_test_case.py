@@ -1,4 +1,4 @@
-# Copyright 2015-2024 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -180,18 +180,19 @@ class AbstractAssetLaunchingHelper:
 
     @classmethod
     @require_container_management
-    def run_container(cls, service_name: str) -> str:
+    def run_container(cls, service_name: str, stderr: bool = True) -> str:
         completed_process = _run_cmd(
             ['docker', 'compose']
             + cls._docker_compose_options()
-            + ['run', '--rm', service_name]
+            + ['run', '--rm', service_name],
+            stderr=stderr,
         )
         if completed_process.returncode != 0:
-            stdout = completed_process.stdout
-            stderr = completed_process.stderr
+            std_output = completed_process.stdout
+            err_output = completed_process.stderr
             raise ContainerStartFailed(
-                stdout=stdout.decode('unicode-escape') if stdout else None,
-                stderr=stderr.decode('unicode-escape') if stderr else None,
+                stdout=std_output.decode('unicode-escape') if std_output else None,
+                stderr=err_output.decode('unicode-escape') if err_output else None,
                 return_code=completed_process.returncode,
             )
 
@@ -581,7 +582,7 @@ def make_asset_fixture(
 
 def _run_cmd(cmd: list[str], stderr: bool = True) -> subprocess.CompletedProcess:
     logger.debug('%s', cmd)
-    error_output = subprocess.STDOUT if stderr else None
+    error_output = subprocess.STDOUT if stderr else subprocess.PIPE
     completed_process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=error_output)
 
     if completed_process.stdout:
