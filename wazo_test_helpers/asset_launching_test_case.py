@@ -188,11 +188,11 @@ class AbstractAssetLaunchingHelper:
             stderr=stderr,
         )
         if completed_process.returncode != 0:
-            stdout = completed_process.stdout
-            stderr = completed_process.stderr
+            std_output = completed_process.stdout
+            err_output = completed_process.stderr
             raise ContainerStartFailed(
-                stdout=stdout.decode('unicode-escape') if stdout else None,
-                stderr=stderr.decode('unicode-escape') if stderr else None,
+                stdout=std_output.decode('unicode-escape') if std_output else None,
+                stderr=err_output.decode('unicode-escape') if err_output else None,
                 return_code=completed_process.returncode,
             )
 
