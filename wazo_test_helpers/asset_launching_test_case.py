@@ -88,7 +88,7 @@ class ContainerCommandFailed(Exception):
         super().__init__(message)
 
 
-class CachedClassProperty(Generic[R]):
+class CachedClassProperty(Generic[ClassType, R]):
     __slots__ = ('_func', '_value')
 
     def __init__(self, func: Callable[[ClassType], R]) -> None:
@@ -191,8 +191,8 @@ class AbstractAssetLaunchingHelper:
             std_output = completed_process.stdout
             err_output = completed_process.stderr
             raise ContainerStartFailed(
-                stdout=std_output.decode('unicode-escape') if std_output else None,
-                stderr=err_output.decode('unicode-escape') if err_output else None,
+                stdout=std_output.decode('unicode-escape') if std_output else '',
+                stderr=err_output.decode('unicode-escape') if err_output else '',
                 return_code=completed_process.returncode,
             )
 
@@ -210,8 +210,8 @@ class AbstractAssetLaunchingHelper:
             stdout = completed_process.stdout
             stderr = completed_process.stderr
             raise ContainerStartFailed(
-                stdout=stdout.decode('unicode-escape') if stdout else None,
-                stderr=stderr.decode('unicode-escape') if stderr else None,
+                stdout=stdout.decode('unicode-escape') if stdout else '',
+                stderr=stderr.decode('unicode-escape') if stderr else '',
                 return_code=completed_process.returncode,
             )
 
