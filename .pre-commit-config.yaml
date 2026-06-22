@@ -16,6 +16,7 @@ repos:
       - id: mypy
         language_version: "3.11"
         additional_dependencies:
+          - "pytest"
           - "types-requests"
           - "types-flask"
           - "sqlalchemy-stubs"
