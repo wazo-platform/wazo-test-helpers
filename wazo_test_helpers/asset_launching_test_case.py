@@ -133,6 +133,10 @@ class AbstractAssetLaunchingHelper:
     asset: str  # The name of the asset to run, e.g 'base'
     assets_root: str | Path  # Root path for storing assets
 
+    # Prefix for the docker-compose project name, distinguishing this suite's
+    # containers from others using the same `service` name. Defaults to `service`.
+    project_name: str | None = None
+
     cur_dir: str | Path | None = None
     log_dir: str | Path | None = None
 
@@ -452,7 +456,7 @@ class AbstractAssetLaunchingHelper:
             '--ansi',
             'never',
             '--project-name',
-            cls.service + '_' + cls.asset,
+            (cls.project_name or cls.service) + '_' + cls.asset,
             '--file',
             str(root_dir / 'docker-compose.yml'),
             '--file',
