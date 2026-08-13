@@ -175,6 +175,27 @@ class AbstractAssetLaunchingHelper:
         )
 
     @classmethod
+    @require_container_management
+    def rm_networks(cls) -> None:
+        """Cleanup project networks to avoid exhausting Docker's address pool."""
+        logger.debug('Removing networks...')
+        result = _run_cmd(
+            [
+                'docker',
+                'network',
+                'ls',
+                '--quiet',
+                '--filter',
+                f'label=com.docker.compose.project={cls._project_name()}',
+            ],
+            stderr=False,
+        )
+        networks = result.stdout.decode('utf-8').split()
+        if networks:
+            _run_cmd(['docker', 'network', 'rm', *networks], stderr=False)
+        logger.debug('Done.')
+
+    @classmethod
     def pull_containers(cls) -> None:
         _run_cmd(
             ['docker', 'compose']
@@ -348,6 +369,8 @@ class AbstractAssetLaunchingHelper:
         cls.stop_services()
         cls._maybe_dump_docker_logs()
         cls._maybe_collect_coverage()
+        # Last, because the logs and the coverage need the containers.
+        cls.rm_networks()
         logger.debug('Done.')
 
     @classmethod
@@ -450,13 +473,17 @@ class AbstractAssetLaunchingHelper:
         return result
 
     @classmethod
+    def _project_name(cls) -> str:
+        return (cls.project_name or cls.service) + '_' + cls.asset
+
+    @classmethod
     def _docker_compose_options(cls) -> list[str]:
         root_dir = Path(cls.assets_root)
         options = [
             '--ansi',
             'never',
             '--project-name',
-            (cls.project_name or cls.service) + '_' + cls.asset,
+            cls._project_name(),
             '--file',
             str(root_dir / 'docker-compose.yml'),
             '--file',
