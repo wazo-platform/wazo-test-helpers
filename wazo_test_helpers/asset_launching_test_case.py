@@ -159,10 +159,9 @@ class AbstractAssetLaunchingHelper:
             cls.start_containers(bootstrap_container='sync')
         except ContainerStartFailed as e:
             logger.error(e)
-
-            cls.stop_services()
-            cls._maybe_dump_docker_logs()
-            cls._maybe_collect_coverage()
+            # A stack that failed to start needs the same teardown as one that
+            # ran: the caller gets the exception, so nothing else stops it.
+            cls.stop_service_with_asset()
             raise
         logger.debug('Done.')
 
