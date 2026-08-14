@@ -178,21 +178,20 @@ class AbstractAssetLaunchingHelper:
     def rm_networks(cls) -> None:
         """Cleanup project networks to avoid exhausting Docker's address pool."""
         logger.debug('Removing networks...')
-        result = _run_cmd(
+        # `prune` leaves a network that a container still uses, so call it after
+        # the containers stop. `--force` answers the confirmation it would ask.
+        _run_cmd(
             [
                 'docker',
                 'network',
-                'ls',
-                '--quiet',
+                'prune',
+                '--force',
                 '--filter',
                 f'label=com.docker.compose.project={cls._project_name()}',
             ],
             stderr=False,
         )
-        networks = result.stdout.decode('utf-8').split()
-        if networks:
-            _run_cmd(['docker', 'network', 'rm', *networks], stderr=False)
-        logger.debug('Done.')
+        logger.debug('Networks removed')
 
     @classmethod
     def pull_containers(cls) -> None:
