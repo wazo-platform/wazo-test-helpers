@@ -137,8 +137,14 @@ class AbstractAssetLaunchingHelper:
     # containers from others using the same `service` name. Defaults to `service`.
     project_name: str | None = None
 
+    # When True, `sync` must not start `service`: it is started once
+    # `setup_dependencies` has configured the dependencies.
+    start_service_after_setup: bool = False
+
     cur_dir: str | Path | None = None
     log_dir: str | Path | None = None
+
+    _launched: bool = False
 
     @classmethod
     @require_container_management
@@ -155,13 +161,21 @@ class AbstractAssetLaunchingHelper:
             logger.debug('Done.')
 
         logger.debug('Starting containers...')
+        cls._launched = True
         try:
             cls.start_containers(bootstrap_container='sync')
-        except ContainerStartFailed as e:
+            if cls.start_service_after_setup:
+                cls.setup_dependencies()
+                cls.up_service()
+        except BaseException as e:
             logger.error(e)
             cls.stop_service_with_asset()
             raise
         logger.debug('Done.')
+
+    @classmethod
+    def setup_dependencies(cls) -> None:
+        pass
 
     @classmethod
     def rm_containers(cls) -> None:
@@ -360,6 +374,9 @@ class AbstractAssetLaunchingHelper:
     @classmethod
     @require_container_management
     def stop_service_with_asset(cls) -> None:
+        if not cls._launched:
+            return
+        cls._launched = False
         cls.stop_services()
         cls._maybe_dump_docker_logs()
         cls._maybe_collect_coverage()
@@ -385,6 +402,23 @@ class AbstractAssetLaunchingHelper:
     def start_service(cls, service_name: str | None = None) -> None:
         docker = docker_client.from_env().api
         docker.start(cls._container_id(service_name or cls.service))
+
+    @classmethod
+    @require_container_management
+    def up_service(cls, service_name: str | None = None) -> None:
+        completed_process = _run_cmd(
+            ['docker', 'compose']
+            + cls._docker_compose_options()
+            + ['up', '--detach', '--no-deps', service_name or cls.service]
+        )
+        if completed_process.returncode != 0:
+            stdout = completed_process.stdout
+            stderr = completed_process.stderr
+            raise ContainerStartFailed(
+                stdout=stdout.decode('unicode-escape') if stdout else '',
+                stderr=stderr.decode('unicode-escape') if stderr else '',
+                return_code=completed_process.returncode,
+            )
 
     @classmethod
     def pause_service(cls, service_name: str | None = None) -> None:

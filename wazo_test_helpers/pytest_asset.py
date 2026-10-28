@@ -43,10 +43,7 @@ from typing import Any, Literal
 
 import pytest
 
-from wazo_test_helpers.asset_launching_test_case import (
-    AssetLaunchingTestCase,
-    ContainerStartFailed,
-)
+from wazo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
 
 logger = logging.getLogger(__name__)
 
@@ -155,9 +152,6 @@ def _managed_asset(
     marker = request.fixturename
     try:
         asset_class.setUpClass()
-    except ContainerStartFailed:
-        # launch_service_with_asset already tore the stack down
-        raise
     except BaseException:
         asset_class.tearDownClass()
         raise
