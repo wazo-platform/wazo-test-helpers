@@ -39,12 +39,14 @@ import logging
 import sys
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Literal
+from typing import Any, Literal
 
 import pytest
 
-if TYPE_CHECKING:
-    from wazo_test_helpers.asset_launching_test_case import AssetLaunchingTestCase
+from wazo_test_helpers.asset_launching_test_case import (
+    AssetLaunchingTestCase,
+    ContainerStartFailed,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -151,7 +153,14 @@ def _managed_asset(
 ) -> Iterator[None]:
     """Set up ``asset_class`` and ensure it is torn down exactly once."""
     marker = request.fixturename
-    asset_class.setUpClass()
+    try:
+        asset_class.setUpClass()
+    except ContainerStartFailed:
+        # launch_service_with_asset already tore the stack down
+        raise
+    except BaseException:
+        asset_class.tearDownClass()
+        raise
     if marker:
         _teardowns[marker] = asset_class.tearDownClass
     try:
