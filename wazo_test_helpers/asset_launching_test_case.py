@@ -387,6 +387,23 @@ class AbstractAssetLaunchingHelper:
         docker.start(cls._container_id(service_name or cls.service))
 
     @classmethod
+    @require_container_management
+    def up_service(cls, service_name: str | None = None) -> None:
+        completed_process = _run_cmd(
+            ['docker', 'compose']
+            + cls._docker_compose_options()
+            + ['up', '--detach', '--no-deps', service_name or cls.service]
+        )
+        if completed_process.returncode != 0:
+            stdout = completed_process.stdout
+            stderr = completed_process.stderr
+            raise ContainerStartFailed(
+                stdout=stdout.decode('unicode-escape') if stdout else '',
+                stderr=stderr.decode('unicode-escape') if stderr else '',
+                return_code=completed_process.returncode,
+            )
+
+    @classmethod
     def pause_service(cls, service_name: str | None = None) -> None:
         docker = docker_client.from_env().api
         docker.pause(cls._container_id(service_name or cls.service))
