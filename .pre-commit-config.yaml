@@ -19,6 +19,7 @@ repos:
           - "pytest"
           - "types-requests"
           - "types-flask"
+          - "types-PyYAML"
           - "sqlalchemy-stubs"
           - "pyhamcrest"
           - "kombu==5.0.2"

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2015-2025 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2026 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
@@ -9,8 +9,10 @@ import logging
 import sys
 import uuid
 from collections import deque
+from pathlib import Path
 from typing import Any, TypedDict, cast
 
+import yaml
 from flask import Flask, Response, jsonify, request
 
 logging.basicConfig(level=logging.DEBUG)
@@ -18,6 +20,7 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
 
 ACCEPT_ALL = '__accept_all__'
+INIT_FILE = Path('/etc/wazo-auth-mock/init.yml')
 
 app = Flask(__name__)
 
@@ -298,14 +301,17 @@ def reset() -> tuple[str, int]:
     return '', 204
 
 
-@app.route(f"{url_prefix}/_set_tenants", methods=['POST'])
-def set_tenants() -> tuple[str, int]:
+def _set_tenants(new_tenants: list[TenantDict]) -> None:
     global tenants
-    new_tenants = request.get_json()
     for tenant in new_tenants:
         tenant.setdefault('name', tenant['uuid'])
         tenant.setdefault('parent_uuid', tenant['uuid'])
     tenants = new_tenants
+
+
+@app.route(f"{url_prefix}/_set_tenants", methods=['POST'])
+def set_tenants() -> tuple[str, int]:
+    _set_tenants(request.get_json())
     return '', 204
 
 
@@ -319,14 +325,14 @@ def set_users() -> tuple[str, int]:
     return '', 204
 
 
+def _set_token(token: TokenDict) -> None:
+    token.setdefault('acl', [ACCEPT_ALL])
+    valid_tokens[token['token']] = token
+
+
 @app.route(f"{url_prefix}/_set_token", methods=['POST'])
 def set_token() -> tuple[str, int]:
-    request_body = request.get_json()
-    token = request_body['token']
-    request_body.setdefault('acl', [ACCEPT_ALL])
-
-    valid_tokens[token] = request_body
-
+    _set_token(request.get_json())
     return '', 204
 
 
@@ -373,15 +379,17 @@ def add_credentials_for_invalid_token() -> tuple[str, int]:
     return '', 204
 
 
-@app.route(f"{url_prefix}/_add_valid_credentials", methods=['POST'])
-def add_valid_credentials() -> tuple[str, int]:
-    request_body = request.get_json()
-    valid_credentials[request_body['username']] = {
-        'username': request_body['username'],
-        'password': request_body['password'],
-        'token': request_body['token'],
+def _add_valid_credentials(credentials: CredentialsDict) -> None:
+    valid_credentials[credentials['username']] = {
+        'username': credentials['username'],
+        'password': credentials['password'],
+        'token': credentials['token'],
     }
 
+
+@app.route(f"{url_prefix}/_add_valid_credentials", methods=['POST'])
+def add_valid_credentials() -> tuple[str, int]:
+    _add_valid_credentials(request.get_json())
     return '', 204
 
 
@@ -689,5 +697,20 @@ def users_policies_put(user_uuid: str, policy_uuid: str) -> tuple[str, int]:
     return '', 204
 
 
+def _load_init_file() -> None:
+    if not INIT_FILE.exists():
+        return
+
+    logger.info('Loading initial state from %s', INIT_FILE)
+    init = yaml.safe_load(INIT_FILE.read_text()) or {}
+    for token in init.get('tokens', []):
+        _set_token(token)
+    for credentials in init.get('valid_credentials', []):
+        _add_valid_credentials(credentials)
+    if 'tenants' in init:
+        _set_tenants(init['tenants'])
+
+
 if __name__ == "__main__":
+    _load_init_file()
     app.run(host='0.0.0.0', port=port, debug=True)
