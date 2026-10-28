@@ -137,6 +137,10 @@ class AbstractAssetLaunchingHelper:
     # containers from others using the same `service` name. Defaults to `service`.
     project_name: str | None = None
 
+    # When True, `sync` must not start `service`: it is started once
+    # `setup_dependencies` has configured the dependencies.
+    start_service_after_setup: bool = False
+
     cur_dir: str | Path | None = None
     log_dir: str | Path | None = None
 
@@ -157,11 +161,18 @@ class AbstractAssetLaunchingHelper:
         logger.debug('Starting containers...')
         try:
             cls.start_containers(bootstrap_container='sync')
+            if cls.start_service_after_setup:
+                cls.setup_dependencies()
+                cls.up_service()
         except ContainerStartFailed as e:
             logger.error(e)
             cls.stop_service_with_asset()
             raise
         logger.debug('Done.')
+
+    @classmethod
+    def setup_dependencies(cls) -> None:
+        pass
 
     @classmethod
     def rm_containers(cls) -> None:
