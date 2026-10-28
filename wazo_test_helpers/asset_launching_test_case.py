@@ -144,6 +144,8 @@ class AbstractAssetLaunchingHelper:
     cur_dir: str | Path | None = None
     log_dir: str | Path | None = None
 
+    _launched: bool = False
+
     @classmethod
     @require_container_management
     def launch_service_with_asset(cls) -> None:
@@ -159,12 +161,13 @@ class AbstractAssetLaunchingHelper:
             logger.debug('Done.')
 
         logger.debug('Starting containers...')
+        cls._launched = True
         try:
             cls.start_containers(bootstrap_container='sync')
             if cls.start_service_after_setup:
                 cls.setup_dependencies()
                 cls.up_service()
-        except ContainerStartFailed as e:
+        except BaseException as e:
             logger.error(e)
             cls.stop_service_with_asset()
             raise
@@ -371,6 +374,9 @@ class AbstractAssetLaunchingHelper:
     @classmethod
     @require_container_management
     def stop_service_with_asset(cls) -> None:
+        if not cls._launched:
+            return
+        cls._launched = False
         cls.stop_services()
         cls._maybe_dump_docker_logs()
         cls._maybe_collect_coverage()
